@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="ced2ar-rdb">
+		<class>edu.ncrn.cornell.model.Field</class>
+		<class>edu.ncrn.cornell.model.FieldIndicy</class>
+		<class>edu.ncrn.cornell.model.FieldIndicyPK</class>
+		<class>edu.ncrn.cornell.model.FieldInst</class>
+		<class>edu.ncrn.cornell.model.Mapping</class>
+		<class>edu.ncrn.cornell.model.MappingPK</class>
+		<class>edu.ncrn.cornell.model.Profile</class>
+		<class>edu.ncrn.cornell.model.RawDoc</class>
+		<class>edu.ncrn.cornell.model.Schema</class>
+		<class>edu.ncrn.cornell.model.SchemaPK</class>
+	</persistence-unit>
+</persistence>
