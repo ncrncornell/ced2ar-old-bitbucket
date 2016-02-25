@@ -25,6 +25,9 @@ public class FieldController {
 		List<Field> fields = fieldDao.findAll();
 		model.addAttribute("fields", fields);
 		
+		long count = fieldDao.count();
+		System.out.println("[FieldController]:: number of records in Field table: "+count);
+		
 		return "field";
 	}
 }
