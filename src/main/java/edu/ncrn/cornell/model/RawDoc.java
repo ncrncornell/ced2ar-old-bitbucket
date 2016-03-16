@@ -67,7 +67,7 @@ public class RawDoc implements Serializable {
 		this.lastSync = lastSync;
 	}
 
-	public Object getRawXml() {
+	public String getRawXml() {
 		return this.rawXml;
 	}
 

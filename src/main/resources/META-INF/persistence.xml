@@ -7,7 +7,9 @@
 		<class>edu.ncrn.cornell.model.FieldInst</class>
 		<class>edu.ncrn.cornell.model.Mapping</class>
 		<class>edu.ncrn.cornell.model.MappingPK</class>
+		<class>edu.ncrn.cornell.model.Metadata</class>
 		<class>edu.ncrn.cornell.model.Profile</class>
+		<class>edu.ncrn.cornell.model.ProfileField</class>
 		<class>edu.ncrn.cornell.model.RawDoc</class>
 		<class>edu.ncrn.cornell.model.Schema</class>
 		<class>edu.ncrn.cornell.model.SchemaPK</class>

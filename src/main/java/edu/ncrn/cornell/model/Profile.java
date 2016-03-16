@@ -19,19 +19,6 @@ public class Profile implements Serializable {
 
 	private String description;
 
-	//bi-directional many-to-many association to Field
-	@ManyToMany
-	@JoinTable(
-		name="profile_field"
-		, joinColumns={
-			@JoinColumn(name="profile_id")
-			}
-		, inverseJoinColumns={
-			@JoinColumn(name="field_id")
-			}
-		)
-	private List<Field> fields;
-
 	public Profile() {
 	}
 
@@ -49,14 +36,6 @@ public class Profile implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public List<Field> getFields() {
-		return this.fields;
-	}
-
-	public void setFields(List<Field> fields) {
-		this.fields = fields;
 	}
 
 }

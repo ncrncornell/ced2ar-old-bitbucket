@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import edu.ncrn.cornell.model.dao.FieldDao;
 import edu.ncrn.cornell.model.dao.MappingDao;
+import edu.ncrn.cornell.model.dao.ProfileDao;
 import edu.ncrn.cornell.model.dao.SchemaDao;
 import edu.ncrn.cornell.model.Field;
 import edu.ncrn.cornell.model.Mapping;
@@ -17,7 +18,7 @@ import edu.ncrn.cornell.model.Schema;
 import edu.ncrn.cornell.model.SchemaPK;
 
 /**
- * Class check the health of the database
+ * Class checks the health of the database
  * and fill the structural tables if necessary
  * 
  * @author kylebrumsted
@@ -33,6 +34,8 @@ public class DBChecker {
 	private MappingDao mappingDao;
 	@Autowired 
 	private SchemaDao schemaDao;
+	@Autowired
+	private ProfileDao profileDao;
 	
 	private ArrayList<String> fields;
 	
@@ -74,6 +77,7 @@ public class DBChecker {
 	public void DBinit(){
 		fieldsInit();
 		schemasInit();
+		//mappings is broken. PK changed, need to figure how to search by field
 		mappingsInit();
 	}
 	
@@ -273,7 +277,7 @@ public class DBChecker {
 		for(Iterator<String> it = missingMappings.iterator(); it.hasNext();){
 			String field_id = it.next();
 			try{
-				ArrayList<Mapping> m = (ArrayList<Mapping>)mappingDao.findByField_id(field_id);
+				ArrayList<Mapping> m = (ArrayList<Mapping>)mappingDao.findById_FieldId(field_id);
 				if(m.size() > 0) it.remove();
 			}catch(Exception e){
 				e.printStackTrace();
@@ -333,12 +337,12 @@ public class DBChecker {
 		
 		//VARNAME
 		if(missingMappings.contains("varname")){
-			createMapping("varname", "/codebook/dataDscr/var[*]/@name");
+			createMapping("varname", "/codeBook/dataDscr/var[*]/@name");
 		}		
 
 		//VARLABEL
 		if(missingMappings.contains("varlabel")){
-			createMapping("varlabel","/codebook/dataDscr/var[*]/labl");
+			createMapping("varlabel","/codeBook/dataDscr/var[*]/labl");
 		}
 		
 		//VARACCESS
@@ -349,71 +353,71 @@ public class DBChecker {
 
 		//VARTYPE
 		if(missingMappings.contains("vartype")){
-			createMapping("vartype","/codebook/dataDscr/var[*]/varFormat/@type");
+			createMapping("vartype","/codeBook/dataDscr/var[*]/varFormat/@type");
 		}
 
 		//VARFILES
 		if(missingMappings.contains("varfiles")){
-			createMapping("varfiles","/codebook/fileDscr[*]");
+			createMapping("varfiles","/codeBook/fileDscr[*]");
 		}
 
 		//VARDESC
 		if(missingMappings.contains("vardesc")){
-			createMapping("vardesc","/codebook/dataDscr/var[*]/txt");
+			createMapping("vardesc","/codeBook/dataDscr/var[*]/txt");
 		}
 			
 		//SUMSTAT
 		if(missingMappings.contains("sumstat")){
-			createMapping("sumstat","/codebook/dataDscr/var[*]/sumstat[*]");
+			createMapping("sumstat","/codeBook/dataDscr/var[*]/sumstat[*]");
 		}
 		
 		//VALRANGE
 		if(missingMappings.contains("valrange")){
-			createMapping("valrange","/codebook/dataDscr/var[*]/valrng");
+			createMapping("valrange","/codeBook/dataDscr/var[*]/valrng");
 		}
 		
 		//VALRANGEMIN
 		if(missingMappings.contains("valrangemin")){
-			createMapping("valrangemin","/codebook/dataDscr/var[*]/valrng/@min");
+			createMapping("valrangemin","/codeBook/dataDscr/var[*]/valrng/@min");
 		}
 		
 		//VALRANGEMAX
 		if(missingMappings.contains("valrangemax")){
-			createMapping("valrangemax","/codebook/dataDscr/var[*]/valrng/@max");
+			createMapping("valrangemax","/codeBook/dataDscr/var[*]/valrng/@max");
 		}
 		
 		//CODEBOOKNAME
 		if(missingMappings.contains("codebookname")){
-			createMapping("codebookname","/codebook/docDscr/citation/titlStmt/titl");
+			createMapping("codebookname","/codeBook/docDscr/citation/titlStmt/titl");
 		}
 		
 		//CODEBOOKALT
 		if(missingMappings.contains("codebookalt")){
-			createMapping("codebookalt","/codebook/docDscr/citation/titlStmt/altTitl");
+			createMapping("codebookalt","/codeBook/docDscr/citation/titlStmt/altTitl");
 		}
 		
 		//CODEBOOKDIST
 		if(missingMappings.contains("codebookdist")){
-			createMapping("codebookdist","/codebook/docDscr/citation/distStmt/distrbtr[*]");
+			createMapping("codebookdist","/codeBook/docDscr/citation/distStmt/distrbtr[*]");
 		}
 		
 		//CODEBOOKCIT
 		if(missingMappings.contains("codebookcit")){
-			createMapping("codebookcit","/codebook/docDscr/citation/biblCit");
+			createMapping("codebookcit","/codeBook/docDscr/citation/biblCit");
 		}
 		
 		if(missingMappings.contains("datacit")){
-			createMapping("datacit","/codebook/stdyDscr/citation/biblCit");
+			createMapping("datacit","/codeBook/stdyDscr/citation/biblCit");
 		}
 		
 		//ABSTRACT
 		if(missingMappings.contains("abstract")){
-			createMapping("abstract","/codebook/stdyDscr/stdyInfo/abstract");
+			createMapping("abstract","/codeBook/stdyDscr/stdyInfo/abstract");
 		}
 		
 		//RELATEDMATERIAL
 		if(missingMappings.contains("relatedmaterial")){
-			createMapping("relatedmaterial","/codebook/stdyDscr/otherStdMat/relMat[*]");
+			createMapping("relatedmaterial","/codeBook/stdyDscr/otherStdMat/relMat[*]");
 		}
 				
 	}

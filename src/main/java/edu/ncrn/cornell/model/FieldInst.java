@@ -30,7 +30,13 @@ public class FieldInst implements Serializable {
 
 	//bi-directional many-to-one association to Field
 	@ManyToOne
-	private Field field;
+	@JoinColumn(name="field_id")
+	private Field field1;
+
+	//bi-directional many-to-one association to Field
+	@ManyToOne
+	@JoinColumn(name="field")
+	private Field field2;
 
 	//bi-directional many-to-one association to RawDoc
 	@ManyToOne
@@ -86,12 +92,20 @@ public class FieldInst implements Serializable {
 		return fieldIndicy;
 	}
 
-	public Field getField() {
-		return this.field;
+	public Field getField1() {
+		return this.field1;
 	}
 
-	public void setField(Field field) {
-		this.field = field;
+	public void setField1(Field field1) {
+		this.field1 = field1;
+	}
+
+	public Field getField2() {
+		return this.field2;
+	}
+
+	public void setField2(Field field2) {
+		this.field2 = field2;
 	}
 
 	public RawDoc getRawDoc() {

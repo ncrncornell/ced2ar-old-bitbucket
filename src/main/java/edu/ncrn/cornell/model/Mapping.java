@@ -3,8 +3,6 @@ package edu.ncrn.cornell.model;
 import java.io.Serializable;
 import javax.persistence.*;
 
-//import edu.ncrn.cornell.ced2ar.model.Field;
-
 
 /**
  * The persistent class for the mapping database table.
@@ -21,15 +19,14 @@ public class Mapping implements Serializable {
 	private String xpath;
 
 	//bi-directional many-to-one association to Field
-	@ManyToOne(optional=false)
-	@JoinColumn(name="field_id",referencedColumnName="id", insertable=false, updatable=false)
+	@ManyToOne
 	private Field field;
 
 	//bi-directional many-to-one association to Schema
 	@ManyToOne
 	@JoinColumns({
-		@JoinColumn(name="schema_id", referencedColumnName="id",insertable=false, updatable=false),
-		@JoinColumn(name="schema_version", referencedColumnName="version",insertable=false, updatable=false)
+		@JoinColumn(name="schema_id", referencedColumnName="id", insertable = false, updatable = false),
+		@JoinColumn(name="schema_version", referencedColumnName="version", insertable = false, updatable = false)
 		})
 	private Schema schema;
 

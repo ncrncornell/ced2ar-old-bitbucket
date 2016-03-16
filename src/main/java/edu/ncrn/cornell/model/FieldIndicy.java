@@ -22,7 +22,7 @@ public class FieldIndicy implements Serializable {
 
 	//bi-directional many-to-one association to FieldInst
 	@ManyToOne
-	@JoinColumn(name="field_inst_id",insertable=false, updatable=false)
+	@JoinColumn(name="field_inst_id", insertable = false, updatable = false)
 	private FieldInst fieldInst;
 
 	public FieldIndicy() {
