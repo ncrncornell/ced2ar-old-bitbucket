@@ -1,6 +1,5 @@
 package edu.ncrn.cornell.web;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +27,12 @@ public class CodebookController {
 	 * @return
 	 */
 	@RequestMapping(value = "/codebooks", method = RequestMethod.GET)
-	public String codebooks(Model model){
+	public String codebooks(Model model,
+			@RequestParam(value = "auth", defaultValue = "false") boolean auth){
 		
 		List<String> handles = codebookService.getAllHandles();
+		
 		model.addAttribute("handles",handles);
-		boolean auth = false;
 		model.addAttribute("auth",auth);
 		
 		return "codebooks";
@@ -54,15 +54,53 @@ public class CodebookController {
 		
 		Map<String, String> codebookDetails = codebookService.getCodebookDetails(handle);
 		
-		/*
-		for(String k : codebookDetails.keySet()){
-			System.out.println("key: "+k+", value: "+codebookDetails.get(k));
-		}
-		*/
-		
+		model.addAttribute("handle", handle);
 		model.addAttribute("details", codebookDetails);
 		
 		return "codebook";
+	}
+	
+	/**
+	 * Controller for list of variables in a codebook
+	 * @param handle
+	 * @param auth
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/codebooks/{c}/vars", method = RequestMethod.GET)
+	public String vars(@PathVariable(value = "c") String handle,
+			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
+			Model model){
+		
+		Map<String, String> codebookVars = codebookService.getCodebookVariables(handle);
+		
+		model.addAttribute("handle", handle);
+		model.addAttribute("variables", codebookVars);
+		
+		return "vars";
+	}
+	
+	/**
+	 * Controller for variable details page
+	 * @param handle
+	 * @param varname
+	 * @param auth
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/codebooks/{c}/vars/{v}", method = RequestMethod.GET)
+	public String var(@PathVariable(value = "c") String handle,
+			@PathVariable(value = "v") String varname,
+			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
+			Model model){
+		
+		Map<String, String> varDetails = codebookService.getVariableDetails(handle, varname);
+		
+		model.addAttribute("handle", handle);
+		model.addAttribute("varname", varname);
+		model.addAttribute("details", varDetails);
+		
+		return "var";
 	}
 	
 }

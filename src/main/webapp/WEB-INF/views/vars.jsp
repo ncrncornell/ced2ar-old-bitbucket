@@ -23,16 +23,51 @@
 			</div>
 		</div>
 	</div>
-	<h1>Codebook Details</h1>
-	<p>
-		<a href="${baseURI}/ced2ar-rdb/codebooks/${handle}/vars"
-	                   title="View variables for this codebook">View Variables            
-        </a>
-	</p>
-	<c:forEach var="field" items="${details}">
-		<h3>${field.key}</h3>
-		<p>${field.value}</p>	
-	</c:forEach>
+	<div class="row">
+		<div class="col-sm-12">&nbsp;</div>
+	</div>
+	<div class="row">
+
+		<div class="col-sm-12">
+			<h1>Variables</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12">&nbsp;</div>
+	</div>
+	<table class="table table-striped">
+		<tr>
+			<th></th>
+			<th>Variable Name</th>
+			<th>Variable Label</th>
+			<th></th>
+		</tr>
+		<!--  Process -->
+		<c:forEach var="variable" items="${variables}">
+			<tr>
+				<td></td>
+				<td><a href="${baseURI}/ced2ar-rdb/codebooks/${handle}/vars/${variable.key}"
+	                   title="${variable.key}">${variable.key}            
+                    </a>
+                </td>
+				<td>
+					${variable.value}
+				</td>
+			</tr>
+		</c:forEach>
+		<!--  END Process -->
+	</table>
+
+	<div class="row">
+		<div class="col-sm-6">
+	
+		</div>
+		<div class="col-sm-6">
+			<a href="search">Search Variables</a>
+
+		</div>
+	</div>
+
 
 </body>
 </html>

@@ -5,9 +5,13 @@ import org.xml.sax.InputSource;
 import javax.xml.xpath.*;
 import javax.xml.parsers.*;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class to handle xml manipulation. Probably will need to be broken into subclasses once more fn'ality is added.
+ * TODO: needs to handle retreiving one vs multiple items much better.
  * @author kylebrumsted
  *
  */
@@ -29,7 +33,7 @@ public class XMLHandle {
 	 * @return xml value
 	 */
 	public String getXPathSingleValue(String expression){
-		//System.out.println("attempting to evaluate expath expression: "+expression);
+		System.out.println("attempting to evaluate expath expression: "+expression);
 		try{
 			XPath xp = XPathFactory.newInstance().newXPath();
 			XPathExpression expr = xp.compile(expression);
@@ -53,6 +57,50 @@ public class XMLHandle {
 		
 		return null;
 	}
+	
+	/**
+	 * Returns a list of values for xpath that access multiple elements
+	 * @param xpath
+	 * @return
+	 */
+	public List<String> getValueList(String xpath){
+		
+		try{
+			//javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
+			//XPathExpression varExpr = xp.compile(xpath);
+			//NodeList nodes = (NodeList) varExpr.evaluate(xml, XPathConstants.NODESET);
+			NodeList nodes = getXPathList(xpath);
+			System.out.println("Number of nodes: "+nodes.getLength());
+		
+			ArrayList<String> items = new ArrayList<String>();
+			for(int i = 0; i < nodes.getLength(); i++){
+				Node node = nodes.item(i);
+				items.add(node.getTextContent());
+				System.out.println(node.getTextContent());
+			}
+			
+			return items;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private NodeList getXPathList(String expression){
+		
+		try{
+			javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
+			XPathExpression expr = xp.compile(expression);
+			NodeList nodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
+			return nodes;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		
+		return null;
+	}
+	
 	
 	/**
 	 * Takes xml in string form and builds a DOM document for parsing/manipulation.

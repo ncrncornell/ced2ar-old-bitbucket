@@ -23,6 +23,10 @@ import edu.ncrn.cornell.util.XMLHandle;
 /**
  * This class is a set of reusable function for getting structured information from postgres.
  * Info returned in forms easily parseable for display by JSP
+ * 
+ * Currently the profiles are hardcoded into these functions.
+ * TODO: dynamic profile reading?
+ * 
  * @author kylebrumsted
  *
  */
@@ -63,22 +67,9 @@ public class CodebookService {
 	 */
 	public Map<String, String> getCodebookDetails(String handle){
 		
-		//can't figure out why this doesn't retreive properly
-		//List<ProfileField> proFields = profileFieldDao.findByProfile_Id("codebookdetails");
+		List<String> field_ids = getProfileFieldIds("codebookdetails");
 		
-		List<ProfileField> proFields = profileFieldDao.findByProfileId("codebookdetails");
-		System.out.println("profileFields count: "+proFields.size());
-		//Get list of fields for variable details
-		List<String> field_ids = new ArrayList<String>();
-		for(ProfileField pf : proFields){
-			field_ids.add(pf.getFieldId());
-		}
-		
-		//get the xml, put into DOM
-		RawDoc codebook = rawDocDao.findOne(handle);
-		String xml = codebook.getRawXml();
-		System.out.println("xml: "+xml.substring(0, 150));
-		XMLHandle xhandle = new XMLHandle(xml);
+		XMLHandle xhandle = getCodebookXML(handle);
 		
 		
 		//get each mapping, execute xpath to get value, put into hashmap
@@ -105,6 +96,108 @@ public class CodebookService {
 		return details;
 		
 	}
+	
+	/**
+	 * Gets the list of variables for a given codebook.
+	 * The profile of this list is comprised of varname and varlabel.
+	 * This profile is currently hardcoded into the function.
+	 * TODO: generate profile dynamically
+	 * 
+	 * @param handle
+	 * @return
+	 */
+	public Map<String, String> getCodebookVariables(String handle){
+		//Get XPath mapping for varname and varlabel
+		XMLHandle xhandle = getCodebookXML(handle);
+		List<Mapping> varNameMaps = mappingDao.findById_FieldId("varname");
+		List<Mapping> varLabelMaps = mappingDao.findById_FieldId("varlabel");
+		Mapping varNameMap = varNameMaps.get(0);
+		Mapping varLabelMap = varLabelMaps.get(0);
+		String varNameXPath = varNameMap.getXpath();
+		String varLabelXPath = varLabelMap.getXpath();
+		
+		//get list of all varnames
+		List<String> vars = xhandle.getValueList(varNameXPath);
+		
+		//The map of name,label pairs to be returned
+		Map<String, String> varlist = new HashMap<String, String>();
+		
+		//iterate over each varname, find associated label, add (name,label) to map
+		for(String var : vars){
+			String currentLabelXPath = getXPathWithVarname(varLabelXPath, var);
+			String label = xhandle.getXPathSingleValue(currentLabelXPath);
+			varlist.put(var, label);
+		}
+		
+		return varlist;
+	}
+	
+	/**
+	 * Service to retrieve the map of Fields and their values for the variable details page
+	 * @param handle
+	 * @param varname
+	 * @return
+	 */
+	public Map<String, String> getVariableDetails(String handle, String varname){
+		
+		List<String> fieldIds = getProfileFieldIds("vardetails");
+		XMLHandle xhandle = getCodebookXML(handle);
+		
+		Map<String, String> details = new HashMap<String, String>();
+		for(String f : fieldIds){
+			//XMLHandle fn to collect var details
+			//get XPath mapping associated with field
+			List<Mapping> maps = mappingDao.findById_FieldId(f);
+			//this is not a good check but need something here
+			if(maps == null){
+				System.out.println("no mappings found for "+f);
+				continue;
+			}
+			Mapping firstMap = maps.get(0);
+			String path = firstMap.getXpath();
+			String pathWithName = getXPathWithVarname(path, varname);
+			String value = xhandle.getXPathSingleValue(pathWithName);
+			if(value == null || value.equals("")){
+				System.out.println("no value found for xpath "+pathWithName);
+				continue;
+			}
+			Field cur = fieldDao.findOne(f);
+			details.put(cur.getDisplayName(), value);
+		}
+		
+		
+		return details;
+	}
+	
+	/***** Private utility functions  ******/
+	
+	private List<String> getProfileFieldIds(String profileId){
+		List<ProfileField> proFields = profileFieldDao.findByProfileId(profileId);
+		List<String> fieldIds = new ArrayList<String>();
+		for(ProfileField pf : proFields){
+			fieldIds.add(pf.getFieldId());
+		}
+		
+		return fieldIds;
+	}
+	
+	private XMLHandle getCodebookXML(String handle){
+		
+		RawDoc codebook = rawDocDao.findOne(handle);
+		if(codebook == null) return null;
+		
+		String xml = codebook.getRawXml();
+		//System.out.println("xml: "+xml.substring(0, 150));
+		XMLHandle xhandle = new XMLHandle(xml);
+		
+		return xhandle;
+	}
+	
+	private String getXPathWithVarname(String xpath, String varname){
+		return xpath.replace("*", "@name='"+varname+"'");
+	}
+	
+	
 		
 
 	

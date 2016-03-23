@@ -23,16 +23,22 @@
 			</div>
 		</div>
 	</div>
-	<h1>Codebook Details</h1>
-	<p>
-		<a href="${baseURI}/ced2ar-rdb/codebooks/${handle}/vars"
-	                   title="View variables for this codebook">View Variables            
-        </a>
-	</p>
+	<h1>Variable Details:</h1>
+	<h2>	${varname}</h2>
+	
 	<c:forEach var="field" items="${details}">
 		<h3>${field.key}</h3>
 		<p>${field.value}</p>	
 	</c:forEach>
-
+	<p>
+		<a href="${baseURI}/ced2ar-rdb/codebooks/${handle}/"
+	                   title="View Codebook">Back to ${handle}            
+        </a>
+	</p>
+	<p>
+		<a href="${baseURI}/ced2ar-rdb/codebooks/${handle}/vars"
+	                   title="View Codebook">Back to ${handle} Variables            
+        </a>
+	</p>
 </body>
 </html>
