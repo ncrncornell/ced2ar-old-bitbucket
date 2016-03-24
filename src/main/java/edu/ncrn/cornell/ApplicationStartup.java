@@ -26,7 +26,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	public void onApplicationEvent(final ContextRefreshedEvent event)
 	{
 		
-		System.out.println("[ApplicationStartup]:: This is a test for executing code on application startup");
+		//System.out.println("[ApplicationStartup]:: This is a test for executing code on application startup");
 		dbChecker.DBinit();
 		return;
 	}

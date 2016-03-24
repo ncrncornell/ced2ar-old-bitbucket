@@ -18,6 +18,8 @@ import edu.ncrn.cornell.model.dao.MappingDao;
 import edu.ncrn.cornell.model.dao.ProfileDao;
 import edu.ncrn.cornell.model.dao.ProfileFieldDao;
 import edu.ncrn.cornell.model.dao.RawDocDao;
+import edu.ncrn.cornell.model.dao.SchemaDao;
+import edu.ncrn.cornell.model.Schema;
 import edu.ncrn.cornell.util.XMLHandle;
 
 /**
@@ -43,6 +45,8 @@ public class CodebookService {
 	ProfileFieldDao profileFieldDao;
 	@Autowired
 	MappingDao mappingDao;
+	@Autowired
+	SchemaDao schemaDao;
 	
 	/**
 	 * Lists all handles from the RawDocs table in postgres
@@ -188,7 +192,15 @@ public class CodebookService {
 		
 		String xml = codebook.getRawXml();
 		//System.out.println("xml: "+xml.substring(0, 150));
-		XMLHandle xhandle = new XMLHandle(xml);
+		String schemaURL = "";
+		List<Schema> schemas = schemaDao.findAll();
+		if(schemas.isEmpty()){
+			System.out.println("no schemas founds");
+		}else{
+			Schema schema = schemas.get(0);
+			schemaURL = schema.getUrl();
+		}
+		XMLHandle xhandle = new XMLHandle(xml, schemaURL);
 		
 		return xhandle;
 	}

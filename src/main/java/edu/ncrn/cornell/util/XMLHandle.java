@@ -1,13 +1,26 @@
 package edu.ncrn.cornell.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import edu.ncrn.cornell.model.dao.SchemaDao;
+
 import javax.xml.xpath.*;
 import javax.xml.parsers.*;
+import javax.xml.XMLConstants;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.*;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+
 
 /**
  * Class to handle xml manipulation. Probably will need to be broken into subclasses once more fn'ality is added.
@@ -19,10 +32,17 @@ public class XMLHandle {
 
 	private Document xml;
 	//TODO:add schema stuff
+	private String schemaURL;
 	
-	public XMLHandle(String x){
+	public XMLHandle(String x, String schemaUrl){
 		this.xml = loadXMLFromString(x);
-		//TODO: Validate!!
+		this.schemaURL = schemaUrl;
+		if(!isValid()){
+			System.out.println("XML NOT VALID");
+		}else{
+			System.out.println("XML IS VALID");
+		}
+		
 	}
 	
 	/**
@@ -66,9 +86,6 @@ public class XMLHandle {
 	public List<String> getValueList(String xpath){
 		
 		try{
-			//javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
-			//XPathExpression varExpr = xp.compile(xpath);
-			//NodeList nodes = (NodeList) varExpr.evaluate(xml, XPathConstants.NODESET);
 			NodeList nodes = getXPathList(xpath);
 			System.out.println("Number of nodes: "+nodes.getLength());
 		
@@ -85,6 +102,41 @@ public class XMLHandle {
 		}
 		return null;
 	}
+	
+	/**
+	 * Function to insert a new value into a codebook.
+	 * If value already exists at specified XPATH, either do nothing or replace,
+	 * depending on value of replace argument.
+	 * Returns boolean; whether or not insert was successful.
+	 * @param XPath
+	 * @param newValue
+	 * @param replace
+	 * @return
+	 */
+	public boolean insert(String XPath, String newValue, boolean replace){
+		return false;
+	}
+	
+	/**
+	 * Replaces an already existing value
+	 * @param XPath
+	 * @param newValue
+	 * @return
+	 */
+	public boolean replace(String XPath, String newValue){
+		return false;
+	}
+	
+	/**
+	 * Deletes the value/contents/children specified by XPath 
+	 * @param XPath
+	 * @return
+	 */
+	public boolean delete(String XPath){
+		return false;
+	}
+	
+	
 	
 	private NodeList getXPathList(String expression){
 		
@@ -119,5 +171,27 @@ public class XMLHandle {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	private boolean isValid(){
+		Source xmlFile = null;
+		try {
+			URL schemaFile = new URL(this.schemaURL);
+			xmlFile = new DOMSource(this.xml);
+			System.out.println(xmlFile.toString().substring(0,200));
+			SchemaFactory schemaFactory = SchemaFactory
+					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			Schema schema = schemaFactory.newSchema(schemaFile);
+			Validator validator = schema.newValidator();
+			validator.validate(xmlFile);
+		}catch (SAXException e){
+			System.out.println(xmlFile.getSystemId() + " is NOT valid");
+			System.out.println("Reason: " + e.getLocalizedMessage());
+			return false;
+		}catch (Exception e){
+			System.out.println("Validation exception; malformed URL or IO");
+			return false;
+		}
+		return true;
 	}
 }
