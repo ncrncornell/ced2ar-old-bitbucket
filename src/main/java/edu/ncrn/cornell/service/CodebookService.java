@@ -197,7 +197,7 @@ public class CodebookService {
 		if(schemas.isEmpty()){
 			System.out.println("no schemas founds");
 		}else{
-			Schema schema = schemas.get(0);
+			Schema schema = schemas.get(1);
 			schemaURL = schema.getUrl();
 		}
 		XMLHandle xhandle = new XMLHandle(xml, schemaURL);

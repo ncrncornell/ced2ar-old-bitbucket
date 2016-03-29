@@ -164,6 +164,7 @@ public class XMLHandle {
 		//System.out.println("[XMLHandle]:: Attempting to build document from string: "+xml.substring(0, 100));
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			//factory.setNamespaceAware(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputSource is = new InputSource(new StringReader(xml));
 			return builder.parse(is);
@@ -177,8 +178,9 @@ public class XMLHandle {
 		Source xmlFile = null;
 		try {
 			URL schemaFile = new URL(this.schemaURL);
-			xmlFile = new DOMSource(this.xml);
-			System.out.println(xmlFile.toString().substring(0,200));
+			xmlFile = new DOMSource(this.xml.getDocumentElement());
+			System.out.println("ROOT ELEMENT: "+this.xml.getDocumentElement().getTagName());
+			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(schemaFile);
@@ -190,6 +192,7 @@ public class XMLHandle {
 			return false;
 		}catch (Exception e){
 			System.out.println("Validation exception; malformed URL or IO");
+			e.printStackTrace();
 			return false;
 		}
 		return true;
