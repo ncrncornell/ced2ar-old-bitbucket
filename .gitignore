@@ -1,3 +1,6 @@
+### Config properties with sensitive info
+src/main/resources/application-default.properties
+
 ### Java template
 *.class
 
