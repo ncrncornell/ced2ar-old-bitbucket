@@ -1,11 +1,9 @@
 package edu.ncrn.cornell.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import edu.ncrn.cornell.model.dao.SchemaDao;
 
 import javax.xml.xpath.*;
 import javax.xml.parsers.*;
@@ -18,7 +16,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 
@@ -30,13 +27,26 @@ import java.util.Map;
  */
 public class XMLHandle {
 
+	/**
+	 * private attributes
+	 */
+	private String xml_string;
 	private Document xml;
-	//TODO:add schema stuff
 	private String schemaURL;
 	
+	/**
+	 * public constructor
+	 * @param x: XML string
+	 * @param schemaUrl: URL string for the schema location for validation
+	 */
 	public XMLHandle(String x, String schemaUrl){
-		this.xml = loadXMLFromString(x);
+		//save the string for validation
+		this.xml_string = x;
+		//create doc w/o namespaces for easy xpath
+		this.xml = loadXMLFromString(x, false);
+		//set the schema url
 		this.schemaURL = schemaUrl;
+		//check validity
 		if(!isValid()){
 			System.out.println("XML NOT VALID");
 		}else{
@@ -69,7 +79,7 @@ public class XMLHandle {
 				}
 				value = builder;
 			}
-			System.out.println("node: "+value);
+			//System.out.println("node: "+value);
 			return value;
 		}catch(Exception e){
 			e.printStackTrace();
@@ -87,13 +97,13 @@ public class XMLHandle {
 		
 		try{
 			NodeList nodes = getXPathList(xpath);
-			System.out.println("Number of nodes: "+nodes.getLength());
+			//System.out.println("Number of nodes: "+nodes.getLength());
 		
 			ArrayList<String> items = new ArrayList<String>();
 			for(int i = 0; i < nodes.getLength(); i++){
 				Node node = nodes.item(i);
 				items.add(node.getTextContent());
-				System.out.println(node.getTextContent());
+				//System.out.println(node.getTextContent());
 			}
 			
 			return items;
@@ -159,12 +169,12 @@ public class XMLHandle {
 	 * @param xml
 	 * @return
 	 */
-	private Document loadXMLFromString(String xml)
+	private Document loadXMLFromString(String xml, boolean ns_aware)
 	{
-		//System.out.println("[XMLHandle]:: Attempting to build document from string: "+xml.substring(0, 100));
 		try{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			//factory.setNamespaceAware(true);
+			if(ns_aware)
+				factory.setNamespaceAware(true);
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputSource is = new InputSource(new StringReader(xml));
 			return builder.parse(is);
@@ -178,7 +188,9 @@ public class XMLHandle {
 		Source xmlFile = null;
 		try {
 			URL schemaFile = new URL(this.schemaURL);
-			xmlFile = new DOMSource(this.xml.getDocumentElement());
+			System.out.println("SCHEMA URL: "+this.schemaURL);
+			Document ns_aware_xml = loadXMLFromString(this.xml_string, true);
+			xmlFile = new DOMSource(ns_aware_xml.getDocumentElement());
 			System.out.println("ROOT ELEMENT: "+this.xml.getDocumentElement().getTagName());
 			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
