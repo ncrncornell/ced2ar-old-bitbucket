@@ -1,15 +1,17 @@
 package edu.ncrn.cornell.view
 
-import org.springframework.ui.Model
 import scalatags.Text.all._
 
+import scala.collection.JavaConversions._
+
+
 object UploadView {
-  def getView(model: Model): String = {
+  def getView(stash: java.util.Map[String, String]): String = {
     val typedHtml = html(
       head(
         script(src := "..."),
         script(
-          "alert('Hello World')"
+          s"alert('${stash.get("myString")}')"
         )
       ),
       body(
