@@ -10,7 +10,6 @@ import javax.xml.parsers.*;
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.*;
 import java.io.*;
 import java.net.URL;
@@ -124,6 +123,7 @@ public class XMLHandle {
 	 * @return
 	 */
 	public boolean insert(String XPath, String newValue, boolean replace){
+		//TODO: implement fn
 		return false;
 	}
 	
@@ -134,6 +134,7 @@ public class XMLHandle {
 	 * @return
 	 */
 	public boolean replace(String XPath, String newValue){
+		//TODO: implement fn
 		return false;
 	}
 	
@@ -143,6 +144,7 @@ public class XMLHandle {
 	 * @return
 	 */
 	public boolean delete(String XPath){
+		//TODO: implement fn
 		return false;
 	}
 	
