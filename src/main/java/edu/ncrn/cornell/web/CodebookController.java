@@ -32,8 +32,8 @@ public class CodebookController {
 		
 		List<String> handles = codebookService.getAllHandles();
 		
-		model.addAttribute("handles",handles);
-		model.addAttribute("auth",auth);
+		model.addAttribute("handles", handles);
+		model.addAttribute("auth", auth);
 		
 		return "codebooks";
 	}
