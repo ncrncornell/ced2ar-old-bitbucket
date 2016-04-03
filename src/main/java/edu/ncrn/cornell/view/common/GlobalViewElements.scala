@@ -8,13 +8,12 @@ import scala.collection.JavaConversions._
   */
 object GlobalViewElements {
 
-  def defaultMetaTags: Seq[Tag] = Seq(
+  val defaultMetaTags: Seq[Tag] = Seq(
     meta(charset := "utf-8"),
     meta(name := "viewport", content := "width=device-width, initial-scale=1")
   )
 
-  def defaultStyleSheetsAndScripts: Seq[Tag] = {
-
+  val defaultStyleSheetsAndScripts: Seq[Tag] = {
     val cssUrls = Seq(
       "styles/main.css",
       "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css",
@@ -30,8 +29,7 @@ object GlobalViewElements {
       scriptUrls.map{u => script(src := u)}
   }
 
-  def topBanner: Seq[Tag] = {
-
+  val topBanner: Seq[Tag] =
     Seq(
       div(`class` := "row", div(`class` := "col-sm-12", style := "background-color: #B40404;",
         div(`class` := "row",
@@ -40,5 +38,5 @@ object GlobalViewElements {
       )),
       div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
     )
-  }
+
 }
