@@ -38,3 +38,6 @@ buildNumber.properties
 *.iml
 # Emacs
 *~
+
+#Upload directory - should match UPLOAD_DIR in Ced2arApplication
+upload-dir/*
