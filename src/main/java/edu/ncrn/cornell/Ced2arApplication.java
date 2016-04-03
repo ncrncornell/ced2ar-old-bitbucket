@@ -9,7 +9,8 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @SpringBootApplication
 public class Ced2arApplication{
-	
+
+	public static String UPLOAD_DIR = "upload-dir";
 	
     public static void main(String[] args) {
     	SpringApplication.run(Ced2arApplication.class, args);

@@ -6,18 +6,34 @@ import scala.collection.JavaConversions._
 
 
 object UploadView {
-  def getView(stash: java.util.Map[String, String]): String = {
+  def getView(uploadedFiles: java.util.List[String]): String = {
     val typedHtml = html(
       head(
-        script(src := "..."),
-        script(
-          s"alert('${stash.get("myString")}')"
-        )
+        script(src := "...")
       ),
       body(
         div(
-          h1(id := "title", "This is a title"),
-          p("This is a big paragraph of text")
+          h2("Files already uploaded"),
+          ul(
+            uploadedFiles.map{f => li(f)}
+          )
+
+        )
+      )
+    )
+
+    typedHtml.toString()
+  }
+
+  def noUploadDir(): String = {
+    val typedHtml = html(
+      head(
+        script(src := "...")
+      ),
+      body(
+        div(
+          //TODO: Need to come up with some canned administrator message/template
+          h2("Error: specified upload directory not present! Please contact administrators.")
         )
       )
     )
