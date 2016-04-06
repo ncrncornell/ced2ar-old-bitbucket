@@ -41,3 +41,6 @@ buildNumber.properties
 
 #Upload directory - should match UPLOAD_DIR in Ced2arApplication
 upload-dir/*
+
+#git cache files
+.cache*

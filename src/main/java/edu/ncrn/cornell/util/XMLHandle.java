@@ -34,7 +34,7 @@ public class XMLHandle {
 	private String schemaURL;
 	
 	/**
-	 * public constructor
+	 * public constructor for String xml
 	 * @param x: XML string
 	 * @param schemaUrl: URL string for the schema location for validation
 	 */
@@ -46,13 +46,16 @@ public class XMLHandle {
 		//set the schema url
 		this.schemaURL = schemaUrl;
 		//check validity
+		/*
 		if(!isValid()){
 			System.out.println("XML NOT VALID");
 		}else{
 			System.out.println("XML IS VALID");
 		}
+		*/
 		
 	}
+	
 	
 	/**
 	 * Returns the evalaution of the input XPath as a string. 
@@ -186,7 +189,7 @@ public class XMLHandle {
 		return null;
 	}
 	
-	private boolean isValid(){
+	public boolean isValid(){
 		Source xmlFile = null;
 		try {
 			URL schemaFile = new URL(this.schemaURL);
