@@ -22,6 +22,7 @@ import edu.ncrn.cornell.model.dao.SchemaDao;
 import edu.ncrn.cornell.model.Schema;
 import edu.ncrn.cornell.model.SchemaPK;
 import edu.ncrn.cornell.util.XMLHandle;
+import org.springframework.stereotype.Service;
 
 /**
  * This class is a set of reusable function for getting structured information from postgres.
@@ -33,7 +34,7 @@ import edu.ncrn.cornell.util.XMLHandle;
  * @author kylebrumsted
  *
  */
-@Component
+@Service
 public class CodebookService {
 
 	@Autowired

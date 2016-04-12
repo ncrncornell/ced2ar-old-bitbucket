@@ -192,11 +192,11 @@ public class XMLHandle {
 	public boolean isValid(){
 		Source xmlFile = null;
 		try {
-			URL schemaFile = new URL(this.schemaURL);
-			System.out.println("SCHEMA URL: "+this.schemaURL);
-			Document ns_aware_xml = loadXMLFromString(this.xml_string, true);
+			URL schemaFile = new URL(schemaURL);
+			System.out.println("SCHEMA URL: " + schemaURL);
+			Document ns_aware_xml = loadXMLFromString(xml_string, true);
 			xmlFile = new DOMSource(ns_aware_xml.getDocumentElement());
-			System.out.println("ROOT ELEMENT: "+this.xml.getDocumentElement().getTagName());
+			System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
 			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

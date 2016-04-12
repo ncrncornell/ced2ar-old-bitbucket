@@ -2,6 +2,7 @@ package edu.ncrn.cornell.web;
 
 import edu.ncrn.cornell.Ced2arApplication;
 import edu.ncrn.cornell.service.CodebookService;
+import edu.ncrn.cornell.service.UploadService;
 import edu.ncrn.cornell.view.UploadView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,9 +27,8 @@ import java.util.stream.Collectors;
 @Controller
 public class UploadController {
 
-    //TODO: Testing only:
     @Autowired
-    CodebookService codebookService;
+    UploadService uploadService;
 	
 	//GET page
     @ResponseBody
@@ -40,9 +40,11 @@ public class UploadController {
     public String provideUploadInfo() {
         File uploadDir = new File(Ced2arApplication.UPLOAD_DIR);
         Optional<File[]> folderFilesMaybe = Optional.ofNullable((uploadDir).listFiles());
+
+        //TODO: change to log message:
         System.out.println(uploadDir.getAbsolutePath());
 
-
+        //TODO: file list for developer-mode only (add or use a developer/debug-mode flag)
         return folderFilesMaybe.map(files -> {
             List<String> uploadedFiles = Arrays.stream(files)
                 .sorted(Comparator.comparingLong(f -> -1 * f.lastModified()))
@@ -74,10 +76,14 @@ public class UploadController {
 
         if (!file.isEmpty()) {
             try {
+                File newXmlFile = new File(Ced2arApplication.UPLOAD_DIR + "/" + name);
                 BufferedOutputStream stream = new BufferedOutputStream(
-                        new FileOutputStream(new File(Ced2arApplication.UPLOAD_DIR + "/" + name)));
+                        new FileOutputStream(newXmlFile));
                 FileCopyUtils.copy(file.getInputStream(), stream);
                 stream.close();
+                //Process file
+                uploadService.newUpload(newXmlFile);
+
                 redirectAttributes.addFlashAttribute("message",
                         "You successfully uploaded " + name + "!");
             }
