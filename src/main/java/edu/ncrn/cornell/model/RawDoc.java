@@ -26,7 +26,11 @@ public class RawDoc implements Serializable {
 	private Timestamp lastSync;
 
 	@Column(name="raw_xml")
-	private String rawXml;
+    @org.hibernate.annotations.Type(type="edu.ncrn.cornell.model.SQLXMLType")
+    private String rawXml;
+
+	@Column(name="sha256")
+	private String sha256;
 
 	//bi-directional many-to-one association to FieldInst
 	@OneToMany(mappedBy="rawDoc")
@@ -74,6 +78,13 @@ public class RawDoc implements Serializable {
 	public void setRawXml(String rawXml) {
 		this.rawXml = rawXml;
 	}
+
+    public String getSha256() { return sha256; }
+
+    public void setSha256(String sha256) {
+        assert(sha256.length() == 64);
+        this.sha256 = sha256;
+    }
 
 	public List<FieldInst> getFieldInsts() {
 		return this.fieldInsts;

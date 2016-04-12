@@ -1,5 +1,6 @@
 package edu.ncrn.cornell.util;
 
+import com.google.common.base.Joiner;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -45,14 +46,6 @@ public class XMLHandle {
 		this.xml = loadXMLFromString(x, false);
 		//set the schema url
 		this.schemaURL = schemaUrl;
-		//check validity
-		/*
-		if(!isValid()){
-			System.out.println("XML NOT VALID");
-		}else{
-			System.out.println("XML IS VALID");
-		}
-		*/
 		
 	}
 	
@@ -61,33 +54,12 @@ public class XMLHandle {
 	 * Returns the evalaution of the input XPath as a string. 
 	 * If Xpath points to multiple nodes, concatenates all values into one string,
 	 * separated by newlines.
-	 * @param expression - the xpath
+	 * @param xpath - the xpath
 	 * @return xml value
 	 */
-	public String getXPathSingleValue(String expression){
-		System.out.println("attempting to evaluate expath expression: "+expression);
-		try{
-			XPath xp = XPathFactory.newInstance().newXPath();
-			XPathExpression expr = xp.compile(expression);
-			String value = (String) expr.evaluate(xml, XPathConstants.STRING);
-			NodeList nodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
-			System.out.println("node count: "+nodes.getLength());
-			//This conditional is a hack. Not robust at all for different xpaths.
-			if(nodes.getLength() > 1){
-				String builder = "";
-				for(int i = 0; i < nodes.getLength(); i++){
-					Node n = nodes.item(i);
-					builder = builder + n.getTextContent() + "\n";
-				}
-				value = builder;
-			}
-			//System.out.println("node: "+value);
-			return value;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-		return null;
+	public String getXPathSingleValue(String xpath){
+        List<String> values = getValueList(xpath);
+        return Joiner.on("\n").skipNulls().join(values);
 	}
 	
 	/**
@@ -112,7 +84,7 @@ public class XMLHandle {
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-		return null;
+		return new ArrayList<>();
 	}
 	
 	/**

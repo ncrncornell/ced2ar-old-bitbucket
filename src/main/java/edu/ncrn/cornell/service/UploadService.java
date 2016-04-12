@@ -3,11 +3,14 @@ package edu.ncrn.cornell.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.google.common.hash.Hashing;
+import edu.ncrn.cornell.model.RawDoc;
 import edu.ncrn.cornell.model.dao.*;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,14 +85,27 @@ public class UploadService {
 
         // Note, we use a hash value of the input xml rather than normalized xml;
         // This is meant to be a simple check rather than a rigorous constraint.
+        // TODO: Although, we may want this to do some form of normalization since,
+        // TODO: expecially considering a raw_doc may be converted to another schema
         final String xmlHash = Hashing.sha256()
             .hashString(xmlString, StandardCharsets.UTF_8).toString();
+
 
         System.out.println("xmlHash is " + xmlHash);
 
 
         // persist rawdoc in database, so that we have it on record
-        // TODO
+        // TODO: Should grab some of these as dfault values and present a way
+        // TODO: edit them in the view
+        RawDoc newRawDoc = new RawDoc();
+        String rawDocId = f.getName().replace(".xml", "");
+        newRawDoc.setId(rawDocId);
+        newRawDoc.setCodebookId(rawDocId + "_codebook");
+        newRawDoc.setLastSync(new Timestamp((new Date()).getTime()));
+        newRawDoc.setRawXml(xmlString);
+        newRawDoc.setSchema(schema);
+        newRawDoc.setSha256(xmlHash);
+        rawDocDao.save(newRawDoc);
 
 		// parse the rawdoc into fields
 		importSucceded = Optional.of(updateFieldInsts(xhandle));
