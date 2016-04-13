@@ -4,14 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.google.common.base.Joiner;
 import com.google.common.hash.Hashing;
+import edu.ncrn.cornell.model.Mapping;
 import edu.ncrn.cornell.model.RawDoc;
 import edu.ncrn.cornell.model.dao.*;
+import edu.ncrn.cornell.util.DDIHandle;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -74,7 +75,7 @@ public class UploadService {
 		List<Schema> schemas = schemaDao.findById_Version(DEFAULT_SCHEMA_VERSION);
 		Schema schema = schemas.get(0);
 		String schemaURL = schema.getUrl();
-		XMLHandle xhandle = new XMLHandle(xmlString, schemaURL);
+		DDIHandle xhandle = new DDIHandle(xmlString, schemaURL);
 		if(!xhandle.isValid()) {
             uploadIsValid = Optional.of(false);
             //TODO: delete file and redirect with error message
@@ -114,10 +115,10 @@ public class UploadService {
 	
 	/**
 	 * fills SQL tables from XML codebook
-	 * @param xhdl
+	 * @param xhandle
 	 * @return
 	 */
-	private boolean updateFieldInsts(XMLHandle xhdl){
+	private boolean updateFieldInsts(XMLHandle xhandle){
 		List<Field> fields = fieldDao.findAll();
 		/*
 		 * iterate over fields
@@ -129,8 +130,34 @@ public class UploadService {
 		 * insert as index into fieldIndicy table
 		 * 
 		 */
-		
-		
+
+        List<String> fieldIds = fields.stream().map(Field::getId)
+            .collect(Collectors.toList());
+
+        Map<String, List<String>> fieldMappings = new HashMap<>();
+        for(String fieldId: fieldIds) {
+            List<String> fieldXpaths = mappingDao.findById_FieldId(fieldId).stream()
+                .map(Mapping::getXpath).collect(Collectors.toList());
+            fieldMappings.put(fieldId, fieldXpaths);
+        }
+
+        fieldMappings.forEach((fieldId, xpathList) -> {
+            //TODO: call getUniqueXPaths
+            System.out.println("Xpaths for field " + fieldId + " are:");
+            System.out.println(Joiner.on("\n").join(xpathList));
+            System.out.println("Values are: ");
+            xpathList.stream().forEach(xpath -> {
+                xhandle.getValueList(xpath).stream().forEach(v -> System.out.println(v));
+
+            });
+
+//            List<String> fieldValues = xpathList.stream().map(xpath -> {
+//            });
+        });
+
+
+
+
 		return false;
 	}
 	
