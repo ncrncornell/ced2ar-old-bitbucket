@@ -300,7 +300,8 @@ public class XMLHandle {
             );
         }
         else {
-            throw new UnknownError("Logic error in getUniqueXPaths");
+            //Nothing to do at this level, moving on:
+            return getUniqueXPaths(nextXpath, remainingXpath);
         }
         // Never reached
     }
