@@ -148,8 +148,8 @@ public class UploadService {
             System.out.println("Values are: ");
             xpathList.stream().forEach(xpath -> {
                 xhandle.getValueList(xpath).stream().forEach(v -> System.out.println(v));
-
-            });
+				xhandle.getUniqueXPaths("", xpath).forEach(v -> System.out.println(v));
+			});
 
 //            List<String> fieldValues = xpathList.stream().map(xpath -> {
 //            });

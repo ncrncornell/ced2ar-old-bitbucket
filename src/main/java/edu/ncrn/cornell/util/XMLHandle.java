@@ -16,13 +16,12 @@ import javax.xml.validation.*;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 /**
@@ -42,10 +41,14 @@ public class XMLHandle {
 
     //TODO: replace usage with faster parse functions: https://www.w3.org/TR/xml/#NT-Name
     private static final Pattern elementWildcard = Pattern.compile("\\[\\*\\]");
-    private static final Pattern attributeWildcard = Pattern.compile("\\[@(.+)=\"\\*\"\\]");
+    private static final Pattern attributeWildcard = Pattern.compile(
+        "\\[@(.+)\\s*=\\s*[\"'](\\*)[\"']\\]"
+    );
+    private static final Pattern wildcard = Pattern.compile("\\*");
 
-	
-	/**
+
+
+    /**
 	 * public constructor for String xml
 	 * @param x: XML string
 	 * @param schemaUrl: URL string for the schema location for validation
@@ -172,19 +175,29 @@ public class XMLHandle {
 			InputSource is = new InputSource(new StringReader(xml));
 			return builder.parse(is);
 		}catch(Exception e){
-			e.printStackTrace();
+            //TODO: Log by some means; shouldn't log in testing:
+			//e.printStackTrace();
 		}
 		return null;
 	}
-	
+
+    /**
+     * Validates the instance's schema document against the instance's
+     * schema.
+     *
+     * @return
+     */
 	public boolean isValid(){
 		Source xmlFile = null;
 		try {
 			URL schemaFile = new URL(schemaURL);
 			System.out.println("SCHEMA URL: " + schemaURL);
 			Document ns_aware_xml = loadXMLFromString(xml_string, true);
-			xmlFile = new DOMSource(ns_aware_xml.getDocumentElement());
-			System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
+            if (ns_aware_xml == null) {
+                return false;
+            }
+            xmlFile = new DOMSource(ns_aware_xml.getDocumentElement());
+            System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
 			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -192,7 +205,10 @@ public class XMLHandle {
 			Validator validator = schema.newValidator();
 			validator.validate(xmlFile);
 		}catch (SAXException e){
-			System.out.println(xmlFile.getSystemId() + " is NOT valid");
+			System.out.println(
+                    (xmlFile != null ? xmlFile.getSystemId() :
+                            "file with null id") + " is NOT valid"
+            );
 			System.out.println("Reason: " + e.getLocalizedMessage());
 			return false;
 		}catch (Exception e){
@@ -205,30 +221,28 @@ public class XMLHandle {
 
     /**
      * For the given xpath, iterates recursively over each wildcard or element list
-     * and constructs a list of unique xpaths.
+     * and constructs a list of unique xpaths. This implementation is currently not
+     * tail-recursive (may be possible to change this, but Java 8 doesn't have TCO
+     * anyway).
      *
      * @param xpathBuilt - pass in empty string initially
      * @param xpathRest - pass in initial, potentially non-unique xpath
      * @return
      */
-    private List<String> getUniqueXPaths(String xpathBuilt, String xpathRest) {
+    public Stream<String> getUniqueXPaths(String xpathBuilt, String xpathRest) {
         if (xpathRest.equals("")) {
             List<String> singleton = new ArrayList<>(1);
             singleton.add(xpathBuilt);
-            return singleton;
+            return singleton.stream();
         }
 
-        //TODO: do we need this at this outer-scope?
         List<String> xpathValues = new ArrayList<>(200);
 
-        Iterator<String> xpathParts = Splitter.on("/").split(xpathRest).iterator();
+        Iterator<String> xpathParts = Splitter.on("/").omitEmptyStrings()
+			.split(xpathRest).iterator();
         String currentPathPart = xpathParts.next();
-        String nextXpath = xpathBuilt + "/" + currentPathPart;
 
-        if (xpathBuilt.equals("")) {
-            // We are at the root node
-            nextXpath = "/" + nextXpath;
-        }
+        final String nextXpath = xpathBuilt + "/" + currentPathPart;
 
         Matcher wildElemMatcher = elementWildcard.matcher(currentPathPart);
         Matcher wildAttribMatcher = attributeWildcard.matcher(currentPathPart);
@@ -238,12 +252,15 @@ public class XMLHandle {
             // represent multiple element values
             xpathValues.addAll(getValueList(nextXpath));
             if (xpathValues.size() == 0) {
-                return new ArrayList<>(0);
-            } else if (xpathValues.size() == 1) {
+                List<String> singleton = new ArrayList<>(0);
+                return  singleton.stream();
+            }
+            else if (xpathValues.size() == 1) {
                 List<String> singleton = new ArrayList<>(1);
                 singleton.add(nextXpath);
-                return singleton;
-            } else {
+                return singleton.stream();
+            }
+            else {
                 ambiguousEndName = true;
             }
         }
@@ -251,23 +268,40 @@ public class XMLHandle {
         List<String> uniqueXpaths = new ArrayList<>(200);
         String remainingXpath = xpathRest.replace(currentPathPart, "");
         // Now we must deal with one of the following types of multiplicities
-        if (wildElemMatcher.matches()) {
-            //TODO: process substitutions using utility method
+        //TODO: need good tests for each of the following
+        if (wildElemMatcher.find()) {
+            xpathValues.addAll(getValueList(nextXpath));
+            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
+                xpathBuilt + "/" +
+                wildElemMatcher.replaceFirst("[" + Integer.toString(ii) + "]")
+            ).collect(Collectors.toList()));
             return uniqueXpaths.stream().flatMap(xpath ->
-                getUniqueXPaths(xpath, remainingXpath).stream()
-            ).collect(Collectors.toList());
+                getUniqueXPaths(xpath, remainingXpath)
+            );
         }
-        else if (wildAttribMatcher.matches()) {
-            //TODO ...
-
+        else if (wildAttribMatcher.find()) {
+            Matcher attrValueMatcher = wildcard.matcher(currentPathPart);
+            String attribXpath = xpathBuilt + "/@" + wildAttribMatcher.group(0);
+            List<String> attribValues = getValueList(attribXpath);
+            uniqueXpaths.addAll(attribValues.stream().map(ii ->
+                xpathBuilt + "/" + attrValueMatcher.replaceFirst(ii)
+            ).collect(Collectors.toList()));
+            return uniqueXpaths.stream().flatMap(xpath ->
+                getUniqueXPaths(xpath, remainingXpath)
+            );
         }
         else if (ambiguousEndName) {
-            //TODO ...
+            //xpathValues already obtained
+            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
+                nextXpath + "/[" + Integer.toString(ii) + "]"
+            ).collect(Collectors.toList()));
+            return uniqueXpaths.stream().flatMap(xpath ->
+                getUniqueXPaths(xpath, remainingXpath)
+            );
         }
         else {
             throw new UnknownError("Logic error in getUniqueXPaths");
         }
         // Never reached
-        return uniqueXpaths;
     }
 }
