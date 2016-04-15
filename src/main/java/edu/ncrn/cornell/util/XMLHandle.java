@@ -74,7 +74,7 @@ public class XMLHandle {
 	 * separated by newlines.
 	 *
 	 * Unless there is a good reason to use it, we should probably leave as
-	 * deprecated in favor of using getValueList which has a better type.
+	 * deprecated in favor of using getValueList or getUniqueValue.
 	 *
 	 * @param xpath - the xpath
 	 * @return xml value
@@ -84,6 +84,29 @@ public class XMLHandle {
         List<String> values = getValueList(xpath);
         return Joiner.on("\n").skipNulls().join(values);
 	}
+
+    /**
+     *
+     * @param xpath An xpath without any wildcards (including
+     *              implicit wildcards). Throws an exception if
+     *
+     * @return A value corresponding to the given xpath, or nothing
+     * if no value is found.
+     */
+    public Optional<String> getUniqueValue(String xpath){
+        Optional<NodeList> nodes = getXPathList(xpath);
+
+        if (nodes.isPresent()) {
+            if (nodes.get().getLength() > 1) {
+                throw new IllegalArgumentException("Not a unique xpath in getUniqueValue");
+            }
+            if (nodes.get().getLength() == 1) {
+                Node node = nodes.get().item(0);
+                return Optional.ofNullable(node.getTextContent());
+            }
+        }
+        return Optional.empty();
+    }
 	
 	/**
 	 * Returns a list of values for xpath that access multiple elements
