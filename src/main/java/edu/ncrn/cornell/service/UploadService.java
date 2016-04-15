@@ -170,7 +170,15 @@ public class UploadService {
                 return fieldInst;
             }).collect(Collectors.toList());
 
-            fieldInsts.forEach(f -> fieldInstDao.save(f));
+			System.out.println("uniqueXpaths count is " + uniqueXpaths.size());
+			System.out.println("xpathValues count is " + xpathValues.size());
+
+
+			//TODO: do this as a transaction, possibly using CrudRepo's save(iterable)
+            fieldInsts.forEach(f -> {
+                System.out.println("trying to save " + f.getValue()); // DEBUG
+                f = fieldInstDao.save(f);
+            });
 
 
 
