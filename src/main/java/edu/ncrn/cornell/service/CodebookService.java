@@ -258,8 +258,8 @@ public class CodebookService {
 		
 		return xhandle;
 	}
-	
-	private String getXPathWithVarname(String xpath, String varname){
+
+    private String getXPathWithVarname(String xpath, String varname){
 		return xpath.replace("*", "@name='"+varname+"'");
 	}
 	
