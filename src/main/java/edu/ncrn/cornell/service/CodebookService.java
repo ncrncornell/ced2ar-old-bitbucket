@@ -9,11 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.ncrn.cornell.model.Field;
+import edu.ncrn.cornell.model.FieldInst;
 import edu.ncrn.cornell.model.Mapping;
 import edu.ncrn.cornell.model.Profile;
 import edu.ncrn.cornell.model.ProfileField;
 import edu.ncrn.cornell.model.RawDoc;
 import edu.ncrn.cornell.model.dao.FieldDao;
+import edu.ncrn.cornell.model.dao.FieldInstDao;
 import edu.ncrn.cornell.model.dao.MappingDao;
 import edu.ncrn.cornell.model.dao.ProfileDao;
 import edu.ncrn.cornell.model.dao.ProfileFieldDao;
@@ -49,6 +51,8 @@ public class CodebookService {
 	MappingDao mappingDao;
 	@Autowired
 	SchemaDao schemaDao;
+	@Autowired
+	FieldInstDao fieldInstDao;
 	
 	/**
 	 * Lists all handles from the RawDocs table in postgres
@@ -104,6 +108,45 @@ public class CodebookService {
 	}
 	
 	/**
+	 * gathers codebook details from FieldInst table rather than parsing XML
+	 * @param handle
+	 * @return
+	 */
+	public Map<String, String> getCodebookDetails_SQL(String handle){
+		
+		//Map of field names and their corresponding instances
+		Map<String, String> details = new HashMap<String, String>();
+		//List of field for the codebookdetails profile
+		List<String> fieldIds = getProfileFieldIds("codebookdetails");
+		
+		//iterate over fields, try to find corresponding instance for specified handle
+		for(String f : fieldIds){
+			Field curField = fieldDao.findOne(f);
+			String dispName = curField.getDisplayName();
+			
+			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocAndField1(handle, f);
+			String value = "";
+			
+			//check for multiplicities and concatenate values accordingly
+			if(fieldInsts.size() > 1){
+				for(FieldInst fi : fieldInsts) value += fi.getValue() + " \n";
+			}else if(fieldInsts.size() == 1){
+				FieldInst fi = fieldInsts.get(0);
+				value = fi.getValue();
+			}else{
+				System.out.println("[READING FIELDISNTS]:: No FieldInst for codebook "+handle+" field "+f);
+				continue;
+			}
+			
+			//add display name of field and instance value to the map
+			details.put(dispName, value);
+		}
+		
+		
+		return details;
+	}
+	
+	/**
 	 * Gets the list of variables for a given codebook.
 	 * The profile of this list is comprised of varname and varlabel.
 	 * This profile is currently hardcoded into the function.
@@ -136,6 +179,12 @@ public class CodebookService {
 		}
 		
 		return varlist;
+	}
+	
+	public Map<String, String> getCodebookVariables_SQL(String handle){
+		
+		
+		return null;
 	}
 	
 	/**
