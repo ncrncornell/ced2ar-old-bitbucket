@@ -6,20 +6,19 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.google.common.base.Joiner;
 import com.google.common.hash.Hashing;
-import edu.ncrn.cornell.model.Mapping;
-import edu.ncrn.cornell.model.RawDoc;
+import edu.ncrn.cornell.model.*;
 import edu.ncrn.cornell.model.dao.*;
 import edu.ncrn.cornell.util.DDIHandle;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import edu.ncrn.cornell.model.Schema;
-import edu.ncrn.cornell.model.Field;
 import edu.ncrn.cornell.util.XMLHandle;
 import org.springframework.stereotype.Service;
+import scala.Tuple2;
 
 
 /**
@@ -109,7 +108,7 @@ public class UploadService {
         rawDocDao.save(newRawDoc);
 
 		// parse the rawdoc into fields
-		importSucceded = Optional.of(updateFieldInsts(xhandle));
+		importSucceded = Optional.of(updateFieldInsts(xhandle, newRawDoc));
 
 	}
 	
@@ -118,8 +117,13 @@ public class UploadService {
 	 * @param xhandle
 	 * @return
 	 */
-	private boolean updateFieldInsts(XMLHandle xhandle){
+	private boolean updateFieldInsts(XMLHandle xhandle, RawDoc raw_doc_id){
 		List<Field> fields = fieldDao.findAll();
+        Map<String, Field> fieldMap = new HashMap<>(fields.size());
+        for (Field field: fields) {
+            fieldMap.put(field.getId(), field);
+        }
+
 		/*
 		 * iterate over fields
 		 * get mapping for each one
@@ -146,9 +150,50 @@ public class UploadService {
             System.out.println("Xpaths for field " + fieldId + " are:");
             System.out.println(Joiner.on("\n").join(xpathList));
             System.out.println("Values are: ");
-            xpathList.stream().forEach(xpath -> {
-                xhandle.getValueList(xpath).stream().forEach(v -> System.out.println(v));
-				xhandle.getUniqueXPaths("", xpath).forEach(v -> System.out.println(v));
+
+			List<String> uniqueXpaths = xpathList.stream().flatMap(xpath ->
+					xhandle.getUniqueXPaths("", xpath)
+			).collect(Collectors.toList());
+
+			List<String> xpathValues = uniqueXpaths.stream().map(xpath ->
+                xhandle.getUniqueValue(xpath).orElse("")
+			).collect(Collectors.toList());
+
+            List<FieldInst> fieldInsts = IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
+                FieldInst fieldInst = new FieldInst();
+                // fieldInst.setId(); //TODO: use RDB auto-increment behind the scenes?
+                //fieldInst.setTransactionDate(); //TODO: also let the database handle this?
+                fieldInst.setValue(xpathValues.get(ii));
+                fieldInst.setField1(fieldMap.get(fieldId));
+                fieldInst.setRawDoc(raw_doc_id);
+
+                return fieldInst;
+            }).collect(Collectors.toList());
+
+			System.out.println("uniqueXpaths count is " + uniqueXpaths.size());
+			System.out.println("xpathValues count is " + xpathValues.size());
+
+
+			//TODO: do this as a transaction, possibly using CrudRepo's save(iterable)
+            fieldInsts.forEach(f -> {
+                System.out.println("trying to save " + f.getValue()); // DEBUG
+                f = fieldInstDao.save(f);
+            });
+
+
+
+//            List<Tuple2<Field, FieldIndicy>> fieldEntities IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
+//
+//            });
+
+
+
+
+
+			xpathList.stream().forEach(xpath -> {
+//              xhandle.getValueList(xpath).stream().forEach(v -> System.out.println(v));
+//				xhandle.getUniqueXPaths("", xpath).forEach(v -> System.out.println(v));
+
 			});
 
 //            List<String> fieldValues = xpathList.stream().map(xpath -> {

@@ -2,6 +2,7 @@ package edu.ncrn.cornell.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentFilter;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,6 +40,9 @@ public class XMLHandle {
 	private Document xml;
 	private String schemaURL;
 
+    private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    private DocumentBuilder builder;
+
     //TODO: replace usage with faster parse functions: https://www.w3.org/TR/xml/#NT-Name
     private static final Pattern elementWildcard = Pattern.compile("\\[\\*\\]");
     private static final Pattern attributeWildcard = Pattern.compile(
@@ -54,10 +58,10 @@ public class XMLHandle {
 	 * @param schemaUrl: URL string for the schema location for validation
 	 */
 	public XMLHandle(String x, String schemaUrl){
-		//save the string for validation
+        //save the string for validation
 		this.xml_string = x;
 		//create doc w/o namespaces for easy xpath
-		this.xml = loadXMLFromString(x, false);
+		this.xml = loadXMLFromString(x, false).orElse(builder.newDocument());
 		//set the schema url
 		this.schemaURL = schemaUrl;
 		
@@ -70,7 +74,7 @@ public class XMLHandle {
 	 * separated by newlines.
 	 *
 	 * Unless there is a good reason to use it, we should probably leave as
-	 * deprecated in favor of using getValueList which has a better type.
+	 * deprecated in favor of using getValueList or getUniqueValue.
 	 *
 	 * @param xpath - the xpath
 	 * @return xml value
@@ -80,6 +84,29 @@ public class XMLHandle {
         List<String> values = getValueList(xpath);
         return Joiner.on("\n").skipNulls().join(values);
 	}
+
+    /**
+     *
+     * @param xpath An xpath without any wildcards (including
+     *              implicit wildcards). Throws an exception if
+     *
+     * @return A value corresponding to the given xpath, or nothing
+     * if no value is found.
+     */
+    public Optional<String> getUniqueValue(String xpath){
+        Optional<NodeList> nodes = getXPathList(xpath);
+
+        if (nodes.isPresent()) {
+            if (nodes.get().getLength() > 1) {
+                throw new IllegalArgumentException("Not a unique xpath in getUniqueValue");
+            }
+            if (nodes.get().getLength() == 1) {
+                Node node = nodes.get().item(0);
+                return Optional.ofNullable(node.getTextContent());
+            }
+        }
+        return Optional.empty();
+    }
 	
 	/**
 	 * Returns a list of values for xpath that access multiple elements
@@ -87,23 +114,16 @@ public class XMLHandle {
 	 * @return
 	 */
 	public List<String> getValueList(String xpath){
-		
-		try{
-			NodeList nodes = getXPathList(xpath);
-			//System.out.println("Number of nodes: "+nodes.getLength());
-		
-			ArrayList<String> items = new ArrayList<String>();
-			for(int ii = 0; ii < nodes.getLength(); ii++){
-				Node node = nodes.item(ii);
-				items.add(node.getTextContent());
-				//System.out.println(node.getTextContent());
-			}
-			
-			return items;
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		return new ArrayList<>();
+        Optional<NodeList> nodes = getXPathList(xpath);
+        ArrayList<String> items = new ArrayList<String>();
+
+        if (nodes.isPresent()) {
+            for (int ii = 0; ii < nodes.get().getLength(); ii++) {
+                Node node = nodes.get().item(ii);
+                items.add(node.getTextContent());
+            }
+        }
+        return items;
 	}
 	
 	/**
@@ -144,19 +164,17 @@ public class XMLHandle {
 	
 	
 	
-	private NodeList getXPathList(String expression){
+	private Optional<NodeList> getXPathList(String expression){
 		
 		try{
 			javax.xml.xpath.XPath xp = XPathFactory.newInstance().newXPath();
 			XPathExpression expr = xp.compile(expression);
-			NodeList nodes = (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
-			return nodes;
-		}catch(Exception e){
+			NodeList nodes =  (NodeList) expr.evaluate(xml, XPathConstants.NODESET);
+			return Optional.ofNullable(nodes);
+		} catch(Exception e){
 			e.printStackTrace();
 		}
-		
-		
-		return null;
+		return Optional.empty();
 	}
 	
 	
@@ -165,20 +183,19 @@ public class XMLHandle {
 	 * @param xml
 	 * @return
 	 */
-	private Document loadXMLFromString(String xml, boolean ns_aware)
+	private Optional<Document> loadXMLFromString(String xml, boolean ns_aware)
 	{
 		try{
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			if(ns_aware)
 				factory.setNamespaceAware(true);
-			DocumentBuilder builder = factory.newDocumentBuilder();
+			builder = factory.newDocumentBuilder();
 			InputSource is = new InputSource(new StringReader(xml));
-			return builder.parse(is);
+			return Optional.ofNullable(builder.parse(is));
 		}catch(Exception e){
             //TODO: Log by some means; shouldn't log in testing:
 			//e.printStackTrace();
 		}
-		return null;
+		return Optional.empty();
 	}
 
     /**
@@ -192,11 +209,11 @@ public class XMLHandle {
 		try {
 			URL schemaFile = new URL(schemaURL);
 			System.out.println("SCHEMA URL: " + schemaURL);
-			Document ns_aware_xml = loadXMLFromString(xml_string, true);
-            if (ns_aware_xml == null) {
+			Optional<Document> ns_aware_xml = loadXMLFromString(xml_string, true);
+            if (!ns_aware_xml.isPresent()) {
                 return false;
             }
-            xmlFile = new DOMSource(ns_aware_xml.getDocumentElement());
+            xmlFile = new DOMSource(ns_aware_xml.get().getDocumentElement());
             System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
 			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
@@ -240,6 +257,11 @@ public class XMLHandle {
 
         Iterator<String> xpathParts = Splitter.on("/").omitEmptyStrings()
 			.split(xpathRest).iterator();
+
+        if (!xpathParts.hasNext()){
+            System.out.println("Logic error; xpathRest is " + xpathRest + " but no split paths");
+            System.out.println("xpathBuilt is " + xpathBuilt);
+        }
         String currentPathPart = xpathParts.next();
 
         final String nextXpath = xpathBuilt + "/" + currentPathPart;
@@ -266,10 +288,10 @@ public class XMLHandle {
         }
 
         List<String> uniqueXpaths = new ArrayList<>(200);
-        String remainingXpath = xpathRest.replace(currentPathPart, "");
+        String remainingXpath = xpathRest.replace("/" + currentPathPart, "");
         // Now we must deal with one of the following types of multiplicities
         //TODO: need good tests for each of the following
-        if (wildElemMatcher.find()) {
+        if (wildElemMatcher.find(0) && !ambiguousEndName) {
             xpathValues.addAll(getValueList(nextXpath));
             uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
                 xpathBuilt + "/" +
@@ -279,7 +301,7 @@ public class XMLHandle {
                 getUniqueXPaths(xpath, remainingXpath)
             );
         }
-        else if (wildAttribMatcher.find()) {
+        else if (wildAttribMatcher.find(0)) {
             Matcher attrValueMatcher = wildcard.matcher(currentPathPart);
             String attribXpath = xpathBuilt + "/@" + wildAttribMatcher.group(0);
             List<String> attribValues = getValueList(attribXpath);
@@ -293,7 +315,7 @@ public class XMLHandle {
         else if (ambiguousEndName) {
             //xpathValues already obtained
             uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
-                nextXpath + "/[" + Integer.toString(ii) + "]"
+                nextXpath + "[" + Integer.toString(ii) + "]"
             ).collect(Collectors.toList()));
             return uniqueXpaths.stream().flatMap(xpath ->
                 getUniqueXPaths(xpath, remainingXpath)

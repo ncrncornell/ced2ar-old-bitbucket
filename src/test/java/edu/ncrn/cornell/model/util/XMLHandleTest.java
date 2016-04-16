@@ -11,14 +11,11 @@ import org.junit.gen5.api.Test;
 import org.junit.gen5.junit4.runner.JUnit5;
 import org.junit.runner.RunWith;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.gen5.api.Assertions.*;
@@ -36,8 +33,12 @@ public class XMLHandleTest {
     private String schema = "http://www.ncrn.cornell.edu/docs/ddi/2.5.NCRN.P/schemas/codebook.xsd";
 
     private final String[] allDdiFiles = {"/SIPP Synthetic Beta v5.1.xml"};
+
+    List<String> allDdiFilesList = Arrays.asList(allDdiFiles);
+
     private List<InputStream> allDdiInputs = new ArrayList<>();
 
+    static private Map<String, String[]> allXpaths = new HashMap<>(5);
 
     @Test
     public void createXmlHandles() {
@@ -51,38 +52,61 @@ public class XMLHandleTest {
         }
     }
 
-    //TODO: should be restructured to be document-dependent; not every
-    //TODO: document has the same data
     @Test
-    public void generateUniqueXpaths() {
-        //Some possibilities from the DB:
-        //        "/codeBook/stdyDscr/stdyInfo/abstract"
-        //        "/codeBook/docDscr/citation/titlStmt/altTitl"
-        //        "/codeBook/docDscr/citation/biblCit"
-        //        "/codeBook/docDscr/citation/distStmt/distrbtr"
-        //        "/codeBook/docDscr/citation/titlStmt/titl"
-        //        "/codeBook/stdyDscr/citation/biblCit"
-        //        "/codeBook/stdyDscr/otherStdMat/relMat[*]"
-        //        "/codeBook/dataDscr/var[*]/sumStat"
-        //        "/codeBook/dataDscr/var[*]/valrng"
-        //        "/codeBook/dataDscr/var[*]/valrng/range/@max"
-        //        "/codeBook/dataDscr/var[*]/valrng/range/@min"
-        //        "/codeBook/dataDscr/var[*]/txt"
-        //        "/codeBook/fileDscr[*]"
-        //        "/codeBook/dataDscr/var[*]/labl"
-        //        "/codeBook/dataDscr/var[*]/@name"
-        //        "/codeBook/dataDscr/var[*]/varFormat/@type"
+    /**
+     * These tests should NOT depend on specific documents or schemas
+     */
+    public void generateUniqueXpathsDocumentIndependent() {
 
         for(InputStream input: allDdiInputs) {
             String xmlString = getXmlString(input, Charsets.UTF_8);
             XMLHandle xhandle = new XMLHandle(xmlString, schema);
-            Long numXpath = xhandle.getUniqueXPaths("", "/codeBook/dataDscr/var[*]/labl").count();
-            assertTrue(numXpath > 1);
-            //DEBUG
-            //xhandle.getUniqueXPaths("", "/codeBook/dataDscr/var[*]/labl").forEach(x -> System.out.println(x));
+            //TODO: just one schema for now
+            for(String xpath: allXpaths.get("ddi_2.5.1")) {
 
+                Long numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+                List<String> xpathValues = xhandle.getValueList(xpath);
+                if (numUniqXpath != xpathValues.size()) {
+                    System.out.println("Error, discrepancy in xpath mappings and value index sizes:");
+                    System.out.println(
+                        xpath + ": " +
+                        String.valueOf(xpathValues.size()) + " : " + String.valueOf(numUniqXpath)
+                    );
+                    xhandle.getUniqueXPaths("", xpath).forEach(System.out::println);
+                }
+                assertTrue(xpathValues.size() == numUniqXpath);
+
+                //TODO: add test that each unique xpath returns a single value
+
+                //TODO check /some/xpath count = /some/xpath[*] count for both values and unique xpaths
+
+            }
         }
     }
+
+    @Test
+    /**
+     * These are tests that depend on specific documents or schemas.
+     */
+    public void generateUniqueXpathsDocumentDependent() {
+
+        int docIdx = allDdiFilesList.indexOf("/SIPP Synthetic Beta v5.1.xml");
+        InputStream input = allDdiInputs.get(docIdx);
+
+        String xmlString = getXmlString(input, Charsets.UTF_8);
+        XMLHandle xhandle = new XMLHandle(xmlString, schema);
+
+        String xpath = "/codeBook/dataDscr/var[*]/labl";
+        Long numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+        assertTrue(numUniqXpath > 1);
+
+        xpath = "/codeBook/stdyDscr/othrStdyMat/relMat[*]";
+        numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+        assertTrue(4 == numUniqXpath);
+
+
+    }
+
 
 
     @Test
@@ -110,6 +134,31 @@ public class XMLHandleTest {
             System.out.println("Couldn't close" + f.toString());
         }});
         allDdiInputs.clear();
+    }
+
+    @BeforeAll
+    static void setupDataSources() {
+        //TODO: should build this from DB once test db available
+        String[] ddi251 = {
+            "/codeBook/stdyDscr/stdyInfo/abstract",
+            "/codeBook/docDscr/citation/titlStmt/altTitl",
+            "/codeBook/docDscr/citation/biblCit",
+            "/codeBook/docDscr/citation/distStmt/distrbtr",
+            "/codeBook/docDscr/citation/titlStmt/titl",
+            "/codeBook/stdyDscr/citation/biblCit",
+            "/codeBook/stdyDscr/othrStdyMat/relMat[*]",
+            "/codeBook/dataDscr/var[*]/sumStat",
+            "/codeBook/dataDscr/var[*]/valrng",
+            "/codeBook/dataDscr/var[*]/valrng/range/@max",
+            "/codeBook/dataDscr/var[*]/valrng/range/@min",
+            "/codeBook/dataDscr/var[*]/txt",
+            "/codeBook/fileDscr[*]",
+            "/codeBook/dataDscr/var[*]/labl",
+            "/codeBook/dataDscr/var[*]/@name",
+            "/codeBook/dataDscr/var[*]/varFormat/@type"
+        };
+
+        allXpaths.put("ddi_2.5.1", ddi251);
     }
 
     public static String getXmlString(InputStream input, Charset charset) {
