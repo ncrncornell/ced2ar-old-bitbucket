@@ -417,7 +417,7 @@ public class DBChecker {
 		
 		//RELATEDMATERIAL
 		if(missingMappings.contains("relatedmaterial")){
-			createMapping("relatedmaterial","/codeBook/stdyDscr/otherStdMat/relMat[*]");
+			createMapping("relatedmaterial","/codeBook/stdyDscr/othrStdMat/relMat[*]");
 		}
 				
 	}

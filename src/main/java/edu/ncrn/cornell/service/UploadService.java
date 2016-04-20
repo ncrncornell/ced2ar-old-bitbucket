@@ -164,8 +164,8 @@ public class UploadService {
                 // fieldInst.setId(); //TODO: use RDB auto-increment behind the scenes?
                 //fieldInst.setTransactionDate(); //TODO: also let the database handle this?
                 fieldInst.setValue(xpathValues.get(ii));
-                fieldInst.setField1(fieldMap.get(fieldId));
-                fieldInst.setRawDoc(raw_doc_id);
+                fieldInst.setFieldId(fieldMap.get(fieldId));
+                fieldInst.setRawDocId(raw_doc_id);
 
                 return fieldInst;
             }).collect(Collectors.toList());

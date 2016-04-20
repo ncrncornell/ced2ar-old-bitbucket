@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 
+
 /**
  * The persistent class for the raw_doc database table.
  * 
@@ -26,23 +27,15 @@ public class RawDoc implements Serializable {
 	private Timestamp lastSync;
 
 	@Column(name="raw_xml")
-    @org.hibernate.annotations.Type(type="edu.ncrn.cornell.model.SQLXMLType")
-    private String rawXml;
+	private String rawXml;
 
-	@Column(name="sha256")
+	@Column(name="schema_id")
+	private String schemaId;
+
+	@Column(name="schema_version")
+	private String schemaVersion;
+
 	private String sha256;
-
-	//bi-directional many-to-one association to FieldInst
-	@OneToMany(mappedBy="rawDoc")
-	private List<FieldInst> fieldInsts;
-
-	//bi-directional many-to-one association to Schema
-	@ManyToOne
-	@JoinColumns({
-		@JoinColumn(name="schema_id", referencedColumnName="id"),
-		@JoinColumn(name="schema_version", referencedColumnName="version")
-		})
-	private Schema schema;
 
 	public RawDoc() {
 	}
@@ -79,41 +72,28 @@ public class RawDoc implements Serializable {
 		this.rawXml = rawXml;
 	}
 
-    public String getSha256() { return sha256; }
-
-    public void setSha256(String sha256) {
-        assert(sha256.length() == 64);
-        this.sha256 = sha256;
-    }
-
-	public List<FieldInst> getFieldInsts() {
-		return this.fieldInsts;
+	public String getSchemaId() {
+		return this.schemaId;
 	}
 
-	public void setFieldInsts(List<FieldInst> fieldInsts) {
-		this.fieldInsts = fieldInsts;
+	public void setSchemaId(String schemaId) {
+		this.schemaId = schemaId;
 	}
 
-	public FieldInst addFieldInst(FieldInst fieldInst) {
-		getFieldInsts().add(fieldInst);
-		fieldInst.setRawDoc(this);
-
-		return fieldInst;
+	public String getSchemaVersion() {
+		return this.schemaVersion;
 	}
 
-	public FieldInst removeFieldInst(FieldInst fieldInst) {
-		getFieldInsts().remove(fieldInst);
-		fieldInst.setRawDoc(null);
-
-		return fieldInst;
+	public void setSchemaVersion(String schemaVersion) {
+		this.schemaVersion = schemaVersion;
 	}
 
-	public Schema getSchema() {
-		return this.schema;
+	public String getSha256() {
+		return this.sha256;
 	}
 
-	public void setSchema(Schema schema) {
-		this.schema = schema;
+	public void setSha256(String sha256) {
+		this.sha256 = sha256;
 	}
 
 }

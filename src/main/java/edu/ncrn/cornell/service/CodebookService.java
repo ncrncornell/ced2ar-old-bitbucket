@@ -124,7 +124,7 @@ public class CodebookService {
 			Field curField = fieldDao.findOne(f);
 			String dispName = curField.getDisplayName();
 			
-			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocAndField1(handle, f);
+			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocIdAndFieldId(handle, f);
 			String value = "";
 			
 			//check for multiplicities and concatenate values accordingly
@@ -183,7 +183,7 @@ public class CodebookService {
 	
 	public Map<String, String> getCodebookVariables_SQL(String handle){
 		
-		
+		//TODO implement fn
 		return null;
 	}
 	
@@ -224,6 +224,17 @@ public class CodebookService {
 		return details;
 	}
 	
+	public Map<String, String> getVariableDetails_SQL(String handle, String varname){
+		
+		//TODO implement fn
+		List<String> fieldIds = getProfileFieldIds("vardetails");
+		Map<String, String> details = new HashMap<String, String>();
+		
+		
+		
+		return details;
+	}
+	
 	/***** Private utility functions  ******/
 	
 	private List<String> getProfileFieldIds(String profileId){
@@ -242,9 +253,7 @@ public class CodebookService {
 		if(codebook == null) return null;
 		
 		String xml = codebook.getRawXml();
-		Schema s = codebook.getSchema();
-		SchemaPK spk = s.getId();
-		String sVers = spk.getVersion();
+		String sVers = codebook.getSchemaVersion();
 		//System.out.println("xml: "+xml.substring(0, 150));
 		String schemaURL = "";
 		List<Schema> schemas = schemaDao.findById_Version(sVers);

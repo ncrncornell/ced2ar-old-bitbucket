@@ -19,29 +19,19 @@ public class FieldInst implements Serializable {
 	@Id
 	private Long id;
 
+	@Column(name="canonical_xpath")
+	private String canonicalXpath;
+
+	@Column(name="field_id")
+	private String fieldId;
+
+	@Column(name="raw_doc_id")
+	private String rawDocId;
+
 	@Column(name="transaction_date")
 	private Timestamp transactionDate;
 
 	private String value;
-
-	//bi-directional many-to-one association to FieldIndicy
-	@OneToMany(mappedBy="fieldInst")
-	private List<FieldIndicy> fieldIndicies;
-
-	//bi-directional many-to-one association to Field
-	@ManyToOne
-	@JoinColumn(name="field_id")
-	private Field field1;
-
-	//bi-directional many-to-one association to Field
-	@ManyToOne
-	@JoinColumn(name="field")
-	private Field field2;
-
-	//bi-directional many-to-one association to RawDoc
-	@ManyToOne
-	@JoinColumn(name="raw_doc_id")
-	private RawDoc rawDoc;
 
 	public FieldInst() {
 	}
@@ -52,6 +42,30 @@ public class FieldInst implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getCanonicalXpath() {
+		return this.canonicalXpath;
+	}
+
+	public void setCanonicalXpath(String canonicalXpath) {
+		this.canonicalXpath = canonicalXpath;
+	}
+
+	public String getFieldId() {
+		return this.fieldId;
+	}
+
+	public void setFieldId(String fieldId) {
+		this.fieldId = fieldId;
+	}
+
+	public String getRawDocId() {
+		return this.rawDocId;
+	}
+
+	public void setRawDocId(String rawDocId) {
+		this.rawDocId = rawDocId;
 	}
 
 	public Timestamp getTransactionDate() {
@@ -68,52 +82,6 @@ public class FieldInst implements Serializable {
 
 	public void setValue(String value) {
 		this.value = value;
-	}
-
-	public List<FieldIndicy> getFieldIndicies() {
-		return this.fieldIndicies;
-	}
-
-	public void setFieldIndicies(List<FieldIndicy> fieldIndicies) {
-		this.fieldIndicies = fieldIndicies;
-	}
-
-	public FieldIndicy addFieldIndicy(FieldIndicy fieldIndicy) {
-		getFieldIndicies().add(fieldIndicy);
-		fieldIndicy.setFieldInst(this);
-
-		return fieldIndicy;
-	}
-
-	public FieldIndicy removeFieldIndicy(FieldIndicy fieldIndicy) {
-		getFieldIndicies().remove(fieldIndicy);
-		fieldIndicy.setFieldInst(null);
-
-		return fieldIndicy;
-	}
-
-	public Field getField1() {
-		return this.field1;
-	}
-
-	public void setField1(Field field1) {
-		this.field1 = field1;
-	}
-
-	public Field getField2() {
-		return this.field2;
-	}
-
-	public void setField2(Field field2) {
-		this.field2 = field2;
-	}
-
-	public RawDoc getRawDoc() {
-		return this.rawDoc;
-	}
-
-	public void setRawDoc(RawDoc rawDoc) {
-		this.rawDoc = rawDoc;
 	}
 
 }
