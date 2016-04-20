@@ -48,6 +48,7 @@ public class UploadService {
 	
 	//Other private members
 	private static final String DEFAULT_SCHEMA_VERSION = "2.5";
+	private static final String DEFAULT_SCHEMA_ID = "ddi";
 
     private Optional<Boolean> uploadIsValid = Optional.empty();
 
@@ -103,7 +104,8 @@ public class UploadService {
         newRawDoc.setCodebookId(rawDocId + "_codebook");
         newRawDoc.setLastSync(new Timestamp((new Date()).getTime()));
         newRawDoc.setRawXml(xmlString);
-        newRawDoc.setSchema(schema);
+        newRawDoc.setSchemaId(DEFAULT_SCHEMA_ID);
+        newRawDoc.setSchemaVersion(DEFAULT_SCHEMA_VERSION);
         newRawDoc.setSha256(xmlHash);
         rawDocDao.save(newRawDoc);
 
@@ -117,7 +119,7 @@ public class UploadService {
 	 * @param xhandle
 	 * @return
 	 */
-	private boolean updateFieldInsts(XMLHandle xhandle, RawDoc raw_doc_id){
+	private boolean updateFieldInsts(XMLHandle xhandle, RawDoc raw_doc){
 		List<Field> fields = fieldDao.findAll();
         Map<String, Field> fieldMap = new HashMap<>(fields.size());
         for (Field field: fields) {
@@ -164,8 +166,8 @@ public class UploadService {
                 // fieldInst.setId(); //TODO: use RDB auto-increment behind the scenes?
                 //fieldInst.setTransactionDate(); //TODO: also let the database handle this?
                 fieldInst.setValue(xpathValues.get(ii));
-                fieldInst.setFieldId(fieldMap.get(fieldId));
-                fieldInst.setRawDocId(raw_doc_id);
+                fieldInst.setFieldId(fieldId);
+                fieldInst.setRawDocId(raw_doc.getId());
 
                 return fieldInst;
             }).collect(Collectors.toList());
