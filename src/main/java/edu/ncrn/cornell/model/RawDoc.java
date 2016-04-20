@@ -26,6 +26,7 @@ public class RawDoc implements Serializable {
 	@Column(name="last_sync")
 	private Timestamp lastSync;
 
+	@org.hibernate.annotations.Type(type="edu.ncrn.cornell.model.SQLXMLType")
 	@Column(name="raw_xml")
 	private String rawXml;
 
@@ -93,6 +94,7 @@ public class RawDoc implements Serializable {
 	}
 
 	public void setSha256(String sha256) {
+		assert(sha256.length() == 64);
 		this.sha256 = sha256;
 	}
 
