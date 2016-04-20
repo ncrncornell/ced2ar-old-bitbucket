@@ -3,6 +3,7 @@ package edu.ncrn.cornell.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 
@@ -23,8 +24,10 @@ public class RawDoc implements Serializable {
 	@Column(name="codebook_id")
 	private String codebookId;
 
-	@Column(name="last_sync")
-	private Timestamp lastSync;
+	@Basic(optional = false)
+	@Column(name = "last_sync", insertable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastSync;
 
 	@org.hibernate.annotations.Type(type="edu.ncrn.cornell.model.SQLXMLType")
 	@Column(name="raw_xml")
@@ -57,12 +60,8 @@ public class RawDoc implements Serializable {
 		this.codebookId = codebookId;
 	}
 
-	public Timestamp getLastSync() {
+	public Date getLastSync() {
 		return this.lastSync;
-	}
-
-	public void setLastSync(Timestamp lastSync) {
-		this.lastSync = lastSync;
 	}
 
 	public String getRawXml() {

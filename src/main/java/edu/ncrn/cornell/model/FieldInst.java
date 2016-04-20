@@ -3,6 +3,7 @@ package edu.ncrn.cornell.model;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class FieldInst implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@SequenceGenerator(name="pk_sequence",sequenceName="field_inst_id_seq", allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE,generator="pk_sequence")
 	@Id
 	private Long id;
 
@@ -28,8 +31,10 @@ public class FieldInst implements Serializable {
 	@Column(name="raw_doc_id")
 	private String rawDocId;
 
-	@Column(name="transaction_date")
-	private Timestamp transactionDate;
+	@Basic(optional = false)
+	@Column(name = "transaction_date", insertable = false, updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date transactionDate;
 
 	private String value;
 
@@ -68,12 +73,8 @@ public class FieldInst implements Serializable {
 		this.rawDocId = rawDocId;
 	}
 
-	public Timestamp getTransactionDate() {
+	public Date getTransactionDate() {
 		return this.transactionDate;
-	}
-
-	public void setTransactionDate(Timestamp transactionDate) {
-		this.transactionDate = transactionDate;
 	}
 
 	public String getValue() {
