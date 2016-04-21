@@ -4,20 +4,20 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 /**
- * The primary key class for the field_indicies database table.
+ * The primary key class for the field_indices database table.
  * 
  */
 @Embeddable
-public class FieldIndicyPK implements Serializable {
+public class FieldIndicePK implements Serializable {
 	//default serial version id, required for serializable classes.
 	private static final long serialVersionUID = 1L;
 
 	@Column(name="field_inst_id", insertable=false, updatable=false)
 	private Long fieldInstId;
 
-	private String index;
+	private Long index;
 
-	public FieldIndicyPK() {
+	public FieldIndicePK() {
 	}
 	public Long getFieldInstId() {
 		return this.fieldInstId;
@@ -25,10 +25,10 @@ public class FieldIndicyPK implements Serializable {
 	public void setFieldInstId(Long fieldInstId) {
 		this.fieldInstId = fieldInstId;
 	}
-	public String getIndex() {
+	public Long getIndex() {
 		return this.index;
 	}
-	public void setIndex(String index) {
+	public void setIndex(Long index) {
 		this.index = index;
 	}
 
@@ -36,10 +36,10 @@ public class FieldIndicyPK implements Serializable {
 		if (this == other) {
 			return true;
 		}
-		if (!(other instanceof FieldIndicyPK)) {
+		if (!(other instanceof FieldIndicePK)) {
 			return false;
 		}
-		FieldIndicyPK castOther = (FieldIndicyPK)other;
+		FieldIndicePK castOther = (FieldIndicePK)other;
 		return 
 			this.fieldInstId.equals(castOther.fieldInstId)
 			&& this.index.equals(castOther.index);

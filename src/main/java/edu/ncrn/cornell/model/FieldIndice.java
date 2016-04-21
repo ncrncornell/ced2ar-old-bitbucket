@@ -5,17 +5,17 @@ import javax.persistence.*;
 
 
 /**
- * The persistent class for the field_indicies database table.
+ * The persistent class for the field_indices database table.
  * 
  */
 @Entity
-@Table(name="field_indicies")
-@NamedQuery(name="FieldIndicy.findAll", query="SELECT f FROM FieldIndicy f")
-public class FieldIndicy implements Serializable {
+@Table(name="field_indices")
+@NamedQuery(name="FieldIndice.findAll", query="SELECT f FROM FieldIndice f")
+public class FieldIndice implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@EmbeddedId
-	private FieldIndicyPK id;
+	private FieldIndicePK id;
 
 	@Column(name="index_value")
 	private String indexValue;
@@ -25,14 +25,14 @@ public class FieldIndicy implements Serializable {
 	@JoinColumn(name="field_inst_id", insertable = false, updatable = false)
 	private FieldInst fieldInst;
 
-	public FieldIndicy() {
+	public FieldIndice() {
 	}
 
-	public FieldIndicyPK getId() {
+	public FieldIndicePK getId() {
 		return this.id;
 	}
 
-	public void setId(FieldIndicyPK id) {
+	public void setId(FieldIndicePK id) {
 		this.id = id;
 	}
 

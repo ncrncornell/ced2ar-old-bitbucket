@@ -6,6 +6,7 @@ import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentFilter;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import scala.Tuple2;
 
 
 import javax.xml.xpath.*;
@@ -246,10 +247,11 @@ public class XMLHandle {
      * @param xpathRest - pass in initial, potentially non-unique xpath
      * @return
      */
-    public Stream<String> getUniqueXPaths(String xpathBuilt, String xpathRest) {
+    public Stream<Tuple2<String, List<String>>> getUniqueXPaths(String xpathBuilt, String xpathRest) {
         if (xpathRest.equals("")) {
-            List<String> singleton = new ArrayList<>(1);
-            singleton.add(xpathBuilt);
+            List<Tuple2<String, List<String>>> singleton = new ArrayList<>(1);
+			List<String> emptyIndices =  new ArrayList<String>(0);
+            singleton.add(new Tuple2<>(xpathBuilt, emptyIndices));
             return singleton.stream();
         }
 
@@ -270,16 +272,17 @@ public class XMLHandle {
         Matcher wildAttribMatcher = attributeWildcard.matcher(currentPathPart);
         Boolean ambiguousEndName = false;
         if (!xpathParts.hasNext()) {
-            //We have traversed to the end of the input xpath, but it may
+            // We have traversed to the end of the input xpath, but it may
             // represent multiple element values
             xpathValues.addAll(getValueList(nextXpath));
             if (xpathValues.size() == 0) {
-                List<String> singleton = new ArrayList<>(0);
-                return  singleton.stream();
+                List<Tuple2<String, List<String>>> emptyValueList = new ArrayList<>(0);
+                return emptyValueList.stream();
             }
             else if (xpathValues.size() == 1) {
-                List<String> singleton = new ArrayList<>(1);
-                singleton.add(nextXpath);
+                List<Tuple2<String, List<String>>> singleton = new ArrayList<>(1);
+                List<String> emptyIndices =  new ArrayList<String>(0);
+                singleton.add(new Tuple2<>(nextXpath, emptyIndices));
                 return singleton.stream();
             }
             else {

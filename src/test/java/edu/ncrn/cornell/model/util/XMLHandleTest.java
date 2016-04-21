@@ -104,7 +104,6 @@ public class XMLHandleTest {
         numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
         assertTrue(4 == numUniqXpath);
 
-
     }
 
 
