@@ -2,7 +2,7 @@ package edu.ncrn.cornell.util;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentFilter;
+import com.google.common.collect.Lists;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -16,9 +16,9 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.*;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -206,7 +206,7 @@ public class XMLHandle {
      * @return
      */
 	public boolean isValid(){
-		Source xmlFile = null;
+		Optional<Source> xmlFile = Optional.empty();
 		try {
 			URL schemaFile = new URL(schemaURL);
 			System.out.println("SCHEMA URL: " + schemaURL);
@@ -214,17 +214,24 @@ public class XMLHandle {
             if (!ns_aware_xml.isPresent()) {
                 return false;
             }
-            xmlFile = new DOMSource(ns_aware_xml.get().getDocumentElement());
+            xmlFile = Optional.ofNullable(
+                new DOMSource(ns_aware_xml.get().getDocumentElement())
+            );
             System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
 			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			Schema schema = schemaFactory.newSchema(schemaFile);
 			Validator validator = schema.newValidator();
-			validator.validate(xmlFile);
+            if (xmlFile.isPresent()) {
+                validator.validate(xmlFile.get());
+            }
+            else {
+                return false;
+            }
 		}catch (SAXException e){
 			System.out.println(
-                    (xmlFile != null ? xmlFile.getSystemId() :
+                    (xmlFile.isPresent() ? xmlFile.get().getSystemId() :
                             "file with null id") + " is NOT valid"
             );
 			System.out.println("Reason: " + e.getLocalizedMessage());
@@ -245,16 +252,19 @@ public class XMLHandle {
      *
      * @param xpathBuilt - pass in empty string initially
      * @param xpathRest - pass in initial, potentially non-unique xpath
+     * @param indices - an empty list initially; accumulates indices (xpath list
+     *                indices or tag values) for each unique xpath (xpathBuilt)
+     *
      * @return
      */
-    public Stream<Tuple2<String, List<String>>> getUniqueXPaths(String xpathBuilt, String xpathRest) {
+    public Stream<Tuple2<String, List<String>>> getUniqueXPaths(
+        String xpathBuilt, String xpathRest, List<String> indices
+    ) {
         if (xpathRest.equals("")) {
-            List<Tuple2<String, List<String>>> singleton = new ArrayList<>(1);
-			List<String> emptyIndices =  new ArrayList<String>(0);
-            singleton.add(new Tuple2<>(xpathBuilt, emptyIndices));
-            return singleton.stream();
+            return Collections.singletonList(new Tuple2<>(xpathBuilt, indices)).stream();
         }
 
+        //TODO: consider how to optimize ArrayList allocation
         List<String> xpathValues = new ArrayList<>(200);
 
         Iterator<String> xpathParts = Splitter.on("/").omitEmptyStrings()
@@ -276,57 +286,80 @@ public class XMLHandle {
             // represent multiple element values
             xpathValues.addAll(getValueList(nextXpath));
             if (xpathValues.size() == 0) {
-                List<Tuple2<String, List<String>>> emptyValueList = new ArrayList<>(0);
-                return emptyValueList.stream();
+                return Collections.<Tuple2<String, List<String>>>emptyList().stream();
             }
             else if (xpathValues.size() == 1) {
-                List<Tuple2<String, List<String>>> singleton = new ArrayList<>(1);
-                List<String> emptyIndices =  new ArrayList<String>(0);
-                singleton.add(new Tuple2<>(nextXpath, emptyIndices));
-                return singleton.stream();
+                return Collections.singletonList(new Tuple2<>(nextXpath, indices)).stream();
             }
             else {
                 ambiguousEndName = true;
             }
         }
 
+        //TODO: consider how to optimize ArrayList allocation
         List<String> uniqueXpaths = new ArrayList<>(200);
         String remainingXpath = xpathRest.replace("/" + currentPathPart, "");
+        //Used for calling next iteration:
+        Function<List<List<String>>, Stream<Tuple2<String, List<String>>>> ourFlatMap =
+        (newIndices) -> IntStream.range(0, uniqueXpaths.size()).mapToObj(ii -> {
+            String xpath = uniqueXpaths.get(ii);
+            return getUniqueXPaths(xpath, remainingXpath, newIndices.get(ii));
+        }).flatMap(x -> x);
         // Now we must deal with one of the following types of multiplicities
         //TODO: need good tests for each of the following
         if (wildElemMatcher.find(0) && !ambiguousEndName) {
             xpathValues.addAll(getValueList(nextXpath));
+            // Construct unique xpaths:
             uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
                 xpathBuilt + "/" +
                 wildElemMatcher.replaceFirst("[" + Integer.toString(ii) + "]")
             ).collect(Collectors.toList()));
-            return uniqueXpaths.stream().flatMap(xpath ->
-                getUniqueXPaths(xpath, remainingXpath)
-            );
+            // Append indices for unique xpaths:
+            List<List<String>> iterationIndices =
+            IntStream.range(0, uniqueXpaths.size()).mapToObj(ii -> {
+                List<String> newList = Lists.newArrayList(indices);
+                newList.add(Integer.toString(ii + 1));
+                return newList;
+            }).collect(Collectors.toList());
+            // Proceed to next iteration:
+            return ourFlatMap.apply(iterationIndices);
         }
         else if (wildAttribMatcher.find(0)) {
             Matcher attrValueMatcher = wildcard.matcher(currentPathPart);
             String attribXpath = xpathBuilt + "/@" + wildAttribMatcher.group(0);
             List<String> attribValues = getValueList(attribXpath);
-            uniqueXpaths.addAll(attribValues.stream().map(ii ->
-                xpathBuilt + "/" + attrValueMatcher.replaceFirst(ii)
+            // Construct unique xpaths:
+            uniqueXpaths.addAll(attribValues.stream().map(attribVal ->
+                xpathBuilt + "/" + attrValueMatcher.replaceFirst(attribVal)
             ).collect(Collectors.toList()));
-            return uniqueXpaths.stream().flatMap(xpath ->
-                getUniqueXPaths(xpath, remainingXpath)
-            );
+            // Append indices for unique xpaths:
+            List<List<String>> iterationIndices = attribValues.stream().map(attribVal -> {
+                List<String> newList = Lists.newArrayList(indices);
+                newList.add(attribVal);
+                return newList;
+            }).collect(Collectors.toList());
+            // Proceed to next iteration:
+            return ourFlatMap.apply(iterationIndices);
         }
         else if (ambiguousEndName) {
-            //xpathValues already obtained
+            // xpathValues already obtained
+            // Construct unique xpaths:
             uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
                 nextXpath + "[" + Integer.toString(ii) + "]"
             ).collect(Collectors.toList()));
-            return uniqueXpaths.stream().flatMap(xpath ->
-                getUniqueXPaths(xpath, remainingXpath)
-            );
+            // Append indices for unique xpaths:
+            List<List<String>> iterationIndices =
+            IntStream.range(0, uniqueXpaths.size()).mapToObj(ii -> {
+                List<String> newList = Lists.newArrayList(indices);
+                newList.add(Integer.toString(ii + 1));
+                return newList;
+            }).collect(Collectors.toList());
+            // Proceed to next iteration:
+            return ourFlatMap.apply(iterationIndices);
         }
         else {
             //Nothing to do at this level, moving on:
-            return getUniqueXPaths(nextXpath, remainingXpath);
+            return getUniqueXPaths(nextXpath, remainingXpath, indices);
         }
         // Never reached
     }

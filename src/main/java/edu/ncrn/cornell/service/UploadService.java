@@ -157,7 +157,7 @@ public class UploadService {
             System.out.println("Values are: ");
 
 			List<Tuple2<String, List<String>>> uniqueXpaths = xpathList.stream().flatMap(xpath ->
-					xhandle.getUniqueXPaths("", xpath)
+					xhandle.getUniqueXPaths("", xpath, Collections.emptyList())
 			).collect(Collectors.toList());
 
 			List<String> xpathValues = uniqueXpaths.stream().map(xpath ->
@@ -172,7 +172,6 @@ public class UploadService {
                 fieldInst.setRawDocId(raw_doc.getId());
 				fieldInst.setCanonicalXpath(uniqueXpaths.get(ii)._1);
 
-
                 return fieldInst;
             }).collect(Collectors.toList());
 
@@ -181,28 +180,39 @@ public class UploadService {
 			System.out.println("xpathValues count is " + xpathValues.size());
 
 
+            // entities are altered upon insertion into database; retrive updates
             fieldInsts = Lists.newArrayList(fieldInstDao.save(fieldInsts));
             final List<FieldInst> fieldInstsTmp1 = fieldInsts;
-            Stream<FieldIndice> allFieldIndices = IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
+
+            List<FieldIndice> allFieldIndices = IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
                 FieldInst fieldInst = fieldInstsTmp1.get(ii);
                 List<String> xpathIndices = uniqueXpaths.get(ii)._2;
+
+                //DEBUG
+                System.out.println("xpathIndices:");
+                System.out.println(xpathIndices);
+
                 return IntStream.range(0, xpathIndices.size()).mapToObj(jj -> {
                     FieldIndice fieldIndex = new FieldIndice();
                     FieldIndicePK fieldIndexPk = new FieldIndicePK();
-                    String xpathIndex = xpathValues.get(jj);
+                    String xpathIndex = xpathIndices.get(jj);
                     //
                     fieldIndexPk.setFieldInstId(fieldInst.getId());
-                    fieldIndexPk.setFieldInstId((long) jj);
+                    fieldIndexPk.setIndex((long) jj);
                     //
                     fieldIndex.setId(fieldIndexPk);
                     fieldIndex.setIndexValue(xpathIndex);
                     fieldIndex.setFieldInst(fieldInst);
                     return fieldIndex;
                 });
-            }).flatMap(f -> f);
+            })
+            .flatMap(f -> f)
+            //.filter(f -> f.getIndexValue() == null)
+            .collect(Collectors.toList());
 
-            //FIXME: why does the following cause a hang?
-            //fieldIndiceDao.save(allFieldIndices.collect(Collectors.toList()));
+            System.out.println("There are " + Integer.toString(allFieldIndices.size()) + " indicies");
+
+            fieldIndiceDao.save(allFieldIndices);
 
         });
 
