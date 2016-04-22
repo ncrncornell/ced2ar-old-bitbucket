@@ -3,10 +3,10 @@ package edu.ncrn.cornell.service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -38,7 +38,7 @@ public class UploadService {
 	@Autowired
 	private FieldInstDao fieldInstDao;
 	@Autowired
-	private FieldIndicyDao fieldIndicyDao;
+	private FieldIndiceDao fieldIndiceDao;
 	@Autowired
 	private FieldDao fieldDao;
     @Autowired
@@ -137,7 +137,7 @@ public class UploadService {
 		 * insert into fieldInst table
 		 * convert xpath to refer to specific value
 		 * 	  (i.e. /codeBook/dataDsc/var/varlabl -> /codeBook/dataDscr/var[@name='age']/labl
-		 * insert as index into fieldIndicy table
+		 * insert as index into fieldIndice table
 		 * 
 		 */
 
@@ -156,48 +156,64 @@ public class UploadService {
             System.out.println(Joiner.on("\n").join(xpathList));
             System.out.println("Values are: ");
 
-			List<String> uniqueXpaths = xpathList.stream().flatMap(xpath ->
-					xhandle.getUniqueXPaths("", xpath)
+			List<Tuple2<String, List<String>>> uniqueXpaths = xpathList.stream().flatMap(xpath ->
+					xhandle.getUniqueXPaths("", xpath, Collections.emptyList())
 			).collect(Collectors.toList());
 
 			List<String> xpathValues = uniqueXpaths.stream().map(xpath ->
-                xhandle.getUniqueValue(xpath).orElse("")
+                xhandle.getUniqueValue(xpath._1).orElse("")
 			).collect(Collectors.toList());
 
-            List<FieldInst> fieldInsts = IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
+            List<FieldInst> fieldInsts =
+			IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
                 FieldInst fieldInst = new FieldInst();
-                // fieldInst.setId(); //TODO: use RDB auto-increment behind the scenes?
-                //fieldInst.setTransactionDate(); //TODO: also let the database handle this?
                 fieldInst.setValue(xpathValues.get(ii));
                 fieldInst.setFieldId(fieldId);
                 fieldInst.setRawDocId(raw_doc.getId());
-				fieldInst.setCanonicalXpath(uniqueXpaths.get(ii));
+				fieldInst.setCanonicalXpath(uniqueXpaths.get(ii)._1);
 
                 return fieldInst;
             }).collect(Collectors.toList());
 
+            //DEBUG
 			System.out.println("uniqueXpaths count is " + uniqueXpaths.size());
 			System.out.println("xpathValues count is " + xpathValues.size());
 
 
-			fieldInsts = Lists.newArrayList(fieldInstDao.save(fieldInsts));
+            // entities are altered upon insertion into database; retrive updates
+            fieldInsts = Lists.newArrayList(fieldInstDao.save(fieldInsts));
+            final List<FieldInst> fieldInstsTmp1 = fieldInsts;
 
-//            List<Tuple2<Field, FieldIndicy>> fieldEntities IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
-//
-//            });
+            List<FieldIndice> allFieldIndices = IntStream.range(0, xpathValues.size()).mapToObj(ii -> {
+                FieldInst fieldInst = fieldInstsTmp1.get(ii);
+                List<String> xpathIndices = uniqueXpaths.get(ii)._2;
 
+                //DEBUG
+                System.out.println("xpathIndices:");
+                System.out.println(xpathIndices);
 
+                return IntStream.range(0, xpathIndices.size()).mapToObj(jj -> {
+                    FieldIndice fieldIndex = new FieldIndice();
+                    FieldIndicePK fieldIndexPk = new FieldIndicePK();
+                    String xpathIndex = xpathIndices.get(jj);
+                    //
+                    fieldIndexPk.setFieldInstId(fieldInst.getId());
+                    fieldIndexPk.setIndex((long) jj);
+                    //
+                    fieldIndex.setId(fieldIndexPk);
+                    fieldIndex.setIndexValue(xpathIndex);
+                    fieldIndex.setFieldInst(fieldInst);
+                    return fieldIndex;
+                });
+            })
+            .flatMap(f -> f)
+            //.filter(f -> f.getIndexValue() == null)
+            .collect(Collectors.toList());
 
+            System.out.println("There are " + Integer.toString(allFieldIndices.size()) + " indicies");
 
+            fieldIndiceDao.save(allFieldIndices);
 
-			xpathList.stream().forEach(xpath -> {
-//              xhandle.getValueList(xpath).stream().forEach(v -> System.out.println(v));
-//				xhandle.getUniqueXPaths("", xpath).forEach(v -> System.out.println(v));
-
-			});
-
-//            List<String> fieldValues = xpathList.stream().map(xpath -> {
-//            });
         });
 
 

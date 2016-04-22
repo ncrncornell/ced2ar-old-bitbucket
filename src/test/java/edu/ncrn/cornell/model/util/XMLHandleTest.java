@@ -64,7 +64,7 @@ public class XMLHandleTest {
             //TODO: just one schema for now
             for(String xpath: allXpaths.get("ddi_2.5.1")) {
 
-                Long numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+                Long numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
                 List<String> xpathValues = xhandle.getValueList(xpath);
                 if (numUniqXpath != xpathValues.size()) {
                     System.out.println("Error, discrepancy in xpath mappings and value index sizes:");
@@ -72,7 +72,7 @@ public class XMLHandleTest {
                         xpath + ": " +
                         String.valueOf(xpathValues.size()) + " : " + String.valueOf(numUniqXpath)
                     );
-                    xhandle.getUniqueXPaths("", xpath).forEach(System.out::println);
+                    xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).forEach(System.out::println);
                 }
                 assertTrue(xpathValues.size() == numUniqXpath);
 
@@ -97,13 +97,12 @@ public class XMLHandleTest {
         XMLHandle xhandle = new XMLHandle(xmlString, schema);
 
         String xpath = "/codeBook/dataDscr/var[*]/labl";
-        Long numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+        Long numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
         assertTrue(numUniqXpath > 1);
 
         xpath = "/codeBook/stdyDscr/othrStdyMat/relMat[*]";
-        numUniqXpath = xhandle.getUniqueXPaths("", xpath).count();
+        numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
         assertTrue(4 == numUniqXpath);
-
 
     }
 
