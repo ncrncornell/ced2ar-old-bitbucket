@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import edu.ncrn.cornell.model.Field;
+import edu.ncrn.cornell.model.FieldIndice;
 import edu.ncrn.cornell.model.FieldInst;
 import edu.ncrn.cornell.model.Mapping;
 import edu.ncrn.cornell.model.Profile;
 import edu.ncrn.cornell.model.ProfileField;
 import edu.ncrn.cornell.model.RawDoc;
 import edu.ncrn.cornell.model.dao.FieldDao;
+import edu.ncrn.cornell.model.dao.FieldIndiceDao;
 import edu.ncrn.cornell.model.dao.FieldInstDao;
 import edu.ncrn.cornell.model.dao.MappingDao;
 import edu.ncrn.cornell.model.dao.ProfileDao;
@@ -53,6 +55,8 @@ public class CodebookService {
 	SchemaDao schemaDao;
 	@Autowired
 	FieldInstDao fieldInstDao;
+	@Autowired
+	FieldIndiceDao fieldIndiceDao;
 	
 	/**
 	 * Lists all handles from the RawDocs table in postgres
@@ -182,7 +186,7 @@ public class CodebookService {
 	}
 	
 	/**
-	 * Gets the list of variables for a given codebook.
+	 * Gets the list of variables for a given codebook (name, label) pairs
 	 * The profile of this list is comprised of varname and varlabel.
 	 * This profile is currently hardcoded into the function.
 	 * TODO: generate profile dynamically
@@ -199,14 +203,23 @@ public class CodebookService {
 		
 		//for each varname find the labl and add to hashmap
 		for( FieldInst varname : varnames){
-			//get varname xpath, map to labl xpath
-			String nameXpath = varname.getCanonicalXpath();
-			String lablXpath = nameXpath.replace("@name", "labl");
+			
+			Long varnameId = varname.getId();
+			List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varnameId);
+			FieldIndice varIndex = varIndices.get(0);
+			String varIndexValue = varIndex.getIndexValue();
+			
+			List<Mapping> lablMaps = mappingDao.findById_FieldId("varlabel");
+			Mapping lablMap = lablMaps.get(0);
+			String lablXpath = lablMap.getXpath();
+			
+			lablXpath = lablXpath.replace("*", varIndexValue);
+			
 			//find corresponding varlabl by canonical xpath
 			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
 			//check that xpath was mapped correctly
 			if(varlabls.size() != 1){
-				System.out.println("failed to properly map xpath from varname ("+nameXpath+") to varlabl");
+				System.out.println("failed to properly map xpath from varname to varlabl: "+lablXpath);
 				continue;
 			}
 			FieldInst varlabl = varlabls.get(0);
@@ -254,11 +267,59 @@ public class CodebookService {
 		return details;
 	}
 	
+	/**
+	 * retreives variable details profile from SQL tables
+	 * @param handle
+	 * @param varname
+	 * @return
+	 */
 	public Map<String, String> getVariableDetails_SQL(String handle, String varname){
-		
-		//TODO implement fn
+		//retreive vardetails profile
 		List<String> fieldIds = getProfileFieldIds("vardetails");
 		Map<String, String> details = new HashMap<String, String>();
+		
+		//find the varname instance specified by argument
+		List<FieldInst> varnames = fieldInstDao.findByRawDocIdAndValue(handle, varname);
+		if(varnames.size() != 1){
+			System.out.println("failed to find variable "+varname+" in codebook "+handle);
+			return null;
+		}
+		FieldInst var = varnames.get(0);
+		
+		//find the xpath index of this variable for use in retrieving other fields
+		long varId = var.getId();
+		List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varId);
+		FieldIndice varIndex = varIndices.get(0);
+		String varIndexValue = varIndex.getIndexValue();
+		
+		//iterate over each field in the profile and find the instance using the indexed xpath
+		for(String fieldId : fieldIds){
+			
+			Field currentField = fieldDao.findOne(fieldId);
+			
+			//get the general (with wildcards) xpath for each field
+			List<Mapping> maps = mappingDao.findById_FieldId(fieldId);
+			if(maps.size() != 1){
+				System.out.println("failed to find map for field "+fieldId);
+				continue;
+			}
+			Mapping map = maps.get(0);
+			String generalXpath = map.getXpath();
+			
+			//replace wildcard with index
+			String indexedXpath = generalXpath.replace("*", varIndexValue);
+			
+			//find the instance using the indexed xpath
+			List<FieldInst> insts = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, indexedXpath);
+			if(insts.size() != 1){
+				System.out.println("failed to find field instance with xpath "+indexedXpath);
+				continue;
+			}
+			FieldInst inst = insts.get(0);
+			
+			//add to hashmap; key is display name of field and value is the text value of the FieldInst
+			details.put(currentField.getDisplayName(), inst.getValue());
+		}
 		
 		
 		
