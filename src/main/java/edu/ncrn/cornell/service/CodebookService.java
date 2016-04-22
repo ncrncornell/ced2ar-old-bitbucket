@@ -181,10 +181,40 @@ public class CodebookService {
 		return varlist;
 	}
 	
+	/**
+	 * Gets the list of variables for a given codebook.
+	 * The profile of this list is comprised of varname and varlabel.
+	 * This profile is currently hardcoded into the function.
+	 * TODO: generate profile dynamically
+	 * 
+	 * @param handle
+	 * @return
+	 */
 	public Map<String, String> getCodebookVariables_SQL(String handle){
+		//hashmap with varnames as keys and corresponding varlabls as values
+		Map<String, String> variables = new HashMap<String, String>();
 		
-		//TODO implement fn
-		return null;
+		//get all varname instances for a given codebook
+		List<FieldInst> varnames = fieldInstDao.findByRawDocIdAndFieldId(handle, "varname");
+		
+		//for each varname find the labl and add to hashmap
+		for( FieldInst varname : varnames){
+			//get varname xpath, map to labl xpath
+			String nameXpath = varname.getCanonicalXpath();
+			String lablXpath = nameXpath.replace("@name", "labl");
+			//find corresponding varlabl by canonical xpath
+			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
+			//check that xpath was mapped correctly
+			if(varlabls.size() != 1){
+				System.out.println("failed to properly map xpath from varname ("+nameXpath+") to varlabl");
+				continue;
+			}
+			FieldInst varlabl = varlabls.get(0);
+			//insert into hashmap
+			variables.put(varname.getValue(), varlabl.getValue());
+		}
+		
+		return variables;
 	}
 	
 	/**
