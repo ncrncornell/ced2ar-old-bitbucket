@@ -10,13 +10,17 @@ import org.junit.gen5.api.BeforeEach;
 import org.junit.gen5.api.Test;
 import org.junit.gen5.junit4.runner.JUnit5;
 import org.junit.runner.RunWith;
+import scala.Tuple2;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.gen5.api.Assertions.*;
 
@@ -32,13 +36,18 @@ public class XMLHandleTest {
     //TODO: Support multiple schemas
     private String schema = "http://www.ncrn.cornell.edu/docs/ddi/2.5.NCRN.P/schemas/codebook.xsd";
 
-    private final String[] allDdiFiles = {"/SIPP Synthetic Beta v5.1.xml"};
+    private final String[] allDdiFiles = {
+        "/SIPP Synthetic Beta v5.1.xml",
+        "/ssbv602.xml"
+    };
 
     List<String> allDdiFilesList = Arrays.asList(allDdiFiles);
 
     private List<InputStream> allDdiInputs = new ArrayList<>();
 
     static private Map<String, String[]> allXpaths = new HashMap<>(5);
+
+    private static final Pattern wildcard = Pattern.compile("\\*");
 
     @Test
     public void createXmlHandles() {
@@ -64,7 +73,11 @@ public class XMLHandleTest {
             //TODO: just one schema for now
             for(String xpath: allXpaths.get("ddi_2.5.1")) {
 
-                Long numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
+                List<Tuple2<String, List<String>>> uniqueXpaths =
+                    xhandle.getUniqueXPaths("", xpath, Collections.emptyList())
+                    .collect(Collectors.toList());
+
+                int numUniqXpath = uniqueXpaths.size();
                 List<String> xpathValues = xhandle.getValueList(xpath);
                 if (numUniqXpath != xpathValues.size()) {
                     System.out.println("Error, discrepancy in xpath mappings and value index sizes:");
@@ -76,12 +89,51 @@ public class XMLHandleTest {
                 }
                 assertTrue(xpathValues.size() == numUniqXpath);
 
-                //TODO: add test that each unique xpath returns a single value
+                List<List<String>> uniqueXpathValues = uniqueXpaths.stream()
+                    .map(ux -> xhandle.getValueList(ux._1))
+                    .collect(Collectors.toList());
+
+                // Check that each unique xpath returns a single value
+                List<Integer> uniqueXpathCardinals = uniqueXpathValues.stream().map(List::size)
+                    .collect(Collectors.toList());
+                Integer maxUXcardinal = uniqueXpathCardinals.stream().max(Integer::max).orElse(1);
+                Integer minUXcardinal = uniqueXpathCardinals.stream().min(Integer::min).orElse(1);
+                assertEquals(1, maxUXcardinal);
+                assertEquals(1, minUXcardinal);
+
+                // Verify unique xpaths no longer have wild cards:
+                int numWildcards = uniqueXpaths.stream().map(ux -> {
+                    Matcher wildCardMatcher = wildcard.matcher(ux._1);
+                    int count = 0;
+                    while (wildCardMatcher.find()) {
+                        count++;
+                    }
+                    if (count > 0) {
+                        System.out.println("Error, didn't remove wildcard in: " + ux._1);
+                    }
+                    return count;
+                }).mapToInt(m -> m).sum();
+                assertEquals(0, numWildcards);
+
+
 
                 //TODO check /some/xpath count = /some/xpath[*] count for both values and unique xpaths
+                //TODO: http://stackoverflow.com/questions/2313229/junit-4-compare-collections
+
 
             }
+
+            // Check that multiple indices are generated
+            String multipleIndexedXpath = "/codeBook/dataDscr/var[@name]/catgry/catValu";
+//            String multipleIndexedXpath = "/codeBook/dataDscr/var[@name=\'*\']";
+            //String multipleIndexedXpath = "/codeBook/stdyDscr/othrStdyMat/relMat[*]";
+            List<Tuple2<String, List<String>>> uniqueXpaths =
+                    xhandle.getUniqueXPaths("", multipleIndexedXpath, Collections.emptyList())
+                            .collect(Collectors.toList());
+
+            System.out.println("Num uniq: " + Integer.toString(uniqueXpaths.size()));
         }
+
     }
 
     @Test
