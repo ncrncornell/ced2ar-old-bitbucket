@@ -156,6 +156,13 @@ public class XMLHandleTest {
         numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
         assertTrue(4 == numUniqXpath);
 
+        xpath = "/codeBook/dataDscr/var[@name]";
+        String xpathAttrib = "/codeBook/dataDscr/var/@name";
+        numUniqXpath = xhandle.getUniqueXPaths("", xpath, Collections.emptyList()).count();
+        List<String> attribList = xhandle.getValueList(xpathAttrib);
+        assertTrue(attribList.size() > 0);
+        assertTrue(attribList.size() == numUniqXpath);
+
     }
 
 

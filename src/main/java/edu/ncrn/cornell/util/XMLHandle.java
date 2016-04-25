@@ -46,9 +46,7 @@ public class XMLHandle {
 
     //TODO: replace usage with faster parse functions: https://www.w3.org/TR/xml/#NT-Name
     private static final Pattern elementWildcard = Pattern.compile("\\[\\*\\]");
-    private static final Pattern attributeWildcard = Pattern.compile(
-        "\\[@(.+)\\s*=\\s*[\"'](\\*)[\"']\\]"
-    );
+    private static final Pattern attributeWildcard = Pattern.compile("(.+)\\[@(.+)\\]");
     private static final Pattern wildcard = Pattern.compile("\\*");
 
 
@@ -328,12 +326,12 @@ public class XMLHandle {
             return ourFlatMap.apply(iterationIndices);
         }
         else if (wildAttribMatcher.find(0)) {
-            Matcher attrValueMatcher = wildcard.matcher(currentPathPart);
-            String attribXpath = xpathBuilt + "/@" + wildAttribMatcher.group(0);
+            String elemXpath = xpathBuilt + "/" + wildAttribMatcher.group(1);
+            String attribXpath = elemXpath + "/@" + wildAttribMatcher.group(2);
             List<String> attribValues = getValueList(attribXpath);
             // Construct unique xpaths:
             uniqueXpaths.addAll(attribValues.stream().map(attribVal ->
-                xpathBuilt + "/" + attrValueMatcher.replaceFirst(attribVal)
+                elemXpath + "[@" + wildAttribMatcher.group(2) + "=" + attribVal + "]"
             ).collect(Collectors.toList()));
             // Append indices for unique xpaths:
             List<List<String>> iterationIndices = attribValues.stream().map(attribVal -> {
