@@ -84,8 +84,18 @@ public class UploadController {
                 //Process file
                 uploadService.newUpload(newXmlFile);
 
-                redirectAttributes.addFlashAttribute("message",
-                        "You successfully uploaded " + name + "!");
+                if (uploadService.importSucceded()) {
+                    redirectAttributes.addFlashAttribute("message",
+                            "You successfully uploaded " + name + "!");
+                } else {
+                    if (!uploadService.uploadIsValid()) {
+                        redirectAttributes.addFlashAttribute("message",
+                                "There was a problem parsing XML for " + name + "!");
+                    } else {
+                        redirectAttributes.addFlashAttribute("message",
+                                "There was an unknown problem with importing " + name + "!");
+                    }
+                }
             }
             catch (Exception e) {
                 redirectAttributes.addFlashAttribute("message",

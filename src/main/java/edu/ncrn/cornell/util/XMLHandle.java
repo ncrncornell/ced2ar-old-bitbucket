@@ -262,8 +262,6 @@ public class XMLHandle {
             return Collections.singletonList(new Tuple2<>(xpathBuilt, indices)).stream();
         }
 
-        Optional<List<String>> xpathValues = Optional.empty();
-
         Iterator<String> xpathParts = Splitter.on("/").omitEmptyStrings()
 			.split(xpathRest).iterator();
 
@@ -277,21 +275,15 @@ public class XMLHandle {
 
         Matcher wildElemMatcher = elementWildcard.matcher(currentPathPart);
         Matcher wildAttribMatcher = attributeWildcard.matcher(currentPathPart);
-        Boolean ambiguousEndName = false;
+
+        List<String> xpathValues = getValueList(nextXpath);
         if (!xpathParts.hasNext()) {
             // We have traversed to the end of the input xpath, but it may
             // represent multiple element values
-            xpathValues = Optional.of(getValueList(nextXpath));
-            if (xpathValues.get().size() == 0) {
+            if (xpathValues.size() == 0) {
                 return Collections.<Tuple2<String, List<String>>>emptyList().stream();
-            }
-            else if (xpathValues.get().size() == 1) {
+            } else if (xpathValues.size() == 1) {
                 return Collections.singletonList(new Tuple2<>(nextXpath, indices)).stream();
-            }
-            else if (wildElemMatcher.find(0)) {
-                // Do nothing; will be handled later
-            } else {
-                ambiguousEndName = true;
             }
         }
 
@@ -305,13 +297,10 @@ public class XMLHandle {
             return getUniqueXPaths(xpath, remainingXpath, newIndices.get(ii));
         }).flatMap(x -> x);
         // Now we must deal with one of the following types of multiplicities
-        //TODO: need good tests for each of the following
+        // TODO: need good tests for each of the following
         if (wildElemMatcher.find(0)) {
-            if (!xpathValues.isPresent()) {
-                xpathValues = Optional.of(getValueList(nextXpath));
-            }
             // Construct unique xpaths:
-            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.get().size()).mapToObj(ii ->
+            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
                 xpathBuilt + "/" +
                 wildElemMatcher.replaceFirst("[" + Integer.toString(ii) + "]")
             ).collect(Collectors.toList()));
@@ -342,12 +331,12 @@ public class XMLHandle {
             // Proceed to next iteration:
             return ourFlatMap.apply(iterationIndices);
         }
-        else if (ambiguousEndName) {
-            if (!xpathValues.isPresent()) {
-                xpathValues = Optional.of(getValueList(nextXpath));
-            }
+        else if (xpathValues.size() > 1) {
+            // Now we handle an implicit multicplity in an xpath
+            // (rather than an explicit wildcard)
+            //
             // Construct unique xpaths:
-            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.get().size()).mapToObj(ii ->
+            uniqueXpaths.addAll(IntStream.rangeClosed(1, xpathValues.size()).mapToObj(ii ->
                 nextXpath + "[" + Integer.toString(ii) + "]"
             ).collect(Collectors.toList()));
             // Append indices for unique xpaths:
