@@ -222,8 +222,7 @@ public class UploadService {
 
         });
 
-
-		return false;
+		return true;
 	}
 	
 	

@@ -1,19 +1,19 @@
 package edu.ncrn.cornell.view
 
+import edu.ncrn.cornell.view.common.Ced2arView
+
 import scalatags.Text.all._
 import scala.collection.JavaConversions._
-
-import edu.ncrn.cornell.view.common.GlobalViewElements._
 
 /**
   * Created by Brandon Barker on 4/1/2016.
   */
 
-object UploadView {
+class UploadView extends Ced2arView {
   //TODO: add flash messages
   def uploadForm(
-                  uploadedFiles: java.util.List[String]
-                ): String = {
+    uploadedFiles: java.util.List[String]
+  ): String = {
     val typedHtml = html(
       head(
         defaultMetaTags,
@@ -22,6 +22,7 @@ object UploadView {
       ),
       body(
         topBanner,
+        messages,
         div(form(
           method := "POST",
           action := "/upload",

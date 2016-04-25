@@ -29,6 +29,8 @@ public class UploadController {
 
     @Autowired
     UploadService uploadService;
+
+    UploadView view = new UploadView();
 	
 	//GET page
     @ResponseBody
@@ -50,13 +52,12 @@ public class UploadController {
                 .sorted(Comparator.comparingLong(f -> -1 * f.lastModified()))
                 .map(f -> f.getName())
                 .collect(Collectors.toList());
-            return UploadView.uploadForm(uploadedFiles);
-        }).orElse(UploadView.noUploadDir());
+            return view.uploadForm(uploadedFiles);
+        }).orElse(view.noUploadDir());
     }
 
 
     //POST page
-    //@ResponseBody
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/upload"//,
@@ -67,11 +68,11 @@ public class UploadController {
                                    RedirectAttributes redirectAttributes) {
         if (name.contains("/")) {
             redirectAttributes.addFlashAttribute("message", "Folder separators not allowed");
-            return "redirect:upload";
+            return "redirect:/upload";
         }
         if (name.contains("/")) {
             redirectAttributes.addFlashAttribute("message", "Relative pathnames not allowed");
-            return "redirect:upload";
+            return "redirect:/upload";
         }
 
         if (!file.isEmpty()) {
@@ -85,28 +86,30 @@ public class UploadController {
                 uploadService.newUpload(newXmlFile);
 
                 if (uploadService.importSucceded()) {
-                    redirectAttributes.addFlashAttribute("message",
+                    redirectAttributes.addFlashAttribute("success",
                             "You successfully uploaded " + name + "!");
                 } else {
                     if (!uploadService.uploadIsValid()) {
-                        redirectAttributes.addFlashAttribute("message",
+                        redirectAttributes.addFlashAttribute("error",
                                 "There was a problem parsing XML for " + name + "!");
                     } else {
-                        redirectAttributes.addFlashAttribute("message",
+                        redirectAttributes.addFlashAttribute("error",
                                 "There was an unknown problem with importing " + name + "!");
                     }
                 }
             }
             catch (Exception e) {
-                redirectAttributes.addFlashAttribute("message",
+                redirectAttributes.addFlashAttribute("error",
                         "You failed to upload " + name + " => " + e.getMessage());
             }
         }
         else {
-            redirectAttributes.addFlashAttribute("message",
+            redirectAttributes.addFlashAttribute("error",
                     "You failed to upload " + name + " because the file was empty");
         }
 
-        return "redirect:upload";
+        view.setAttributes(redirectAttributes);
+
+        return "redirect:/upload";
     }
 }
