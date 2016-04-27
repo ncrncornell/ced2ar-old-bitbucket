@@ -30,6 +30,7 @@ public class CodebookController {
 	 * @param model
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(
 	        method = RequestMethod.GET,
 	        value = "/codebooks",

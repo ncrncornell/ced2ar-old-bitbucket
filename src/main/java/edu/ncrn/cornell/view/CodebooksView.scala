@@ -23,13 +23,13 @@ class CodebooksView extends Ced2arView{
         h2("Codebooks"),
         div(
             
-            codebooks.foreach{ case (handle, name) =>
+            codebooks.map{ case (handle, cname) =>
               p(
                   a(href:="localhost:8080/ced2ar-rdb/codebooks/"+handle)(
-                    name
+                    cname
                     )
                )
-            }
+            }.toSeq
         ) 
       )
     )
