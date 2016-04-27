@@ -59,64 +59,35 @@ public class CodebookService {
 	FieldIndiceDao fieldIndiceDao;
 	
 	/**
-	 * Lists all handles from the RawDocs table in postgres
+	 * Lists all handles and full names
 	 * @return
 	 */
-	public List<String> getAllHandles(){
+	public Map<String, String> getAllHandles(){
 		
+		Map<String, String> handles = new HashMap<String, String>();
 		List<RawDoc> docs = rawDocDao.findAll();
-		System.out.println("rawdoc count: "+docs.size());
-		List<String> handles = new ArrayList<String>();
 		for(RawDoc doc : docs){
-			handles.add(doc.getId());
+			String handle = doc.getId();
+			List<FieldInst> codebookNames = fieldInstDao.findByRawDocIdAndFieldId(handle, "codebookname");
+			if(codebookNames.size() != 1){
+				System.out.println("unexpected result from fieldInst retreival");
+				continue;
+			}
+			FieldInst codebookName = codebookNames.get(0);
+			System.out.println("[getAllHandles]:: adding (handle, name): ("+handle+", "+codebookName.getValue());
+			handles.put(handle, codebookName.getValue());
 		}
 		
 		return handles;
 	}
 	
-	/**
-	 * Returns a map of key-value pairs representing the information described by the codebookDetails profile.
-	 * @param handle
-	 * @return
-	 */
-	public Map<String, String> getCodebookDetails(String handle){
-		
-		List<String> field_ids = getProfileFieldIds("codebookdetails");
-		
-		XMLHandle xhandle = getCodebookXML(handle);
-		
-		
-		//get each mapping, execute xpath to get value, put into hashmap
-		Map<String,String> details = new HashMap<String, String>();
-		for(String f : field_ids){
-			//get XPath mapping associated with field
-			List<Mapping> maps = mappingDao.findById_FieldId(f);
-			//this is not a good check but need something here
-			if(maps == null){
-				System.out.println("no mappings found for "+f);
-				continue;
-			}
-			Mapping firstMap = maps.get(0);
-			String path = firstMap.getXpath();
-			String value = xhandle.getXPathSingleValue(path);
-			if(value == null){
-				System.out.println("no value found for xpath "+path);
-				continue;
-			}
-			Field cur = fieldDao.findOne(f);
-			details.put(cur.getDisplayName(), value);
-		}
-		
-		return details;
-		
-	}
 	
 	/**
 	 * gathers codebook details from FieldInst table rather than parsing XML
 	 * @param handle
 	 * @return
 	 */
-	public Map<String, String> getCodebookDetails_SQL(String handle){
+	public Map<String, String> getCodebookDetails(String handle){
 		
 		//Map of field names and their corresponding instances
 		Map<String, String> details = new HashMap<String, String>();
@@ -151,41 +122,6 @@ public class CodebookService {
 	}
 	
 	/**
-	 * Gets the list of variables for a given codebook.
-	 * The profile of this list is comprised of varname and varlabel.
-	 * This profile is currently hardcoded into the function.
-	 * TODO: generate profile dynamically
-	 * 
-	 * @param handle
-	 * @return
-	 */
-	public Map<String, String> getCodebookVariables(String handle){
-		//Get XPath mapping for varname and varlabel
-		XMLHandle xhandle = getCodebookXML(handle);
-		List<Mapping> varNameMaps = mappingDao.findById_FieldId("varname");
-		List<Mapping> varLabelMaps = mappingDao.findById_FieldId("varlabel");
-		Mapping varNameMap = varNameMaps.get(0);
-		Mapping varLabelMap = varLabelMaps.get(0);
-		String varNameXPath = varNameMap.getXpath();
-		String varLabelXPath = varLabelMap.getXpath();
-		
-		//get list of all varnames
-		List<String> vars = xhandle.getValueList(varNameXPath);
-		
-		//The map of name,label pairs to be returned
-		Map<String, String> varlist = new HashMap<String, String>();
-		
-		//iterate over each varname, find associated label, add (name,label) to map
-		for(String var : vars){
-			String currentLabelXPath = getXPathWithVarname(varLabelXPath, var);
-			String label = xhandle.getXPathSingleValue(currentLabelXPath);
-			varlist.put(var, label);
-		}
-		
-		return varlist;
-	}
-	
-	/**
 	 * Gets the list of variables for a given codebook (name, label) pairs
 	 * The profile of this list is comprised of varname and varlabel.
 	 * This profile is currently hardcoded into the function.
@@ -194,7 +130,7 @@ public class CodebookService {
 	 * @param handle
 	 * @return
 	 */
-	public Map<String, String> getCodebookVariables_SQL(String handle){
+	public Map<String, String> getCodebookVariables(String handle){
 		//hashmap with varnames as keys and corresponding varlabls as values
 		Map<String, String> variables = new HashMap<String, String>();
 		
@@ -231,49 +167,12 @@ public class CodebookService {
 	}
 	
 	/**
-	 * Service to retrieve the map of Fields and their values for the variable details page
-	 * @param handle
-	 * @param varname
-	 * @return
-	 */
-	public Map<String, String> getVariableDetails(String handle, String varname){
-		
-		List<String> fieldIds = getProfileFieldIds("vardetails");
-		XMLHandle xhandle = getCodebookXML(handle);
-		
-		Map<String, String> details = new HashMap<String, String>();
-		for(String f : fieldIds){
-			//XMLHandle fn to collect var details
-			//get XPath mapping associated with field
-			List<Mapping> maps = mappingDao.findById_FieldId(f);
-			//this is not a good check but need something here
-			if(maps == null){
-				System.out.println("no mappings found for "+f);
-				continue;
-			}
-			Mapping firstMap = maps.get(0);
-			String path = firstMap.getXpath();
-			String pathWithName = getXPathWithVarname(path, varname);
-			String value = xhandle.getXPathSingleValue(pathWithName);
-			if(value == null || value.equals("")){
-				System.out.println("no value found for xpath "+pathWithName);
-				continue;
-			}
-			Field cur = fieldDao.findOne(f);
-			details.put(cur.getDisplayName(), value);
-		}
-		
-		
-		return details;
-	}
-	
-	/**
 	 * retreives variable details profile from SQL tables
 	 * @param handle
 	 * @param varname
 	 * @return
 	 */
-	public Map<String, String> getVariableDetails_SQL(String handle, String varname){
+	public Map<String, String> getVariableDetails(String handle, String varname){
 		//retreive vardetails profile
 		List<String> fieldIds = getProfileFieldIds("vardetails");
 		Map<String, String> details = new HashMap<String, String>();
@@ -320,9 +219,6 @@ public class CodebookService {
 			//add to hashmap; key is display name of field and value is the text value of the FieldInst
 			details.put(currentField.getDisplayName(), inst.getValue());
 		}
-		
-		
-		
 		return details;
 	}
 	
@@ -358,13 +254,6 @@ public class CodebookService {
 		
 		return xhandle;
 	}
-
-    private String getXPathWithVarname(String xpath, String varname){
-		return xpath.replace("*", "@name='"+varname+"'");
-	}
-	
-	
-		
 
 	
 }

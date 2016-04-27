@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 import edu.ncrn.cornell.service.CodebookService;
+import edu.ncrn.cornell.view.CodebooksView;
 
 @Controller
 public class CodebookController {
@@ -21,21 +23,27 @@ public class CodebookController {
 	@Autowired
 	CodebookService codebookService;
 	
+	CodebooksView codebooksView = new CodebooksView();
+	
 	/**
 	 * controller for all codebooks page
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/codebooks", method = RequestMethod.GET)
+	@RequestMapping(
+	        method = RequestMethod.GET,
+	        value = "/codebooks",
+	        produces = MediaType.TEXT_HTML_VALUE
+	    )
 	public String codebooks(Model model,
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth){
 		
-		List<String> handles = codebookService.getAllHandles();
+		Map<String, String> handles = codebookService.getAllHandles();
 		
 		model.addAttribute("handles", handles);
 		model.addAttribute("auth", auth);
 		
-		return "codebooks";
+		return codebooksView.codebooksList(handles);
 	}
 	
 	
