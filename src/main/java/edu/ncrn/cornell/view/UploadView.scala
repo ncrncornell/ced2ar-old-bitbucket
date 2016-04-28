@@ -20,7 +20,7 @@ class UploadView extends Ced2arView {
         defaultStyleSheetsAndScripts,
         script(src := "...")
       ),
-      body(
+      body(masterDiv(
         topBanner,
         navBar,
         messages,
@@ -50,7 +50,7 @@ class UploadView extends Ced2arView {
 
         )
       )
-    )
+    ))
 
     typedHtml.toString()
   }

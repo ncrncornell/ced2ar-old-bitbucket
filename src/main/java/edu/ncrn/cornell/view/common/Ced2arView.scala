@@ -3,6 +3,7 @@ package edu.ncrn.cornell.view.common
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 import scalatags.Text.all._
+import scalatags.Text.tags2.{nav}
 
 import scala.collection.JavaConversions._
 
@@ -29,22 +30,27 @@ trait Ced2arView {
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js",
       "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
     )
+    val googleFontBase = "https://fonts.googleapis.com/css?family="
+    val googleFontUrls = Seq(
+      "Fjord+One"
+    ).map(u => googleFontBase + u)
 
     cssUrls.map{u => link( rel:= "stylesheet", `type` := "text/css", href := u)} ++
-      scriptUrls.map{u => script(src := u)}
+      scriptUrls.map{u => script(src := u)} ++
+      googleFontUrls.map{u => link( rel:= "stylesheet", `type` := "text/css", href := u) }
   }
 
+  val masterDiv = div(`class` := "container-fluid")
+  
   val topBanner: Seq[Tag] = Seq(
-    div(`class` := "row", div(`class` := "col-sm-12", style := "background-color: #B40404;",
-      div(`class` := "row",
+    div(`class` := "navbar", style := "background-color: #B40404;", div(
+      // TODO: factor below font-family out to headings css class using ScalaCSS
+      div(style := "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;",
         h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;CED<sup>2</sup>AR"))
-      )
-    )),
-    div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
+      ),
+      div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
+    ))
   )
-
-  //TODO: PR to scalatags and remove in update:
-  private lazy val nav = "nav".tag[String]
 
   val navBar: Tag = nav(`class` := "navbar navbar-inverse",
     div(`class` := "navbar-collapse",

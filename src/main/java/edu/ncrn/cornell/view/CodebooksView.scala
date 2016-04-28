@@ -18,7 +18,7 @@ class CodebooksView extends Ced2arView{
         defaultStyleSheetsAndScripts,
         script(src := "...")
       ),
-        body(
+        body(masterDiv(
         topBanner,
         navBar,
         h2("Codebooks"),
@@ -33,7 +33,7 @@ class CodebooksView extends Ced2arView{
             }.toSeq
         ) 
       )
-    )
+    ))
     typedHtml.toString()
   }
   
