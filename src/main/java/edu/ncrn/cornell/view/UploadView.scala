@@ -22,11 +22,12 @@ class UploadView extends Ced2arView {
       ),
       body(
         topBanner,
+        navBar,
         messages,
         div(form(
           method := "POST",
           action := "/upload",
-          "enctype".attr:="multipart/form-data",
+          enctype := "multipart/form-data",
           table(
             tr(
               td("File to upload:"),

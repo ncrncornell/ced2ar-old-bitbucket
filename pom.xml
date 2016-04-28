@@ -95,7 +95,7 @@
         <dependency>
             <groupId>com.lihaoyi</groupId>
             <artifactId>scalatags_${scala.version.major}</artifactId>
-            <version>0.5.4</version>
+            <version>0.5.5</version>
         </dependency>
 
         <dependency>

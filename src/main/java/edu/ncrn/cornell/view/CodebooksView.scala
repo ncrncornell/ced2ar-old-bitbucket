@@ -20,6 +20,7 @@ class CodebooksView extends Ced2arView{
       ),
         body(
         topBanner,
+        navBar,
         h2("Codebooks"),
         div(
             
