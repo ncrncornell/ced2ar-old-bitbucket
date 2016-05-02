@@ -48,9 +48,6 @@ public class CodebookController {
 		
 		Map<String, String> handles = codebookService.getAllHandles();
 		
-		model.addAttribute("handles", handles);
-		model.addAttribute("auth", auth);
-		
 		return codebooksView.codebooksList(handles);
 	}
 	
@@ -71,13 +68,10 @@ public class CodebookController {
 	public String codebook(@PathVariable(value = "c") String handle, 
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
-		System.out.println("controller for codebook details called with handle ["+handle+"]");
+		
 		Map<Tuple2<String, Integer>, String> codebookDetails = codebookService.getCodebookDetails(handle);
 		
-		model.addAttribute("handle", handle);
-		model.addAttribute("details", codebookDetails);
 		
-		//return "codebook";
 		return codebookView.codebookDetails(codebookDetails, handle);
 	}
 	
@@ -98,11 +92,6 @@ public class CodebookController {
 			Model model){
 		
 		Map<String, String> codebookVars = codebookService.getCodebookVariables(handle);
-		
-		System.out.println("[Var List]:: controller called for "+handle);
-		
-		model.addAttribute("handle", handle);
-		model.addAttribute("variables", codebookVars);
 		
 		return varsView.varsList(codebookVars, handle);
 	}
@@ -127,9 +116,6 @@ public class CodebookController {
 		
 		Map<Tuple2<String,Integer>, String> varDetails = codebookService.getVariableDetails(handle, varname);
 		
-		model.addAttribute("handle", handle);
-		model.addAttribute("varname", varname);
-		model.addAttribute("details", varDetails);
 		
 		return varView.variableDetails(varDetails, handle, varname);
 	}

@@ -126,8 +126,7 @@ public class CodebookService {
 			}
 			//create key as tuple of field display name and ordering
 			Tuple2<String, Integer> key = new Tuple2<String, Integer>(dispName, ordering);
-			//System.out.println("created key: "+key._2+","+key._1);
-			System.out.println("adding to details: "+dispName+","+value);
+
 			//add tuple key and instance value to the map
 			details.put(key, value);
 		}
