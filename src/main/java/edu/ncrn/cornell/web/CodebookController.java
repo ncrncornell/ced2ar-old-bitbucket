@@ -27,10 +27,10 @@ public class CodebookController {
 	@Autowired
 	CodebookService codebookService;
 	
-	CodebooksView codebooksView = new CodebooksView();
-	CodebookView codebookView = new CodebookView();
-	VarsView varsView = new VarsView();
-	VarView varView = new VarView();
+	private CodebooksView codebooksView = new CodebooksView();
+	private CodebookView codebookView = new CodebookView();
+	private VarsView varsView = new VarsView();
+	private VarView varView = new VarView();
 	
 	/**
 	 * controller for all codebooks page

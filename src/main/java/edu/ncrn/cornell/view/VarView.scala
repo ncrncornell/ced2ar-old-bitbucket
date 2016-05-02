@@ -14,8 +14,7 @@ class VarView extends Ced2arView{
           handle : String,
           varname : String
         ) : String = {
-      val deets = details.toSeq
-      deets.sortBy(_._1._2)
+      val deets = details.toSeq.sortBy(_._1._2)
       //println(deets) //not sorting???
       val typedHtml = html(
           head(

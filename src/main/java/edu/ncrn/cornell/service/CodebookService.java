@@ -102,7 +102,7 @@ public class CodebookService {
 			//get ordering for display
 			List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId("codebookdetails", f);
 			Integer ordering;
-			if(pfs.size() != 1) ordering = new Integer(99);
+			if(pfs.size() != 1) ordering = 99;
 			else{
 				ProfileField pf = pfs.get(0);
 				ordering = pf.getOrdering();
@@ -117,15 +117,17 @@ public class CodebookService {
 			//check for multiplicities and concatenate values accordingly
 			if(fieldInsts.size() > 1){
 				for(FieldInst fi : fieldInsts) value += fi.getValue() + " \n";
-			}else if(fieldInsts.size() == 1){
+			}
+			else if(fieldInsts.size() == 1){
 				FieldInst fi = fieldInsts.get(0);
 				value = fi.getValue();
-			}else{
+			}
+			else{
 				System.out.println("[READING FIELDISNTS]:: No FieldInst for codebook "+handle+" field "+f);
 				continue;
 			}
 			//create key as tuple of field display name and ordering
-			Tuple2<String, Integer> key = new Tuple2<String, Integer>(dispName, ordering);
+			Tuple2<String, Integer> key = new Tuple2<>(dispName, ordering);
 
 			//add tuple key and instance value to the map
 			details.put(key, value);

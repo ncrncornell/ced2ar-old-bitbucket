@@ -15,7 +15,7 @@ class CodebooksView extends Ced2arView{
     val typedHtml = html(
         head(
         defaultMetaTags,
-        defaultStyleSheetsAndScripts
+        defaultStyleSheetsAndScripts//,
         //script(src := "...")
       ),
         body(masterDiv(
@@ -23,14 +23,13 @@ class CodebooksView extends Ced2arView{
         navBar,
         h2("Codebooks"),
         div(
-            
-            codebooks.map{ case (handle, cname) =>
-              p(
-                  a(href:="localhost:8080/ced2ar-rdb/codebooks/"+handle)(
-                    cname
-                    )
-               )
-            }.toSeq
+          codebooks.map{ case (handle, cname) =>
+            p(
+              a(href:="/codebooks/"+handle)(
+                cname
+              )
+             )
+          }.toSeq
         ) 
       )
     ))

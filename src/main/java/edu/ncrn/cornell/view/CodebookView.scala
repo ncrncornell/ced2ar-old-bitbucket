@@ -13,8 +13,10 @@ class CodebookView extends Ced2arView{
           details : java.util.Map[Tuple2[String, Integer], String],
           handle : String
         ) : String = {
-      val deets = details.toSeq
-      deets.sortBy(_._1._2)
+      val deets = details.toSeq.sortBy(_._1._2)
+      println("printing deets:") //DEBUG FIXME
+      deets.foreach(d => println(d)) //DEBUG FIXME: not getting any deets (tested with SIPP5.1)
+      //deets.sortBy(_._1._2)
       //println(deets) //not sorting???
       val typedHtml = html(
           head(
@@ -34,7 +36,7 @@ class CodebookView extends Ced2arView{
             }//.toSeq //sort by order
            ),
         
-        a(href := "localhost:8080/ced2ar-rdb/codebooks/"+handle+"/vars")(
+        a(href := "/codebooks/"+handle+"/vars")(
            p("View Variables")
            )
          )

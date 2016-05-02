@@ -28,7 +28,7 @@ class VarsView extends Ced2arView{
               variables.map{ case (varname, varlabl) =>
                   tr(
                      td(   
-                        a(href:="localhost:8080/ced2ar-rdb/codebooks/"+handle+"/vars/"+varname)
+                        a(href:="/ced2ar-rdb/codebooks/"+handle+"/vars/"+varname)
                         (varname)
                      ),
                      td( varlabl)
