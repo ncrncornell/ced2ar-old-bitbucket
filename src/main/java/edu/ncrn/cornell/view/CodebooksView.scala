@@ -15,8 +15,8 @@ class CodebooksView extends Ced2arView{
     val typedHtml = html(
         head(
         defaultMetaTags,
-        defaultStyleSheetsAndScripts,
-        script(src := "...")
+        defaultStyleSheetsAndScripts
+        //script(src := "...")
       ),
         body(masterDiv(
         topBanner,

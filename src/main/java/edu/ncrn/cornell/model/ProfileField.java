@@ -28,6 +28,8 @@ public class ProfileField implements Serializable {
 
 	@Column(name="profile_id")
 	private String profileId;
+	
+	private Integer ordering;
 
 	public ProfileField() {
 	}
@@ -54,6 +56,14 @@ public class ProfileField implements Serializable {
 
 	public void setProfileId(String profileId) {
 		this.profileId = profileId;
+	}
+	
+	public Integer getOrdering() {
+		return this.ordering;
+	}
+
+	public void setOrdering(Integer ordering) {
+		this.ordering = ordering;
 	}
 
 }

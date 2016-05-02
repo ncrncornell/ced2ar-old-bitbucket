@@ -13,9 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import scala.Tuple2;
 
 import edu.ncrn.cornell.service.CodebookService;
+import edu.ncrn.cornell.view.CodebookView;
 import edu.ncrn.cornell.view.CodebooksView;
+import edu.ncrn.cornell.view.VarView;
+import edu.ncrn.cornell.view.VarsView;
 
 @Controller
 public class CodebookController {
@@ -24,6 +28,9 @@ public class CodebookController {
 	CodebookService codebookService;
 	
 	CodebooksView codebooksView = new CodebooksView();
+	CodebookView codebookView = new CodebookView();
+	VarsView varsView = new VarsView();
+	VarView varView = new VarView();
 	
 	/**
 	 * controller for all codebooks page
@@ -56,17 +63,22 @@ public class CodebookController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/codebooks/{c}", method = RequestMethod.GET)
+	@ResponseBody
+	@RequestMapping(value = "/codebooks/{c}",
+					method = RequestMethod.GET,
+					produces = MediaType.TEXT_HTML_VALUE
+				)
 	public String codebook(@PathVariable(value = "c") String handle, 
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
-		
-		Map<String, String> codebookDetails = codebookService.getCodebookDetails(handle);
+		System.out.println("controller for codebook details called with handle ["+handle+"]");
+		Map<Tuple2<String, Integer>, String> codebookDetails = codebookService.getCodebookDetails(handle);
 		
 		model.addAttribute("handle", handle);
 		model.addAttribute("details", codebookDetails);
 		
-		return "codebook";
+		//return "codebook";
+		return codebookView.codebookDetails(codebookDetails, handle);
 	}
 	
 	/**
@@ -76,17 +88,23 @@ public class CodebookController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/codebooks/{c}/vars", method = RequestMethod.GET)
+	@ResponseBody
+	@RequestMapping(value = "/codebooks/{c}/vars",
+					method = RequestMethod.GET,
+					produces = MediaType.TEXT_HTML_VALUE
+				   )
 	public String vars(@PathVariable(value = "c") String handle,
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
 		
 		Map<String, String> codebookVars = codebookService.getCodebookVariables(handle);
 		
+		System.out.println("[Var List]:: controller called for "+handle);
+		
 		model.addAttribute("handle", handle);
 		model.addAttribute("variables", codebookVars);
 		
-		return "vars";
+		return varsView.varsList(codebookVars, handle);
 	}
 	
 	/**
@@ -97,19 +115,23 @@ public class CodebookController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/codebooks/{c}/vars/{v}", method = RequestMethod.GET)
+	@ResponseBody
+	@RequestMapping(value = "/codebooks/{c}/vars/{v}",
+					method = RequestMethod.GET,
+					produces = MediaType.TEXT_HTML_VALUE
+					)
 	public String var(@PathVariable(value = "c") String handle,
 			@PathVariable(value = "v") String varname,
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
 		
-		Map<String, String> varDetails = codebookService.getVariableDetails(handle, varname);
+		Map<Tuple2<String,Integer>, String> varDetails = codebookService.getVariableDetails(handle, varname);
 		
 		model.addAttribute("handle", handle);
 		model.addAttribute("varname", varname);
 		model.addAttribute("details", varDetails);
 		
-		return "var";
+		return varView.variableDetails(varDetails, handle, varname);
 	}
 	
 }

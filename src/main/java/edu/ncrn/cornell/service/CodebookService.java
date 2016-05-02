@@ -28,6 +28,8 @@ import edu.ncrn.cornell.model.SchemaPK;
 import edu.ncrn.cornell.util.XMLHandle;
 import org.springframework.stereotype.Service;
 
+import scala.Tuple2;
+
 /**
  * This class is a set of reusable function for getting structured information from postgres.
  * Info returned in forms easily parseable for display by JSP
@@ -87,17 +89,27 @@ public class CodebookService {
 	 * @param handle
 	 * @return
 	 */
-	public Map<String, String> getCodebookDetails(String handle){
+	public Map<Tuple2<String, Integer>, String> getCodebookDetails(String handle){
 		
+		System.out.println("[getCodebookDetails]:: RETREIVING DETAILS FOR CODEBOOK "+handle);
 		//Map of field names and their corresponding instances
-		Map<String, String> details = new HashMap<String, String>();
+		Map<Tuple2<String, Integer>, String> details = new HashMap<Tuple2<String, Integer>, String>();
 		//List of field for the codebookdetails profile
 		List<String> fieldIds = getProfileFieldIds("codebookdetails");
 		
 		//iterate over fields, try to find corresponding instance for specified handle
 		for(String f : fieldIds){
+			//get ordering for display
+			List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId("codebookdetails", f);
+			Integer ordering;
+			if(pfs.size() != 1) ordering = new Integer(99);
+			else{
+				ProfileField pf = pfs.get(0);
+				ordering = pf.getOrdering();
+			}
+			
 			Field curField = fieldDao.findOne(f);
-			String dispName = curField.getDisplayName();
+			String dispName = curField.getDisplayName().trim();
 			
 			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocIdAndFieldId(handle, f);
 			String value = "";
@@ -112,9 +124,12 @@ public class CodebookService {
 				System.out.println("[READING FIELDISNTS]:: No FieldInst for codebook "+handle+" field "+f);
 				continue;
 			}
-			
-			//add display name of field and instance value to the map
-			details.put(dispName, value);
+			//create key as tuple of field display name and ordering
+			Tuple2<String, Integer> key = new Tuple2<String, Integer>(dispName, ordering);
+			//System.out.println("created key: "+key._2+","+key._1);
+			System.out.println("adding to details: "+dispName+","+value);
+			//add tuple key and instance value to the map
+			details.put(key, value);
 		}
 		
 		
@@ -172,10 +187,10 @@ public class CodebookService {
 	 * @param varname
 	 * @return
 	 */
-	public Map<String, String> getVariableDetails(String handle, String varname){
+	public Map<Tuple2<String, Integer>, String> getVariableDetails(String handle, String varname){
 		//retreive vardetails profile
 		List<String> fieldIds = getProfileFieldIds("vardetails");
-		Map<String, String> details = new HashMap<String, String>();
+		Map<Tuple2<String, Integer>, String> details = new HashMap<Tuple2<String, Integer>, String>();
 		
 		//find the varname instance specified by argument
 		List<FieldInst> varnames = fieldInstDao.findByRawDocIdAndValue(handle, varname);
@@ -193,6 +208,14 @@ public class CodebookService {
 		
 		//iterate over each field in the profile and find the instance using the indexed xpath
 		for(String fieldId : fieldIds){
+			//get ordering for display
+			List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId("vardetails", fieldId);
+			Integer ordering;
+			if(pfs.size() != 1) ordering = new Integer(99);
+			else{
+				ProfileField pf = pfs.get(0);
+				ordering = pf.getOrdering();
+			}
 			
 			Field currentField = fieldDao.findOne(fieldId);
 			
@@ -215,9 +238,9 @@ public class CodebookService {
 				continue;
 			}
 			FieldInst inst = insts.get(0);
-			
+			Tuple2<String, Integer> key = new Tuple2<String, Integer>(currentField.getDisplayName(), ordering);
 			//add to hashmap; key is display name of field and value is the text value of the FieldInst
-			details.put(currentField.getDisplayName(), inst.getValue());
+			details.put(key, inst.getValue());
 		}
 		return details;
 	}
