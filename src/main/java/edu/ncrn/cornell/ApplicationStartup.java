@@ -27,7 +27,8 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 	{
 		
 		//System.out.println("[ApplicationStartup]:: This is a test for executing code on application startup");
-		dbChecker.DBinit();
+		//DISABLED FOR NOW TO SAVE TIME ON STARTUP
+		//dbChecker.DBinit();
 		return;
 	}
 }

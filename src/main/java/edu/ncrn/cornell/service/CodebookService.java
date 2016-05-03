@@ -98,20 +98,14 @@ public class CodebookService {
 		List<String> fieldIds = getProfileFieldIds("codebookdetails");
 		
 		//iterate over fields, try to find corresponding instance for specified handle
-		for(String f : fieldIds){
+		for(String fieldId : fieldIds){
 			//get ordering for display
-			List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId("codebookdetails", f);
-			Integer ordering;
-			if(pfs.size() != 1) ordering = 99;
-			else{
-				ProfileField pf = pfs.get(0);
-				ordering = pf.getOrdering();
-			}
+			Integer ordering = getOrdering("codebookdetails", fieldId);
 			
-			Field curField = fieldDao.findOne(f);
+			Field curField = fieldDao.findOne(fieldId);
 			String dispName = curField.getDisplayName().trim();
 			
-			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocIdAndFieldId(handle, f);
+			List<FieldInst> fieldInsts = fieldInstDao.findByRawDocIdAndFieldId(handle, fieldId);
 			String value = "";
 			
 			//check for multiplicities and concatenate values accordingly
@@ -123,7 +117,7 @@ public class CodebookService {
 				value = fi.getValue();
 			}
 			else{
-				System.out.println("[READING FIELDISNTS]:: No FieldInst for codebook "+handle+" field "+f);
+				System.out.println("[READING FIELDISNTS]:: No FieldInst for codebook "+handle+" field "+fieldId);
 				continue;
 			}
 			//create key as tuple of field display name and ordering
@@ -210,13 +204,7 @@ public class CodebookService {
 		//iterate over each field in the profile and find the instance using the indexed xpath
 		for(String fieldId : fieldIds){
 			//get ordering for display
-			List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId("vardetails", fieldId);
-			Integer ordering;
-			if(pfs.size() != 1) ordering = new Integer(99);
-			else{
-				ProfileField pf = pfs.get(0);
-				ordering = pf.getOrdering();
-			}
+			Integer ordering = getOrdering("vardetails", fieldId);
 			
 			Field currentField = fieldDao.findOne(fieldId);
 			
@@ -258,25 +246,15 @@ public class CodebookService {
 		return fieldIds;
 	}
 	
-	private XMLHandle getCodebookXML(String handle){
-		
-		RawDoc codebook = rawDocDao.findOne(handle);
-		if(codebook == null) return null;
-		
-		String xml = codebook.getRawXml();
-		String sVers = codebook.getSchemaVersion();
-		//System.out.println("xml: "+xml.substring(0, 150));
-		String schemaURL = "";
-		List<Schema> schemas = schemaDao.findById_Version(sVers);
-		if(schemas.isEmpty()){
-			System.out.println("no schemas founds");
-		}else{
-			Schema schema = schemas.get(0);
-			schemaURL = schema.getUrl();
+	private Integer getOrdering(String profileId, String fieldId){
+		List<ProfileField> pfs = profileFieldDao.findByProfileIdAndFieldId(profileId, fieldId);
+		Integer ordering;
+		if(pfs.size() != 1) ordering = new Integer(99);
+		else{
+			ProfileField pf = pfs.get(0);
+			ordering = pf.getOrdering();
 		}
-		XMLHandle xhandle = new XMLHandle(xml, schemaURL);
-		
-		return xhandle;
+		return ordering;
 	}
 
 	
