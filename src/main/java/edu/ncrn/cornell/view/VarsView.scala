@@ -17,7 +17,6 @@ class VarsView extends Ced2arView{
         head(
         defaultMetaTags,
         defaultStyleSheetsAndScripts
-        //script(src := "...")
       ),
         body(masterDiv(
         topBanner,

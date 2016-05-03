@@ -61,7 +61,7 @@ public class CodebookController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/codebooks/{c}",
+	@RequestMapping(value = "/codebooks/{c:.+}",
 					method = RequestMethod.GET,
 					produces = MediaType.TEXT_HTML_VALUE
 				)
@@ -69,6 +69,7 @@ public class CodebookController {
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
 		
+		System.out.println("[codebook controller]:: GET request for handle "+handle);
 		Map<Tuple2<String, Integer>, String> codebookDetails = codebookService.getCodebookDetails(handle);
 		
 		
@@ -83,7 +84,7 @@ public class CodebookController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/codebooks/{c}/vars",
+	@RequestMapping(value = "/codebooks/{c:.+}/vars",
 					method = RequestMethod.GET,
 					produces = MediaType.TEXT_HTML_VALUE
 				   )
@@ -105,7 +106,7 @@ public class CodebookController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/codebooks/{c}/vars/{v}",
+	@RequestMapping(value = "/codebooks/{c:.+}/vars/{v}",
 					method = RequestMethod.GET,
 					produces = MediaType.TEXT_HTML_VALUE
 					)

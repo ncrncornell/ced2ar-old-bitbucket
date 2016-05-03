@@ -17,8 +17,7 @@ class UploadView extends Ced2arView {
     val typedHtml = html(
       head(
         defaultMetaTags,
-        defaultStyleSheetsAndScripts,
-        script(src := "...")
+        defaultStyleSheetsAndScripts
       ),
       body(masterDiv(
         topBanner,

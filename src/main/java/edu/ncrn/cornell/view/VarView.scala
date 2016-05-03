@@ -14,24 +14,22 @@ class VarView extends Ced2arView{
           handle : String,
           varname : String
         ) : String = {
-      val deets = details.toSeq.sortBy(_._1._2)
-      //println(deets) //not sorting???
+      val detailsSorted = details.toSeq.sortBy(_._1._2)
       val typedHtml = html(
           head(
         defaultMetaTags,
         defaultStyleSheetsAndScripts
-        //script(src := "...")
       ),
         body(masterDiv(
         topBanner,
         navBar,
         div(
-            deets.map{case ((label,order), value) =>
+            detailsSorted.map{case ((label,order), value) =>
               div(
               h3(label),
               p(value)
               )
-            }//.toSeq //sort by order
+            }
            )
          )
        )

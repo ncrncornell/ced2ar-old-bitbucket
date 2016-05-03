@@ -62,16 +62,16 @@ trait Ced2arView {
             raw("Browse Variables&nbsp;<b class=\"caret\"></b>")
           ),
           ul(`class` := "dropdown-menu",
-            li(a(href := "/all", "View All")),
-            li(a(href := "/browse", "Sort Alphabetically")),
-            li(a(href := "/groups", "Sort by Group"))
+            li(a(href := "/ced2ar-rdb/all", "View All")),
+            li(a(href := "/ced2ar-rdb/browse", "Sort Alphabetically")),
+            li(a(href := "/ced2ar-rdb/groups", "Sort by Group"))
           ),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/codebooks", "Browse by Codebook")),
+          li(a(href := "/ced2ar-rdb/codebooks", "Browse by Codebook")),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/docs", "Documentation")),
+          li(a(href := "/ced2ar-rdb/docs", "Documentation")),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/about", "About"))
+          li(a(href := "/ced2ar-rdb/about", "About"))
         )
       )
     )
