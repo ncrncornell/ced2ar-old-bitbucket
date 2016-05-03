@@ -23,7 +23,13 @@ class VarView extends Ced2arView{
         body(masterDiv(
         topBanner,
         navBar,
-        div(
+        ol(cls:="breadcrumb")(
+            li(a(href:= "/ced2ar-rdb/codebooks")("Codebooks")),
+            li(a(href:= "/ced2ar-rdb/codebooks/"+handle)(handle)),
+            li(a(href:= "/ced2ar-rdb/codebooks/"+handle+"/vars")("Variables")),
+            li(cls:="active")(varname)
+        ),
+        masterDiv(
             detailsSorted.map{case ((label,order), value) =>
               div(
               h3(label),

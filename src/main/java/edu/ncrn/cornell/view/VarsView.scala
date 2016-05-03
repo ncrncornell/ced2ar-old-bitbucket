@@ -21,9 +21,14 @@ class VarsView extends Ced2arView{
         body(masterDiv(
         topBanner,
         navBar,
+        ol(cls:="breadcrumb")(
+            li(a(href:= "/ced2ar-rdb/codebooks")("Codebooks")),
+            li(a(href:= "/ced2ar-rdb/codebooks/"+handle)(handle)),
+            li(cls:="active")("Variables")
+        ),
         h2("Variables"),
-        div(
-            table(
+        masterDiv(
+            masterTable(
               variables.map{ case (varname, varlabl) =>
                   tr(
                      td(   

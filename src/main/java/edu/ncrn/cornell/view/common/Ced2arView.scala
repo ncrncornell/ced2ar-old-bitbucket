@@ -41,6 +41,7 @@ trait Ced2arView {
   }
 
   val masterDiv = div(`class` := "container-fluid")
+  val masterTable = table(cls:= "table table-striped table-hover")
   
   val topBanner: Seq[Tag] = Seq(
     div(`class` := "navbar", style := "background-color: #B40404;", div(

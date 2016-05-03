@@ -20,8 +20,11 @@ class CodebooksView extends Ced2arView{
         body(masterDiv(
         topBanner,
         navBar,
+        ol(cls:="breadcrumb")(
+            li(cls:="active")("Codebooks")
+        ),
         h2("Codebooks"),
-        div(
+        masterDiv(
           codebooks.map{ case (handle, cname) =>
             p(
               a(href:="/ced2ar-rdb/codebooks/"+handle)(
