@@ -28,6 +28,7 @@ public class ApplicationStartup implements ApplicationListener<ContextRefreshedE
 		
 		//System.out.println("[ApplicationStartup]:: This is a test for executing code on application startup");
 		//DISABLED FOR NOW TO SAVE TIME ON STARTUP
+		//FIXME: maybe add various development switched to spring boot, like this one?
 		//dbChecker.DBinit();
 		return;
 	}

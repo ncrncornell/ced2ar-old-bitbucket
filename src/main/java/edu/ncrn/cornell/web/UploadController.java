@@ -1,6 +1,7 @@
 package edu.ncrn.cornell.web;
 
 import edu.ncrn.cornell.Ced2arApplication;
+import edu.ncrn.cornell.config.Ced2arConfig;
 import edu.ncrn.cornell.service.CodebookService;
 import edu.ncrn.cornell.service.UploadService;
 import edu.ncrn.cornell.view.UploadView;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,19 +31,25 @@ import java.util.stream.Collectors;
 public class UploadController {
 
     @Autowired
-    UploadService uploadService;
+    private UploadService uploadService;
 
-    UploadView view = new UploadView();
+    @Autowired
+    private Ced2arConfig ced2arConfig;
+
+    @Autowired
+    UploadView view;
+
+    private final String thisPath = "/upload";
 	
 	//GET page
     @ResponseBody
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/upload",
+        value = thisPath,
         produces = MediaType.TEXT_HTML_VALUE
     )
     public String provideUploadInfo() {
-        File uploadDir = new File(Ced2arApplication.UPLOAD_DIR);
+        File uploadDir = new File(ced2arConfig.getUploadDir());
         Optional<File[]> folderFilesMaybe = Optional.ofNullable((uploadDir).listFiles());
 
         //TODO: change to log message:
@@ -60,24 +69,23 @@ public class UploadController {
     //POST page
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/upload"//,
-        //produces = MediaType.TEXT_HTML_VALUE
+        value = thisPath
     )
     public String handleFileUpload(@RequestParam("name") String name,
                                    @RequestParam("file") MultipartFile file,
                                    RedirectAttributes redirectAttributes) {
         if (name.contains("/")) {
             redirectAttributes.addFlashAttribute("message", "Folder separators not allowed");
-            return "redirect:/upload";
+            return "redirect:" + thisPath;
         }
         if (name.contains("/")) {
             redirectAttributes.addFlashAttribute("message", "Relative pathnames not allowed");
-            return "redirect:/upload";
+            return "redirect:" + thisPath;
         }
 
         if (!file.isEmpty()) {
             try {
-                File newXmlFile = new File(Ced2arApplication.UPLOAD_DIR + "/" + name);
+                File newXmlFile = new File(ced2arConfig.getUploadDir() + "/" + name);
                 BufferedOutputStream stream = new BufferedOutputStream(
                         new FileOutputStream(newXmlFile));
                 FileCopyUtils.copy(file.getInputStream(), stream);
@@ -88,11 +96,13 @@ public class UploadController {
                 if (uploadService.importSucceded()) {
                     redirectAttributes.addFlashAttribute("success",
                             "You successfully uploaded " + name + "!");
-                } else {
+                }
+                else {
                     if (!uploadService.uploadIsValid()) {
                         redirectAttributes.addFlashAttribute("error",
                                 "There was a problem parsing XML for " + name + "!");
-                    } else {
+                    }
+                    else {
                         redirectAttributes.addFlashAttribute("error",
                                 "There was an unknown problem with importing " + name + "!");
                     }
@@ -110,6 +120,7 @@ public class UploadController {
 
         view.setAttributes(redirectAttributes);
 
-        return "redirect:/upload";
+        return "redirect:" + thisPath;
+
     }
 }

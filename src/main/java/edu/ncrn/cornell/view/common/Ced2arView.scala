@@ -1,16 +1,41 @@
 package edu.ncrn.cornell.view.common
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
+import javax.servlet.ServletContext
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
+import org.springframework.web.context.ServletContextAware
 
 import scalatags.Text.all._
-import scalatags.Text.tags2.{nav}
-
+import scalatags.Text.tags2.nav
 import scala.collection.JavaConversions._
 
 /**
   * Created by Brandon Barker on 4/25/2016.
+  *
+  * //TODO: Not really sure why we need extend ServletContextAware;
+  * //TODO: it seems @Autowired isn't working here
+  *
   */
-trait Ced2arView {
+@Component
+trait Ced2arView extends ServletContextAware {
+
+  // Get the context so we can build site-local URLs easily:
+  var servletContext: Option[ServletContext] = {
+    @Autowired
+    val sc = null
+    Option(sc)
+  }
+  //
+  def servletPath = servletContext match {
+    case Some(sc) => sc.getContextPath
+    case None => ""
+  }
+  //
+  def setServletContext(sc: ServletContext) = {
+    servletContext = Option(sc)
+  }
 
   // A few elements needed by almost every view:
 
@@ -63,16 +88,16 @@ trait Ced2arView {
             raw("Browse Variables&nbsp;<b class=\"caret\"></b>")
           ),
           ul(`class` := "dropdown-menu",
-            li(a(href := "/ced2ar-rdb/all", "View All")),
-            li(a(href := "/ced2ar-rdb/browse", "Sort Alphabetically")),
-            li(a(href := "/ced2ar-rdb/groups", "Sort by Group"))
+            li(a(href := s"$servletPath/all", "View All")),
+            li(a(href := s"$servletPath/browse", "Sort Alphabetically")),
+            li(a(href := s"$servletPath/groups", "Sort by Group"))
           ),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/ced2ar-rdb/codebooks", "Browse by Codebook")),
+          li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/ced2ar-rdb/docs", "Documentation")),
+          li(a(href := s"$servletPath/docs", "Documentation")),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := "/ced2ar-rdb/about", "About"))
+          li(a(href := s"$servletPath/about", "About"))
         )
       )
     )
@@ -104,6 +129,5 @@ trait Ced2arView {
     ).toSeq
     case None => Nil
   }
-
 
 }

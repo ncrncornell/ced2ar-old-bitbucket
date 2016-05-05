@@ -1,6 +1,5 @@
 package edu.ncrn.cornell.web;
 
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +20,22 @@ import edu.ncrn.cornell.view.CodebooksView;
 import edu.ncrn.cornell.view.VarView;
 import edu.ncrn.cornell.view.VarsView;
 
+
 @Controller
 public class CodebookController {
 
 	@Autowired
-	CodebookService codebookService;
-	
-	private CodebooksView codebooksView = new CodebooksView();
-	private CodebookView codebookView = new CodebookView();
-	private VarsView varsView = new VarsView();
-	private VarView varView = new VarView();
-	
+	private CodebookService codebookService;
+
+    @Autowired
+    private CodebooksView codebooksView;
+    @Autowired
+    private CodebookView codebookView;
+    @Autowired
+    private VarsView varsView;
+    @Autowired
+    private VarView varView;
+
 	/**
 	 * controller for all codebooks page
 	 * @param model
@@ -47,7 +51,7 @@ public class CodebookController {
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth){
 		
 		Map<String, String> handles = codebookService.getAllHandles();
-		
+
 		return codebooksView.codebooksList(handles);
 	}
 	
@@ -71,8 +75,7 @@ public class CodebookController {
 		
 		System.out.println("[codebook controller]:: GET request for handle "+handle);
 		Map<Tuple2<String, Integer>, String> codebookDetails = codebookService.getCodebookDetails(handle);
-		
-		
+
 		return codebookView.codebookDetails(codebookDetails, handle);
 	}
 	
@@ -91,7 +94,7 @@ public class CodebookController {
 	public String vars(@PathVariable(value = "c") String handle,
 			@RequestParam(value = "auth", defaultValue = "false") boolean auth,
 			Model model){
-		
+
 		Map<String, String> codebookVars = codebookService.getCodebookVariables(handle);
 		
 		return varsView.varsList(codebookVars, handle);

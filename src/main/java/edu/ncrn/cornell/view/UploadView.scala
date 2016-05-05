@@ -1,6 +1,7 @@
 package edu.ncrn.cornell.view
 
 import edu.ncrn.cornell.view.common.Ced2arView
+import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
 import scala.collection.JavaConversions._
@@ -9,6 +10,7 @@ import scala.collection.JavaConversions._
   * Created by Brandon Barker on 4/1/2016.
   */
 
+@Component
 class UploadView extends Ced2arView {
   //TODO: add flash messages
   def uploadForm(
@@ -25,7 +27,7 @@ class UploadView extends Ced2arView {
         messages,
         div(form(
           method := "POST",
-          action := "/upload",
+          action := s"$servletPath/upload",
           enctype := "multipart/form-data",
           table(
             tr(
