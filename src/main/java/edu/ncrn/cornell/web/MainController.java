@@ -1,7 +1,5 @@
 package edu.ncrn.cornell.web;
 
-
-
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +13,8 @@ import edu.ncrn.cornell.view.AboutView;
 @Controller
 public class MainController {
 	
-	private AboutView aboutView = new AboutView();
+	@Autowired
+	private AboutView aboutView;
 	
 	@ResponseBody
 	@RequestMapping(value = "/about",

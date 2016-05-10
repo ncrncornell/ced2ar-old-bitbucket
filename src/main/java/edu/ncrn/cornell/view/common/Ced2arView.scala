@@ -72,16 +72,21 @@ trait Ced2arView extends ServletContextAware {
     div(`class` := "navbar", style := "background-color: #B40404;", div(
       // TODO: factor below font-family out to headings css class using ScalaCSS
       div(style := "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;",
-        h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;CED<sup>2</sup>AR"))
+        h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;CED<sup>2</sup>AR")),
+        h5(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;Development Server - The The Comprehensive Extensible Data Documentation and Access Repository"))
       ),
       div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
     ))
   )
 
-  val navBar: Tag = nav(`class` := "navbar navbar-inverse",
+  lazy val navBar: Tag = nav(`class` := "navbar navbar-inverse",
     div(`class` := "navbar-collapse",
       ul(`class` := "nav navbar-nav",
-        li(`class` := "divider-vertical hidden-xs"),
+          
+          //commented this part of the nav bar out for now
+          //TODO: create controllers for these commented parts of the nav bar
+          
+        /*li(`class` := "divider-vertical hidden-xs"),
         li(`class` := "dropdown",
           a(href := "#", `class` := "dropdown-toggle",
             "data-toggle".attr := "dropdown",
@@ -91,17 +96,19 @@ trait Ced2arView extends ServletContextAware {
             li(a(href := s"$servletPath/all", "View All")),
             li(a(href := s"$servletPath/browse", "Sort Alphabetically")),
             li(a(href := s"$servletPath/groups", "Sort by Group"))
-          ),
+          ),*/
           li(`class` := "divider-vertical hidden-xs"),
           li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
+         // li(`class` := "divider-vertical hidden-xs"),
+         // li(a(href := s"$servletPath/docs", "Documentation")),
           li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := s"$servletPath/docs", "Documentation")),
+          li(a(href := s"$servletPath/upload", "Upload a Codebook")),
           li(`class` := "divider-vertical hidden-xs"),
           li(a(href := s"$servletPath/about", "About"))
         )
       )
     )
-  )
+  //)
 
   // Attribute handling logic:
 

@@ -1,9 +1,10 @@
 package edu.ncrn.cornell.view
 
 import edu.ncrn.cornell.view.common.Ced2arView
+import org.springframework.stereotype.Component
 import scalatags.Text.all._
 
-
+@Component
 class AboutView extends Ced2arView{
   
   def aboutPage() : String = {
