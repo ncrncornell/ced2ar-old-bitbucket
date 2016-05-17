@@ -19,7 +19,9 @@ class VarView extends Ced2arView{
       val typedHtml = html(
         head(
           defaultMetaTags,
-          defaultStyleSheetsAndScripts
+          defaultStyleSheetsAndScripts,
+          //Mathjax is pulled from networked resource, this will not work in restricted environments.
+          script(`type` := "text/javascript", `src` := "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=AM_CHTML")
       ),
         body(masterDiv(
           topBanner,
