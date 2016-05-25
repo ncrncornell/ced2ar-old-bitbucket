@@ -16,7 +16,11 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.*;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -39,7 +43,7 @@ public class XMLHandle {
 	 */
 	private String xml_string;
 	private Document xml;
-	private String schemaURL;
+	private String schemaLocation;
 
     private DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     private DocumentBuilder builder;
@@ -54,15 +58,15 @@ public class XMLHandle {
     /**
 	 * public constructor for String xml
 	 * @param x: XML string
-	 * @param schemaUrl: URL string for the schema location for validation
+	 * @param schemaLocation: URL string for the schema location for validation
 	 */
-	public XMLHandle(String x, String schemaUrl){
+	public XMLHandle(String x, String schemaLocation){
         //save the string for validation
 		this.xml_string = x;
 		//create doc w/o namespaces for easy xpath
 		this.xml = loadXMLFromString(x, false).orElse(builder.newDocument());
 		//set the schema url
-		this.schemaURL = schemaUrl;
+		this.schemaLocation = schemaLocation;
 		
 	}
 	
@@ -206,8 +210,7 @@ public class XMLHandle {
 	public boolean isValid(){
 		Optional<Source> xmlFile = Optional.empty();
 		try {
-			URL schemaFile = new URL(schemaURL);
-			System.out.println("SCHEMA URL: " + schemaURL);
+			System.out.println("SCHEMA URL: " + schemaLocation);
 			Optional<Document> ns_aware_xml = loadXMLFromString(xml_string, true);
             if (!ns_aware_xml.isPresent()) {
                 return false;
@@ -216,13 +219,27 @@ public class XMLHandle {
                 new DOMSource(ns_aware_xml.get().getDocumentElement())
             );
             System.out.println("ROOT ELEMENT: " + xml.getDocumentElement().getTagName());
-			//System.out.println(xmlFile.toString());
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			Schema schema = schemaFactory.newSchema(schemaFile);
-			Validator validator = schema.newValidator();
-            if (xmlFile.isPresent()) {
-                validator.validate(xmlFile.get());
+
+			Schema schema = null;
+			 			//URL schemaFile = new URL(schemaLocation);
+			try {
+				URI schemaUri = new URI(schemaLocation);
+				if (!schemaLocation.startsWith("file:")) {
+					schema = schemaFactory.newSchema(schemaUri.toURL());
+				}
+				else {
+					schema = schemaFactory.newSchema(new File(schemaUri.toURL().getFile()));
+				}
+			}
+			catch (URISyntaxException | MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+            if (xmlFile.isPresent() && schema != null) {
+				Validator validator = schema.newValidator();
+				validator.validate(xmlFile.get());
             }
             else {
                 return false;
