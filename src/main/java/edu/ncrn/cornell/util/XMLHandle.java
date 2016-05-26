@@ -16,11 +16,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.*;
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -222,22 +218,10 @@ public class XMLHandle {
 			SchemaFactory schemaFactory = SchemaFactory
 					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-			Schema schema = null;
-			 			//URL schemaFile = new URL(schemaLocation);
-			try {
-				URI schemaUri = new URI(schemaLocation);
-				if (!schemaLocation.startsWith("file:")) {
-					schema = schemaFactory.newSchema(schemaUri.toURL());
-				}
-				else {
-					schema = schemaFactory.newSchema(new File(schemaUri.toURL().getFile()));
-				}
-			}
-			catch (URISyntaxException | MalformedURLException e) {
-				e.printStackTrace();
-			}
+			URI schemaUri = new URI(schemaLocation);
+			Schema schema = schemaFactory.newSchema(schemaUri.toURL());
 
-            if (xmlFile.isPresent() && schema != null) {
+            if (xmlFile.isPresent()) {
 				Validator validator = schema.newValidator();
 				validator.validate(xmlFile.get());
             }

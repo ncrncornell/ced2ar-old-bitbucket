@@ -15,15 +15,11 @@ import scala.Tuple2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.gen5.api.Assertions.*;
 
@@ -37,9 +33,8 @@ public class XMLHandleTest {
     //TODO: Support multiple character sets (e.g. Charsets.UTF_8).
 
     //TODO: Support multiple schemas
-    //FIXME: as this is a unit test, we should only depend on schema files stored in the repo
-    private String schema = "http://www.ncrn.cornell.edu/docs/ddi/2.5.NCRN.P/schemas/codebook.xsd";
-    //private String schema = this.getClass().getResource("/codebook.xsd").toString();
+    //Note: as this is a unit test, we should only depend on schema files stored in the repo
+    private String schema = XMLHandle.class.getResource("/schemas/codebook.xsd").toString();
 
     private final String[] allDdiFiles = {
         "/SIPP Synthetic Beta v5.1.xml",
