@@ -13,6 +13,7 @@ public class Ced2arApplicationIT {
 
 	@Test
 	public void contextLoads() {
+		System.out.println("hello from Ced2arApplicationIT");
 	}
 
 }
