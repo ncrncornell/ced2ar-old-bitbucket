@@ -119,8 +119,7 @@ public class DBChecker {
 	private void createField(String id, String dispName, String desc){
 		String fieldId = "";
 		try{
-			Field field = new Field();
-			field.setId(id);
+			Field field = new Field(id);
 			field.setDisplayName(dispName);
 			field.setDescription(desc);
 			fieldDao.save(field);

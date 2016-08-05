@@ -12,6 +12,11 @@ import java.util.List;
 @Entity
 @NamedQuery(name="Field.findAll", query="SELECT f FROM Field f")
 public class Field implements Serializable {
+
+	public Field(String id) {
+		this.id = id;
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -29,9 +34,9 @@ public class Field implements Serializable {
 		return this.id;
 	}
 
-	public void setId(String id) {
-		this.id = id;
-	}
+//	public void setId(String id) {
+//		this.id = id;
+//	}
 
 	public String getDescription() {
 		return this.description;
@@ -47,6 +52,14 @@ public class Field implements Serializable {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	public boolean equals(Field field) {
+		return this.id.equals(field.id);
 	}
 
 }
