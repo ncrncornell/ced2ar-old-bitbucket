@@ -29,15 +29,15 @@ public class DBChecker {
 	
 	
 	@Autowired
-	private FieldDao fieldDao;
+	public FieldDao fieldDao;
 	@Autowired
-	private MappingDao mappingDao;
-	@Autowired 
-	private SchemaDao schemaDao;
+	public MappingDao mappingDao;
 	@Autowired
-	private ProfileDao profileDao;
-	
-	private ArrayList<String> fields;
+	public SchemaDao schemaDao;
+	@Autowired
+	public ProfileDao profileDao;
+
+	public ArrayList<String> fields;
 	
 	
 	public DBChecker(){
@@ -74,11 +74,13 @@ public class DBChecker {
 	/**
 	 * top level public method for checking that all necessary structural info is in postgres
 	 */
-	public void DBinit(){
+	public boolean DBinitIsOk(){
 		fieldsInit();
 		schemasInit();
 		//mappings is broken. PK changed, need to figure how to search by field
 		mappingsInit();
+
+		return true;
 	}
 	
 	/**

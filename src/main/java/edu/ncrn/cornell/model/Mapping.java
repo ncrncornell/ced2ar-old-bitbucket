@@ -20,6 +20,9 @@ public class Mapping implements Serializable {
 
 	//bi-directional many-to-one association to Field
 	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name="field_id", referencedColumnName="id", insertable = false, updatable = false)
+	})
 	private Field field;
 
 	//bi-directional many-to-one association to Schema

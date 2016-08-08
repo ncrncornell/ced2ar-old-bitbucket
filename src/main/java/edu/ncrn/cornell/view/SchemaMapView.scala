@@ -30,10 +30,9 @@ class SchemaMapView extends Ced2arView{
           table({
             val schemas: Array[Schema] = mappingTable.keys.map{k => k._2}.toArray
             val fields: Array[Field] = mappingTable.keys.map{k => k._1}.toArray
-            println(s"fields: ${fields.length}; schemas: ${schemas.length}")
 
             Seq(tr(// Headers first (schema identifiers)
-              th(), //empty, corner entry
+              th(b("Field")),
               schemas.map{ schema =>
                 val text = s"${schema.getId.getId} ${schema.getId.getVersion}"
                 th(a(href := schema.getUrl, text))
@@ -42,7 +41,7 @@ class SchemaMapView extends Ced2arView{
             // Now add field mappings as the remaining rows
             fields.map{field =>
               tr(
-                Seq(td("testing")) ++ //td(field.getId), //FIXME: fix NPE
+                Seq(td(field.getId)) ++
                 schemas.map{schema =>
                   td(mappingTable((field, schema)))
                 }.toSeq

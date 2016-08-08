@@ -42,14 +42,11 @@ class SchemaMapController {
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
   def schemaMap(): String = {
-
-    println(s"mappings: ${mappings.size}") //DEBUG
-
+    
     val mappingTable: Map[(Field, Schema), String] = mappings.map{m =>
-      println(s"field id: ${m.field.getId}") //FIXME: why an NPE?
+      println(s"field id: ${m.field.getId}")
       ((m.field, m.schema), m.xpath)
     }.toMap
-    println(s"mapping table keys: ${mappingTable.keys.size}") //DEBUG
 
     view.schemaMap(mappingTable)
   }
