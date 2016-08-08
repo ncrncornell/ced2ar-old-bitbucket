@@ -4,7 +4,6 @@ import edu.ncrn.cornell.model.{Field, Schema}
 import edu.ncrn.cornell.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
-import scala.collection.JavaConversions._
 import scalatags.Text.all._
 
 @Component
@@ -27,6 +26,11 @@ class SchemaMapView extends Ced2arView{
         ),
         h2("Schema Map"),
         masterDiv(
+          p(
+            ced2ar, " stores metadata in a database table that maps to XML files written in various schemas and allows for conversion between schema type. In order to perform this conversion, we have an internal ", i("Field"),
+            " that maps to particular locations (",
+            a(href:="https://en.wikipedia.org/wiki/XPath", "XPaths"), s") within the XML document for each supported schema. These mappings are shown below for each Schema currently supported in ", ced2ar, "."
+          ),
           table({
             val schemas: Array[Schema] = mappingTable.keys.map{k => k._2}.toArray
             val fields: Array[Field] = mappingTable.keys.map{k => k._1}.toArray

@@ -21,6 +21,8 @@ import scala.collection.JavaConversions._
 @Component
 trait Ced2arView extends ServletContextAware {
 
+  val ced2ar = raw("CED<sup>2</sup>AR")
+
   // Get the context so we can build site-local URLs easily:
   var servletContext: Option[ServletContext] = {
     @Autowired
@@ -72,7 +74,7 @@ trait Ced2arView extends ServletContextAware {
     div(`class` := "navbar", style := "background-color: #B40404;", div(
       // TODO: factor below font-family out to headings css class using ScalaCSS
       div(style := "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;",
-        h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;CED<sup>2</sup>AR")),
+        h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;"), ced2ar),
         h5(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;Development Server - The The Comprehensive Extensible Data Documentation and Access Repository"))
       ),
       div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
