@@ -27,11 +27,11 @@ class SchemaMapView extends Ced2arView{
         h2("Schema Map"),
         masterDiv(
           p(
-            ced2ar, " stores metadata in a database table that maps to XML files written in various schemas and allows for conversion between schema type. In order to perform this conversion, we have an internal ", i("Field"),
+            ced2ar, " stores metadata in a database table that maps to XML files written in various schemas and allows for conversion between schema type. In order to perform this conversion, we have an internal ", em("Field"),
             " that maps to particular locations (",
             a(href:="https://en.wikipedia.org/wiki/XPath", "XPaths"), s") within the XML document for each supported schema. These mappings are shown below for each Schema currently supported in ", ced2ar, "."
           ),
-          table({
+          div(`class` := "table-responsive", table(`class` := "table", {
             val schemas: Array[Schema] = mappingTable.keys.map{k => k._2}.toArray
             val fields: Array[Field] = mappingTable.keys.map{k => k._1}.toArray
 
@@ -51,7 +51,7 @@ class SchemaMapView extends Ced2arView{
                 }.toSeq
               )
             }.toSeq
-          })
+          }))
         )
       ))
     )

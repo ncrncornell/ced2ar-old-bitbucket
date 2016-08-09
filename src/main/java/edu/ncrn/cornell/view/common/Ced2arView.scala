@@ -1,11 +1,9 @@
 package edu.ncrn.cornell.view.common
 
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
-import javax.servlet.ServletContext
 
-import org.springframework.beans.factory.annotation.Autowired
+import edu.ncrn.cornell.web.util.HandyServletContextAware
 import org.springframework.stereotype.Component
-import org.springframework.web.context.ServletContextAware
 
 import scalatags.Text.all._
 import scalatags.Text.tags2.nav
@@ -19,25 +17,15 @@ import scala.collection.JavaConversions._
   *
   */
 @Component
-trait Ced2arView extends ServletContextAware {
+trait Ced2arView extends HandyServletContextAware {
 
+  //TODO: how to do something like this, withought h2:
+  // h2("About CED")(sup("2"))("AR")
   val ced2ar = raw("CED<sup>2</sup>AR")
 
-  // Get the context so we can build site-local URLs easily:
-  var servletContext: Option[ServletContext] = {
-    @Autowired
-    val sc = null
-    Option(sc)
-  }
-  //
-  def servletPath = servletContext match {
-    case Some(sc) => sc.getContextPath
-    case None => ""
-  }
-  //
-  def setServletContext(sc: ServletContext) = {
-    servletContext = Option(sc)
-  }
+  def space(rep: Int) =
+    if (rep > 0) raw("&nbsp;" * rep)
+    else raw("")
 
   // A few elements needed by almost every view:
 
@@ -74,10 +62,10 @@ trait Ced2arView extends ServletContextAware {
     div(`class` := "navbar", style := "background-color: #B40404;", div(
       // TODO: factor below font-family out to headings css class using ScalaCSS
       div(style := "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;",
-        h1(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;"), ced2ar),
-        h5(style := "color: #FFFFFF", raw("&nbsp;&nbsp;&nbsp;&nbsp;Development Server - The The Comprehensive Extensible Data Documentation and Access Repository"))
+        h1(style := "color: #FFFFFF", space(4), ced2ar),
+        h5(style := "color: #FFFFFF", space(4), "Development Server - The Comprehensive Extensible Data Documentation and Access Repository")
       ),
-      div(`class` := "row", div(`class` := "col-sm-12", raw("&nbsp;")))
+      div(`class` := "row", div(`class` := "col-sm-12", space(1)))
     ))
   )
 
@@ -85,28 +73,28 @@ trait Ced2arView extends ServletContextAware {
     div(`class` := "navbar-collapse",
       ul(`class` := "nav navbar-nav",
           
-          //commented this part of the nav bar out for now
-          //TODO: create controllers for these commented parts of the nav bar
-          
-        /*li(`class` := "divider-vertical hidden-xs"),
-        li(`class` := "dropdown",
-          a(href := "#", `class` := "dropdown-toggle",
-            "data-toggle".attr := "dropdown",
-            raw("Browse Variables&nbsp;<b class=\"caret\"></b>")
-          ),
-          ul(`class` := "dropdown-menu",
-            li(a(href := s"$servletPath/all", "View All")),
-            li(a(href := s"$servletPath/browse", "Sort Alphabetically")),
-            li(a(href := s"$servletPath/groups", "Sort by Group"))
-          ),*/
-          li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
-         // li(`class` := "divider-vertical hidden-xs"),
-         // li(a(href := s"$servletPath/docs", "Documentation")),
-          li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := s"$servletPath/upload", "Upload a Codebook")),
-          li(`class` := "divider-vertical hidden-xs"),
-          li(a(href := s"$servletPath/about", "About"))
+        //commented this part of the nav bar out for now
+        //TODO: create controllers for these commented parts of the nav bar
+
+      /*li(`class` := "divider-vertical hidden-xs"),
+      li(`class` := "dropdown",
+        a(href := "#", `class` := "dropdown-toggle",
+          attr("data-toggle") := "dropdown",
+          "Browse Variables", space(1) b(`class`:= "caret")
+        ),
+        ul(`class` := "dropdown-menu",
+          li(a(href := s"$servletPath/all", "View All")),
+          li(a(href := s"$servletPath/browse", "Sort Alphabetically")),
+          li(a(href := s"$servletPath/groups", "Sort by Group"))
+        ),*/
+        li(`class` := "divider-vertical hidden-xs"),
+        li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
+        li(`class` := "divider-vertical hidden-xs"),
+        li(a(href := s"$servletPath/upload", "Upload a Codebook")),
+        li(`class` := "divider-vertical hidden-xs"),
+        li(a(href := s"$servletPath/docs", "Documentation")),
+        li(`class` := "divider-vertical hidden-xs"),
+        li(a(href := s"$servletPath/about", "About"))
         )
       )
     )

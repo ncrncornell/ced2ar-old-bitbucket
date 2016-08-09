@@ -18,8 +18,9 @@ class AboutView extends Ced2arView{
         navBar,
         masterDiv(
           div(
-            h2("About CED")(sup("2"))("AR"),
-            p("The Comprehensive Extensible Data Documentation and Access Repository (CED")(sup("2"))("AR) is funded by the National Science Foundation (NSF), under grant ")
+            h2(ced2ar),
+            p("The Comprehensive Extensible Data Documentation and Access Repository (", ced2ar,
+              ") is funded by the National Science Foundation (NSF), under grant ")
             (a(href:="http://www.nsf.gov/awardsearch/showAward?AWD_ID=1131848")("#1131848"))
             (" and developed by the ",
               a(
@@ -29,8 +30,10 @@ class AboutView extends Ced2arView{
               ". The Cornell NCRN branch includes researchers and developers from the Cornell Institute for Social and Economic Research ")
             (a(href:="http://ciser.cornell.edu/")("CISER"))
             (" and the Cornell ")
-            (a(href:="http://www.ilr.cornell.edu/ldi/")(" Labor Dynamics Institute"))
-            (". CED")(sup("2"))("AR is designed to improve the discoverability of both public and restricted data from the federal statistical system. The project is based upon leading metadata standards and ingests data from a variety of sources.")
+            (a(href:="http://www.ilr.cornell.edu/ldi/")(" Labor Dynamics Institute.")), ced2ar,
+            " is designed to improve the discoverability of both public and restricted data from ",
+            "the federal statistical system. The project is based upon leading metadata standards ",
+            "and ingests data from a variety of sources."
             ),
             //images will go here
           div(
@@ -65,9 +68,9 @@ class AboutView extends Ced2arView{
           div(
             h3("Copyright Information"),
              p("Copyright 2012-2016 Cornell University. All rights reserved. ")
-             ("CED")(sup("2"))("AR is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. (See")
+             (ced2ar)(" is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. (See")
              (a(href:="http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt")("http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.txt)"))
-             ("Permission to copy, modify, and distribute all or any part of CED")(sup("2"))("  officially docketed at Cornell as D-6801,")
+             (". Permission to copy, modify, and distribute all or any part of ")(ced2ar)(", officially docketed at Cornell as D-6801,")
              ("titled \"The Comprehensive Extensible Data Documentation and Access Repository\" (\"WORK\")")
              ("and its associated copyrights for educational, research and non-profit purposes, without fee,")
              ("and without a written agreement is hereby granted, provided that the above copyright notice ")
