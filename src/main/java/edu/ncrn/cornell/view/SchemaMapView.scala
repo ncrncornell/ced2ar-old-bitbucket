@@ -34,7 +34,6 @@ class SchemaMapView extends Ced2arView{
           div(`class` := "table-responsive", table(`class` := "table", {
             val schemas: Array[Schema] = mappingTable.keys.map{k => k._2}.toArray
             val fields: Array[Field] = mappingTable.keys.map{k => k._1}.toArray
-
             Seq(tr(// Headers first (schema identifiers)
               th(b("Field")),
               schemas.map{ schema =>
@@ -47,7 +46,7 @@ class SchemaMapView extends Ced2arView{
               tr(
                 Seq(td(field.getId)) ++
                 schemas.map{schema =>
-                  td(mappingTable((field, schema)))
+                  td(mappingTable.getOrElse((field, schema), ""): String)
                 }.toSeq
               )
             }.toSeq

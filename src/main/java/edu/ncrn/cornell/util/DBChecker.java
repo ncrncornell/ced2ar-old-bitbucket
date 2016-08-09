@@ -243,7 +243,19 @@ public class DBChecker {
 		spk.setId("ddi");
 		spk.setVersion("2.5.1");
 		Schema schema = schemaDao.findOne(spk);
-		if(schema == null) createSchema(spk,"http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd");
+		if(schema == null) {
+			createSchema(spk, "http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd");
+			System.out.println("Tried creating ddi:2.5.1");
+		}
+
+		spk = new SchemaPK();
+		spk.setId("lifecycle");
+		spk.setVersion("3.2");
+		schema = schemaDao.findOne(spk);
+		if(schema == null) {
+			createSchema(spk, "http://www.ddialliance.org/Specification/DDI-Lifecycle/3.2/XMLSchema/instance.xsd");
+			System.out.println("Tried creating lifecycle:3.2");
+		}
 	}
 	
 	/**
@@ -286,141 +298,179 @@ public class DBChecker {
 		}
 		
 		int missingMsize = missingMappings.size();
-		System.out.println("[DBCHECKER]:: missing "+missingMsize+"/"+msize+" mappings");
+		System.out.println("[DBCHECKER]:: fields with missing mappings: "
+				+ missingMsize+"/"+msize+" mappings"
+		);
 		//if some fields are absent, create them.
-		if(missingMsize > 0) fillMappings(missingMappings);
+		if(missingMsize > 0) fillMappings();
 	}
 	
-	private void createMapping(String fieldId, String xpath)
-	{
-		
-		//get default schema model
-		//TODO: get rid of this hardcoded schema 
-		String schemaId = "ddi";
-		String schemaVersion = "2.5.1";
-		SchemaPK spk = new SchemaPK();
-		spk.setId(schemaId);
-		spk.setVersion(schemaVersion);
+	private void createMapping(MappingPK mpk, String xpath) {
 		try{
-			Schema schema = schemaDao.findOne(spk);
-			//get field model
-			Field field = fieldDao.findOne(fieldId);
 			//create mapping model
 			Mapping mapping = new Mapping();
-			MappingPK mappingPK = new MappingPK();
-			mappingPK.setFieldId(fieldId);
-			mappingPK.setSchemaId(schemaId);
-			mappingPK.setSchemaVersion(schemaVersion);
-			
-			mapping.setId(mappingPK);
+			mapping.setId(mpk);
 			mapping.setXpath(xpath);
 			mappingDao.save(mapping);
 		}catch(Exception e){
-			System.out.println("[DBCHECKER]:: error creating mapping of field "+fieldId);
+			System.out.println("[DBCHECKER]:: error creating mapping of field "
+				+ mpk.getFieldId());
 			e.printStackTrace();
 		}
-		System.out.println("[DBCHECKER]:: successfully created mapping for "+fieldId);
+		System.out.println("[DBCHECKER]:: successfully created mapping for "
+				+ mpk.getFieldId());
 		
 	}
 	
 	/**
 	 * iterates over the list of missing mappings and adds a single mapping for each missing field
 	 * TODO: needs to be more robust, should be multiple mappings for each field.
-	 * @param missingMappings
 	 */
-	private void fillMappings(List<String> missingMappings)
+	private void fillMappings()
 	{
 		//VARVALUE
-		if(missingMappings.contains("varvalue")){
-			//TODO:valrng is wrong? unclear
-			//createMapping("varvalue","/codebook/dataDscr/var[*]/valrng");
-		}
+//		if(missingMappings.contains("varvalue")){
+//			//TODO:valrng is wrong? unclear
+//			//createMapping("varvalue","/codebook/dataDscr/var[*]/valrng");
+//		}
 		
 		//VARNAME
-		if(missingMappings.contains("varname")){
-			createMapping("varname", "/codeBook/dataDscr/var[*]/@name");
-		}		
+		MappingPK mpk = makeMappingPK("ddi", "2.5.1", "varname");
+		Mapping mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/@name");
+		}
 
 		//VARLABEL
-		if(missingMappings.contains("varlabel")){
-			createMapping("varlabel","/codeBook/dataDscr/var[*]/labl");
-		}
-		
-		//VARACCESS
-		if(missingMappings.contains("varaccess")){
-			//TODO:not sure where access level is
-			//createMapping("varaccess","/codebook/dataDscr/var[*]/??")
+		mpk = makeMappingPK("ddi", "2.5.1", "varlabel");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/labl");
 		}
 
+		//VARACCESS
+//		if(missingMappings.contains("varaccess")){
+//			//TODO:not sure where access level is
+//			//createMapping("varaccess","/codebook/dataDscr/var[*]/??")
+//		}
+
 		//VARTYPE
-		if(missingMappings.contains("vartype")){
-			createMapping("vartype","/codeBook/dataDscr/var[*]/varFormat/@type");
+		mpk = makeMappingPK("ddi", "2.5.1", "vartype");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/varFormat/@type");
 		}
 
 		//VARFILES
-		if(missingMappings.contains("varfiles")){
-			createMapping("varfiles","/codeBook/fileDscr[*]");
+		mpk = makeMappingPK("ddi", "2.5.1", "varfiles");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/fileDscr[*]");
 		}
 
 		//VARDESC
-		if(missingMappings.contains("vardesc")){
-			createMapping("vardesc","/codeBook/dataDscr/var[*]/txt");
+		mpk = makeMappingPK("ddi", "2.5.1", "vardesc");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/txt");
 		}
 			
 		//SUMSTAT
-		if(missingMappings.contains("sumstat")){
-			createMapping("sumstat","/codeBook/dataDscr/var[*]/sumstat[*]");
+		mpk = makeMappingPK("ddi", "2.5.1", "sumstat");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk,"/codeBook/dataDscr/var[*]/sumstat[*]");
 		}
 		
 		//VALRANGE
-		if(missingMappings.contains("valrange")){
-			createMapping("valrange","/codeBook/dataDscr/var[*]/valrng");
+		mpk = makeMappingPK("ddi", "2.5.1", "valrange");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/valrng");
 		}
 		
 		//VALRANGEMIN
-		if(missingMappings.contains("valrangemin")){
-			createMapping("valrangemin","/codeBook/dataDscr/var[*]/valrng/@min");
+		mpk = makeMappingPK("ddi", "2.5.1", "valrangemin");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/valrng/@min");
 		}
-		
+
 		//VALRANGEMAX
-		if(missingMappings.contains("valrangemax")){
-			createMapping("valrangemax","/codeBook/dataDscr/var[*]/valrng/@max");
+		mpk = makeMappingPK("ddi", "2.5.1", "valrangemax");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/dataDscr/var[*]/valrng/@max");
 		}
-		
+
 		//CODEBOOKNAME
-		if(missingMappings.contains("codebookname")){
-			createMapping("codebookname","/codeBook/docDscr/citation/titlStmt/titl");
+		mpk = makeMappingPK("ddi", "2.5.1", "codebookname");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/docDscr/citation/titlStmt/titl");
 		}
 		
 		//CODEBOOKALT
-		if(missingMappings.contains("codebookalt")){
-			createMapping("codebookalt","/codeBook/docDscr/citation/titlStmt/altTitl");
+		mpk = makeMappingPK("ddi", "2.5.1", "codebookalt");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/docDscr/citation/titlStmt/altTitl");
 		}
 		
 		//CODEBOOKDIST
-		if(missingMappings.contains("codebookdist")){
-			createMapping("codebookdist","/codeBook/docDscr/citation/distStmt/distrbtr[*]");
+		mpk = makeMappingPK("ddi", "2.5.1", "codebookdist");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/docDscr/citation/distStmt/distrbtr[*]");
 		}
-		
+
 		//CODEBOOKCIT
-		if(missingMappings.contains("codebookcit")){
-			createMapping("codebookcit","/codeBook/docDscr/citation/biblCit");
+		mpk = makeMappingPK("ddi", "2.5.1", "codebookcit");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/docDscr/citation/biblCit");
 		}
-		
-		if(missingMappings.contains("datacit")){
-			createMapping("datacit","/codeBook/stdyDscr/citation/biblCit");
+		mpk = makeMappingPK("lifecycle", "3.2", "codebookcit");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			//Note: xpath untested for validity
+			createMapping(mpk, "/FragmentInstance/Fragment/dDDIInstance/[name='Citation']");
+		}
+
+		//DATACIT
+		mpk = makeMappingPK("ddi", "2.5.1", "datacit");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/stdyDscr/citation/biblCit");
+		}
+		mpk = makeMappingPK("lifecycle", "3.2", "datacit");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			//Note: xpath untested for validity
+			createMapping(mpk, "/FragmentInstance/Fragment/dDDIInstance/[name='Citation']");
 		}
 		
 		//ABSTRACT
-		if(missingMappings.contains("abstract")){
-			createMapping("abstract","/codeBook/stdyDscr/stdyInfo/abstract");
+		mpk = makeMappingPK("ddi", "2.5.1", "abstract");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/stdyDscr/stdyInfo/abstract");
 		}
 		
 		//RELATEDMATERIAL
-		if(missingMappings.contains("relatedmaterial")){
-			createMapping("relatedmaterial","/codeBook/stdyDscr/othrStdMat/relMat[*]");
+		mpk = makeMappingPK("ddi", "2.5.1", "relatedmaterial");
+		mapping = mappingDao.findOne(mpk);
+		if (mapping == null) {
+			createMapping(mpk, "/codeBook/stdyDscr/othrStdMat/relMat[*]");
 		}
-				
+	}
+
+	private MappingPK makeMappingPK(String schemaId, String schemaVersion, String fieldId) {
+		MappingPK mappingPK = new MappingPK();
+		mappingPK.setFieldId(fieldId);
+		mappingPK.setSchemaId(schemaId);
+		mappingPK.setSchemaVersion(schemaVersion);
+		return mappingPK;
 	}
 	
 	private void profilesInit(){
