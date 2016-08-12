@@ -44,6 +44,3 @@ upload-dir/*
 
 #git cache files
 .cache*
-rdb/src/main/resources/
-src/main/java/
-src/test/java/
