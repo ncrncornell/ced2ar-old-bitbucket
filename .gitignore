@@ -1,5 +1,5 @@
 ### Config properties with sensitive info
-src/main/resources/application-default.properties
+application-default.properties
 
 ### DS_Store files
 .DS_Store
@@ -44,3 +44,6 @@ upload-dir/*
 
 #git cache files
 .cache*
+rdb/src/main/resources/
+src/main/java/
+src/test/java/

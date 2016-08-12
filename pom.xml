@@ -4,11 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>edu.ncrn.cornell</groupId>
-	<artifactId>ced2ar-rdb</artifactId>
+	<artifactId>ced2ar3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+    <modules>
+        <module>site</module>
+        <module>rdb</module>
+        <module>rdb-tests</module>
+    </modules>
+    <packaging>pom</packaging>
 
-	<name>ced2ar</name>
+	<name>CED2AR 3</name>
 	<description></description>
 
 	<parent>
@@ -27,8 +32,6 @@
             ${scala.version.major}.${scala.version.minor}
         </scala.version>
         <junit.gen5.version>5.0.0-ALPHA</junit.gen5.version>
-        <dbunit.version>2.5.2</dbunit.version>
-        <spring-test-dbunit.version>1.3.0</spring-test-dbunit.version>
     </properties>
 
     <profiles>
@@ -52,6 +55,11 @@
     </profiles>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
@@ -102,22 +110,6 @@
             <version>19.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <version>${scala.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.lihaoyi</groupId>
-            <artifactId>scalatags_${scala.version.major}</artifactId>
-            <version>0.6.0</version>
-        </dependency>
 
         <dependency>
             <groupId>org.junit</groupId>
@@ -146,19 +138,6 @@
         <!--</dependency>-->
 
         <dependency>
-            <groupId>com.github.springtestdbunit</groupId>
-            <artifactId>spring-test-dbunit</artifactId>
-            <version>${spring-test-dbunit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.dbunit</groupId>
-            <artifactId>dbunit</artifactId>
-            <version>${dbunit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
         	<groupId>org.springframework.boot</groupId>
         	<artifactId>spring-boot-starter-jersey</artifactId>
         </dependency>
@@ -170,58 +149,13 @@
         </dependency>
 	</dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-reflect</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.2.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-            <plugin>
-                <groupId>net.alchim31.maven</groupId>
-                <artifactId>scala-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
-                            <goal>testCompile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
