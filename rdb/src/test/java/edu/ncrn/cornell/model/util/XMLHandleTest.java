@@ -38,7 +38,7 @@ public class XMLHandleTest {
 
     private final String[] allDdiFiles = {
         "/SIPP Synthetic Beta v5.1.xml",
-        "/ssbv602.xml"
+        //"/ssbv602.xml"
     };
 
     List<String> allDdiFilesList = Arrays.asList(allDdiFiles);

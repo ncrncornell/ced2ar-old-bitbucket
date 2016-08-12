@@ -1,11 +1,9 @@
 package edu.ncrn.cornell.model.testing;
 
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
-//import edu.ncrn.cornell.Ced2arApplication;
-import edu.ncrn.cornell.model.testing.DBChecker;
 import org.junit.Assert;
-import org.junit.gen5.api.Test;
-//TODO: might need to be import org.junit.Test;
+//import org.junit.gen5.api.Test; //TODO: doesn't work with spring yet
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestExecutionListeners;
