@@ -11,9 +11,6 @@
 
     <artifactId>ced2ar3-rdb</artifactId>
 
+    <packaging>jar</packaging>
 
-
-    <dependencies>
-
-    </dependencies>
 </project>
