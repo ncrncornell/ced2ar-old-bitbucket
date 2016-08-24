@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.ServletContextAware
 
 /**
-  * Created by Brandon Barker on 8/9/2016.
+  *  @author Brandon Barker
+  *  8/9/2016
   */
 class HandyServletContextAware extends ServletContextAware {
 
