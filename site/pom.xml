@@ -11,7 +11,7 @@
 
     <artifactId>ced2ar3-site</artifactId>
     <packaging>war</packaging>
-    
+
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>

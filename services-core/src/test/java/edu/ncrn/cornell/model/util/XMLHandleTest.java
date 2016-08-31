@@ -3,6 +3,7 @@ package edu.ncrn.cornell.model.util;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
+import edu.ncrn.cornell.model.Schema;
 import edu.ncrn.cornell.util.XMLHandle;
 import org.junit.gen5.api.AfterEach;
 import org.junit.gen5.api.BeforeAll;
@@ -34,7 +35,7 @@ public class XMLHandleTest {
 
     //TODO: Support multiple schemas
     //Note: as this is a unit test, we should only depend on schema files stored in the repo
-    private String schema = XMLHandle.class.getResource("/schemas/codebook.xsd").toString();
+    private String schema = Schema.class.getResource("/schemas/codebook.xsd").toString();
 
     private final String[] allDdiFiles = {
         "/SIPP Synthetic Beta v5.1.xml",

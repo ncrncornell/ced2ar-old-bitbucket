@@ -7,9 +7,10 @@
 	<artifactId>ced2ar3</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>site</module>
         <module>rdb</module>
         <module>rdb-tests</module>
+        <module>services-core</module>
+        <module>site</module>
     </modules>
     <packaging>pom</packaging>
 
