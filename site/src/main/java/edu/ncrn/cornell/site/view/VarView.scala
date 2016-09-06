@@ -11,10 +11,10 @@ import scala.collection.Map
 class VarView extends Ced2arView{
   
     def variableDetails(
-          details : java.util.Map[Tuple2[String, Integer], String],
-          handle : String,
-          varname : String
-        ) : String = {
+       details : java.util.Map[(String, Integer), String],
+       handle : String,
+       varname : String
+    ) : String = {
       val detailsSorted = details.toSeq.sortBy(_._1._2)
       val typedHtml = html(
         head(

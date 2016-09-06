@@ -11,9 +11,9 @@ import scala.collection.JavaConversions._
 class CodebookView extends Ced2arView {
 
   def codebookDetails(
-          details : java.util.Map[Tuple2[String, Integer], String],
-          handle : String
-        ) : String = {
+     details : java.util.Map[(String, Integer), String],
+     handle : String
+  ) : String = {
       val detailsSorted = details.toSeq.sortBy(_._1._2)
       val typedHtml = html(
         head(

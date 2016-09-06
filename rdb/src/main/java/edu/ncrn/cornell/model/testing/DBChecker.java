@@ -260,11 +260,10 @@ public class DBChecker {
 		}
 	}
 
+
 	/**
 	 * Saves a schema in postgres
-	 *
-	 * @param id
-	 * @param version
+	 * @param schemaPK
 	 * @param url
 	 */
 	private void createSchema(SchemaPK schemaPK, String url) {
