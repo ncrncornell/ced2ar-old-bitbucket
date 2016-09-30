@@ -177,7 +177,7 @@ public class CodebookService {
 	}
 	
 	/**
-	 * retreives variable details profile from SQL tables
+	 * retrieves variable details profile from SQL tables
 	 * @param handle
 	 * @param varname
 	 * @return

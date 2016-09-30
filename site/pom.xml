@@ -31,11 +31,7 @@
             <artifactId>ced2ar3-services-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>edu.ncrn.cornell</groupId>
-            <artifactId>ced2ar3-rdb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>edu.ncrn.cornell</groupId>
             <artifactId>ced2ar3-rdb-tests</artifactId>

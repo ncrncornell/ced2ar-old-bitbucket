@@ -250,7 +250,8 @@ public class XMLHandle {
      * anyway).
      *
      * @param xpathBuilt - pass in empty string initially
-     * @param xpathRest - pass in initial, potentially non-unique xpath
+     * @param xpathRest - pass in initial, potentially non-unique xpath; termination occurs
+	 *                  if value is "", all xpaths should be found if value is "/".
      * @param indices - an empty list initially; accumulates indices (xpath list
      *                indices or tag values) for each unique xpath (xpathBuilt)
      *
