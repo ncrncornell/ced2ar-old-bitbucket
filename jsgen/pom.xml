@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ced2ar3</artifactId>
+        <groupId>edu.ncrn.cornell</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <properties>
+        <scalajs.version>0.6.12</scalajs.version>
+    </properties>
+
+    <artifactId>ced2ar3-jsgen</artifactId>
+    <packaging>jar</packaging>
+
+
+
+    <!--  The following is a way to potentially use scala.js from Maven
+    // See https://gist.github.com/Andrei-Pozolotin/e26380fe9703a9158efe
+    // http://stackoverflow.com/questions/26512750/how-to-use-scala-js-from-maven
+    // Instead I'm opting to use SBT for this, and just import libraries in Maven
+    // for the sake of the IDE.
+    -->
+
+    <dependencies>
+
+        <!-- The following are scala.js libraries and must be
+        identically replicated in build.sbt; they are here for
+        the sake of IDEs using the project. In maven, they should
+        have scope=provided.
+        -->
+
+        <dependency>
+            <groupId>org.scala-js</groupId>
+            <artifactId>scalajs-library_${scala.version.major}</artifactId>
+            <version>${scalajs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>in.nvilla</groupId>
+            <artifactId>monadic-html_sjs0.6_${scala.version.major}</artifactId>
+            <version>0.1.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>in.nvilla</groupId>
+            <artifactId>monadic-rx-cats_sjs0.6_${scala.version.major}</artifactId>
+            <version>0.1.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>platform-win</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <exec executable="cmd.exe"
+                                              spawn="false"
+                                              failonerror="true">
+                                            <arg value="/c"/>
+                                            <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
+                                            <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
+                                            <!--<arg value="${scala.js.opt}"/>-->
+                                            <arg value="fastOptJS"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>unix-platform</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.5.0</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>sbt</executable>
+                            <arguments>
+                                <argument>${scala.js.opt}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/public</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/scala-2.11</directory>
+                                    <includes>
+                                        <include>**/*.js</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
+</project>
