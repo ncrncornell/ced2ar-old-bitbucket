@@ -64,6 +64,50 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>pre-integration-test</phase>
+                        <configuration>
+                            <target>
+                                <exec executable="cmd.exe"
+                                      spawn="true">
+                                    <arg value="/c"/>
+                                    <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
+                                    <arg value="fullOptJS"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.mojo</groupId>-->
+                <!--<artifactId>exec-maven-plugin</artifactId>-->
+                <!--<version>1.5.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>exec</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<executable>sbt</executable>-->
+                    <!--&lt;!&ndash; optional &ndash;&gt;-->
+                    <!--&lt;!&ndash;<workingDirectory>/tmp</workingDirectory>&ndash;&gt;-->
+                    <!--<arguments>-->
+                        <!--<argument>fullOptJS</argument>-->
+                    <!--</arguments>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
 
         </plugins>
     </build>
