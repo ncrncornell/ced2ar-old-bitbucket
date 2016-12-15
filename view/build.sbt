@@ -1,7 +1,9 @@
 name := "ced2ar3-view"
 
 scalaVersion in ThisBuild := "2.11.8" // or any other Scala version >= 2.10.2
-lazy val mhtmlV = "0.1.1"
+
+lazy val mhtmlV = "latest.integration"
+//lazy val mhtmlV = "0.1.1"
 
 
 
@@ -12,7 +14,7 @@ lazy val mhtmlV = "0.1.1"
 //val scalajsOutputDir = Def.settingKey[File]("directory for javascript files output by scalajs")
 
 
-lazy val view = project.enablePlugins(ScalaJSPlugin, ScalaJSWeb)
+lazy val view = (project in file(".")).enablePlugins(ScalaJSPlugin)
   .settings(
     libraryDependencies ++= Seq(
       "in.nvilla" %%% "monadic-rx-cats" % mhtmlV,
@@ -21,12 +23,17 @@ lazy val view = project.enablePlugins(ScalaJSPlugin, ScalaJSWeb)
     )
   )
 
-lazy val server = project
-  .settings(
-    scalaJSProjects := Seq(view),
-    pipelineStages in Assets := Seq(scalaJSPipeline),
-    WebKeys.packagePrefix in Assets := "public/",
-    WebKeys.exportedMappings in Assets ++= (for ((file, path) <- (mappings in Assets).value)
-      yield file -> ((WebKeys.packagePrefix in Assets).value + path))
-  )
-  .enablePlugins(SbtWeb)
+//From http://www.mikaelmayer.com/2015/08/06/integrating-scala-js-into-an-existing-project/
+//FIXME: runs but doesn't appear to copy
+lazy val copyDyn = Def.taskDyn{
+  val outDir = baseDirectory.value / "target/classes/public"
+  val inDir = baseDirectory.value / "target/scala-2.11"
+  val jsFiles = baseDirectory (_ * "*.js" get)
+  Def.task(jsFiles.value map { p =>  (inDir / p.getName, outDir / p.getName) })
+}
+lazy val copyjs = TaskKey[Unit]("copyjs", "Copy javascript files to target directory")
+copyjs := {
+  val files = copyDyn.value
+  IO.copy(files, true)
+
+}
