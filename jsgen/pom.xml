@@ -77,7 +77,9 @@
                                       spawn="true">
                                     <arg value="/c"/>
                                     <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
-                                    <arg value="fullOptJS"/>
+                                    <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
+                                     <!--<arg value="${scala.js.opt}"/>-->
+                                    <arg value="fastOptJS"/>
                                 </exec>
                             </target>
                         </configuration>
@@ -136,5 +138,14 @@
             <!--</plugin>-->
 
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.html</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>
