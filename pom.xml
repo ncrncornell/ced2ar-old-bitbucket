@@ -11,7 +11,7 @@
         <module>rdb-tests</module>
         <module>services-core</module>
         <module>site</module>
-        <module>view</module>
+        <module>jsgen</module>
     </modules>
     <packaging>pom</packaging>
 

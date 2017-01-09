@@ -13,8 +13,8 @@
         <scalajs.version>0.6.12</scalajs.version>
     </properties>
 
-    <artifactId>ced2ar3-view</artifactId>
-    <packaging>war</packaging>
+    <artifactId>ced2ar3-jsgen</artifactId>
+    <packaging>jar</packaging>
 
 
 
@@ -26,12 +26,6 @@
     -->
 
     <dependencies>
-
-        <dependency>
-            <groupId>edu.ncrn.cornell</groupId>
-            <artifactId>ced2ar3-site</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- The following are scala.js libraries and must be
         identically replicated in build.sbt; they are here for
