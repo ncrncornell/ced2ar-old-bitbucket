@@ -118,8 +118,6 @@
                         </executions>
                         <configuration>
                             <executable>sbt</executable>
-                            <!-- optional -->
-                            <!--<workingDirectory>/tmp</workingDirectory>-->
                             <arguments>
                                 <argument>${scala.js.opt}</argument>
                             </arguments>
