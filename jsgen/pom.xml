@@ -56,34 +56,82 @@
 
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>platform-win</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <target>
+                                        <exec executable="cmd.exe"
+                                              spawn="false"
+                                              failonerror="true">
+                                            <arg value="/c"/>
+                                            <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
+                                            <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
+                                            <!--<arg value="${scala.js.opt}"/>-->
+                                            <arg value="fastOptJS"/>
+                                        </exec>
+                                    </target>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>unix-platform</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.5.0</version>
+                        <executions>
+                            <execution>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <executable>sbt</executable>
+                            <!-- optional -->
+                            <!--<workingDirectory>/tmp</workingDirectory>-->
+                            <arguments>
+                                <argument>${scala.js.opt}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <configuration>
-                            <target>
-                                <exec executable="cmd.exe"
-                                      spawn="false"
-                                      failonerror="true">
-                                    <arg value="/c"/>
-                                    <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
-                                    <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
-                                     <!--<arg value="${scala.js.opt}"/>-->
-                                    <arg value="fastOptJS"/>
-                                </exec>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.0.2</version>
@@ -110,27 +158,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--<plugin>-->
-                <!--<groupId>org.codehaus.mojo</groupId>-->
-                <!--<artifactId>exec-maven-plugin</artifactId>-->
-                <!--<version>1.5.0</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<goals>-->
-                            <!--<goal>exec</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-                <!--<configuration>-->
-                    <!--<executable>sbt</executable>-->
-                    <!--&lt;!&ndash; optional &ndash;&gt;-->
-                    <!--&lt;!&ndash;<workingDirectory>/tmp</workingDirectory>&ndash;&gt;-->
-                    <!--<arguments>-->
-                        <!--<argument>fullOptJS</argument>-->
-                    <!--</arguments>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
 
         </plugins>
         <resources>
