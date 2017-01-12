@@ -117,7 +117,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <executable>sbt</executable>
+                            <executable>/usr/local/Cellar/sbt/0.13.9/bin/sbt</executable>
                             <!-- optional -->
                             <!--<workingDirectory>/tmp</workingDirectory>-->
                             <arguments>
