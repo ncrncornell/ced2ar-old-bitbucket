@@ -117,9 +117,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <executable>/usr/local/Cellar/sbt/0.13.9/bin/sbt</executable>
-                            <!-- optional -->
-                            <!--<workingDirectory>/tmp</workingDirectory>-->
+                            <executable>sbt</executable>
                             <arguments>
                                 <argument>${scala.js.opt}</argument>
                             </arguments>
