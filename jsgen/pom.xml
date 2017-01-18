@@ -117,7 +117,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                        	<executable>sbt</executable>
+                            <executable>sbt</executable>
                             <!-- for mac -->
                             <!-- executable>/usr/local/Cellar/sbt/0.13.9/bin/sbt</executable -->
                             <arguments>
@@ -170,4 +170,8 @@
             </resource>
         </resources>
     </build>
+<<<<<<< HEAD
 </project>
+=======
+</project>
+>>>>>>> 8061dac08e10d4e1606de03f847813dad869dc8a
