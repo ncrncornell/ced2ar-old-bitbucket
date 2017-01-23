@@ -23,7 +23,7 @@ class CodebooksView extends Ced2arView{
         ol(cls:="breadcrumb")(
           li(cls:="active")("Codebooks")
         ),
-        h2("Codebooks"),
+        indentDiv(h1("Codebooks"),
         masterDiv(
           codebooks.map{ case (cbHandle, cbName) =>
             p(
@@ -33,7 +33,7 @@ class CodebooksView extends Ced2arView{
              )
           }.toSeq
         )
-      ))
+      )))
     )
     typedHtml.toString()
   }

@@ -136,15 +136,17 @@ public class CodebookService {
 	 * Retrieves all variables in the database
 	 * @return a map of (name,label) pairs
 	 */
-	public Map<String, String> getAllVariables()
+	public Map<String, Tuple2<String, String>> getAllVariables()
 	{
 		
-		Map<String, String> variables = new HashMap<String, String>();
+		Map<String, Tuple2<String,String>> variables = new HashMap<String, Tuple2<String,String>>();
 		
 		List<FieldInst> varnames = fieldInstDao.findByFieldId("varname");
 		
 		//for each varname find the labl and add to hashmap
 		for( FieldInst varname : varnames){
+			
+			String handle = varname.getRawDocId();
 			
 			Long varnameId = varname.getId();
 			List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varnameId);
@@ -158,7 +160,7 @@ public class CodebookService {
 			lablXpath = lablXpath.replace("*", varIndexValue);
 			
 			//find corresponding varlabl by canonical xpath
-			List<FieldInst> varlabls = fieldInstDao.findByCanonicalXpath(lablXpath);
+			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
 			//check that xpath was mapped correctly
 			if(varlabls.size() != 1){
 				System.out.println("failed to properly map xpath from varname to varlabl: "+lablXpath);
@@ -166,7 +168,8 @@ public class CodebookService {
 			}
 			FieldInst varlabl = varlabls.get(0);
 			//insert into hashmap
-			variables.put(varname.getValue(), varlabl.getValue());
+			Tuple2<String, String> value = new Tuple2<>(varlabl.getValue(), handle);
+			variables.put(varname.getValue(), value);
 		}
 		
 		return variables;

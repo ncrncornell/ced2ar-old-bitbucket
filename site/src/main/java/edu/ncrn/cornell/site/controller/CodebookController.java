@@ -19,6 +19,7 @@ import edu.ncrn.cornell.site.view.CodebookView;
 import edu.ncrn.cornell.site.view.CodebooksView;
 import edu.ncrn.cornell.site.view.VarView;
 import edu.ncrn.cornell.site.view.VarsView;
+import edu.ncrn.cornell.site.view.AllVarsView;
 
 
 @Controller
@@ -35,6 +36,8 @@ public class CodebookController {
     private VarsView varsView;
     @Autowired
     private VarView varView;
+    @Autowired
+    private AllVarsView allVarsView;
 
 	/**
 	 * controller for all codebooks page
@@ -123,5 +126,19 @@ public class CodebookController {
 		
 		return varView.variableDetails(varDetails, handle, varname);
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/vars",
+					method = RequestMethod.GET,
+					produces = MediaType.TEXT_HTML_VALUE
+					)
+	public String allVars(@RequestParam(value = "auth", defaultValue = "false") boolean auth,
+			Model model){
+		
+		Map<String, Tuple2<String,String>> variables = codebookService.getAllVariables();
+		
+		return allVarsView.allVarsList(variables);
+	}
+	
 	
 }

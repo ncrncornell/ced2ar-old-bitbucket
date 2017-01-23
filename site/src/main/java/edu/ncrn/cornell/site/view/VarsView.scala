@@ -7,6 +7,9 @@ import scalatags.Text.all._
 import scala.collection.JavaConversions._
 import scala.collection.Map
 
+//TODO: Combine this page with the AllVarsView page; need to add filter. See V2
+
+
 @Component
 class VarsView extends Ced2arView{
   

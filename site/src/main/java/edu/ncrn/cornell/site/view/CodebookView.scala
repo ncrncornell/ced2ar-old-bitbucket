@@ -28,15 +28,17 @@ class CodebookView extends Ced2arView {
           li(cls:="active")(handle)
         ),
         masterDiv(
+            a(href := s"$servletPath/codebooks/$handle/vars")
+         ("View Variables")
+         ),
+         masterDiv(
           detailsSorted.map{case ((fieldName,order), fieldValue) =>
             div(
               h3(fieldName),
               p(fieldValue)
             )
           }
-        ),
-        a(href := s"$servletPath/codebooks/$handle/vars")
-         ("View Variables")
+        )
          )
        )
       )

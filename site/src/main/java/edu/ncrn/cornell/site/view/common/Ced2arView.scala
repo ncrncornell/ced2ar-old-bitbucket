@@ -57,6 +57,7 @@ trait Ced2arView extends HandyServletContextAware {
 
   val masterDiv = div(`class` := "container-fluid")
   val masterTable = table(cls:= "table table-striped table-hover")
+  val indentDiv = div(`class` := "container-fluid", style := "margin-left: 3%")
   
   val topBanner: Seq[Tag] = Seq(
     div(`class` := "navbar", style := "background-color: #B40404;", div(
@@ -89,6 +90,8 @@ trait Ced2arView extends HandyServletContextAware {
         ),*/
         li(`class` := "divider-vertical hidden-xs"),
         li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
+        li(`class` := "divider-vertical hidden-xs"),
+        li(a(href := s"$servletPath/vars", "Browse by Variable")),
         li(`class` := "divider-vertical hidden-xs"),
         li(a(href := s"$servletPath/upload", "Upload a Codebook")),
         li(`class` := "divider-vertical hidden-xs"),
