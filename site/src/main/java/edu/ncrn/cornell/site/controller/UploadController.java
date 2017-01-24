@@ -58,7 +58,7 @@ public class UploadController {
                 .map(f -> f.getName())
                 .collect(Collectors.toList());
             return view.uploadForm(uploadedFiles);
-        }).orElse(view.noUploadDir());
+        }).orElse(view.noUploadDir(uploadDir.getAbsolutePath()));
     }
 
 

@@ -56,7 +56,7 @@ class UploadView extends Ced2arView {
     typedHtml.toString()
   }
 
-  def noUploadDir(): String = {
+  def noUploadDir(invalidDir: String): String = {
     val typedHtml = html(
       head(
         script(src := "...")
@@ -64,7 +64,8 @@ class UploadView extends Ced2arView {
       body(
         div(
           //TODO: Need to come up with some canned administrator message/template
-          h2("Error: specified upload directory not present! Please contact administrators.")
+          h2(s"Error: specified upload directory '$invalidDir' not present! " +
+              "Please contact administrators.")
         )
       )
     )

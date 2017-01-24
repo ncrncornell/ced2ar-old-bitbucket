@@ -7,3 +7,13 @@
 
     1. `antrun:run` (for windows only); generates JavaScript
     2. `process-test-resources`; places JavaScript files in appropriate directory
+
+
+# Configuring CED2AR
+
+Options should be chosen by by editing `ed2ar3-site/WEB-INF/classes/application-default.properties`. Common settings to override:
+
+* `spring.datasource.url` = your db connection string, e.g., jdbc:postgresql://ip/db
+*  `spring.datasource.username` = your db user name
+*  `spring.datasource.password` = your db password
+*  `ced2ar.uploadDir` = An absolute path to the folder where xml files are uploaded by users. 
