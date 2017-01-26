@@ -139,40 +139,10 @@ public class CodebookService {
 	public Map<String, Tuple2<String, String>> getAllVariables()
 	{
 		
-		Map<String, Tuple2<String,String>> variables = new HashMap<String, Tuple2<String,String>>();
+		Map<String, String> handlesMap = getAllHandles();
+		List<String> handles = new ArrayList<String>(handlesMap.keySet());
 		
-		List<FieldInst> varnames = fieldInstDao.findByFieldId("varname");
-		
-		//for each varname find the labl and add to hashmap
-		for( FieldInst varname : varnames){
-			
-			String handle = varname.getRawDocId();
-			
-			Long varnameId = varname.getId();
-			List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varnameId);
-			FieldIndice varIndex = varIndices.get(0);
-			String varIndexValue = varIndex.getIndexValue();
-			
-			List<Mapping> lablMaps = mappingDao.findById_FieldId("varlabel");
-			Mapping lablMap = lablMaps.get(0);
-			String lablXpath = lablMap.getXpath();
-			
-			lablXpath = lablXpath.replace("*", varIndexValue);
-			
-			//find corresponding varlabl by canonical xpath
-			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
-			//check that xpath was mapped correctly
-			if(varlabls.size() != 1){
-				System.out.println("failed to properly map xpath from varname to varlabl: "+lablXpath);
-				continue;
-			}
-			FieldInst varlabl = varlabls.get(0);
-			//insert into hashmap
-			Tuple2<String, String> value = new Tuple2<>(varlabl.getValue(), handle);
-			variables.put(varname.getValue(), value);
-		}
-		
-		return variables;
+		return getVarList(handles);
 		
 	}
 	
@@ -217,6 +187,48 @@ public class CodebookService {
 			FieldInst varlabl = varlabls.get(0);
 			//insert into hashmap
 			variables.put(varname.getValue(), varlabl.getValue());
+		}
+		
+		return variables;
+	}
+	
+	
+	
+	private Map<String, Tuple2<String, String>> getVarList(List<String> handles){
+		
+		Map<String, Tuple2<String,String>> variables = new HashMap<String, Tuple2<String,String>>();
+		
+		List<FieldInst> varnames = fieldInstDao.findByFieldId("varname");
+		
+		//for each varname find the labl and add to hashmap
+		for( FieldInst varname : varnames){
+			
+			String handle = varname.getRawDocId();
+			
+			if(!handles.contains(handle)) continue;
+					
+			Long varnameId = varname.getId();
+			List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varnameId);
+			FieldIndice varIndex = varIndices.get(0);
+			String varIndexValue = varIndex.getIndexValue();
+			
+			List<Mapping> lablMaps = mappingDao.findById_FieldId("varlabel");
+			Mapping lablMap = lablMaps.get(0);
+			String lablXpath = lablMap.getXpath();
+			
+			lablXpath = lablXpath.replace("*", varIndexValue);
+			
+			//find corresponding varlabl by canonical xpath
+			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
+			//check that xpath was mapped correctly
+			if(varlabls.size() != 1){
+				System.out.println("failed to properly map xpath from varname to varlabl: "+lablXpath);
+				continue;
+			}
+			FieldInst varlabl = varlabls.get(0);
+			//insert into hashmap
+			Tuple2<String, String> value = new Tuple2<>(varlabl.getValue(), handle);
+			variables.put(varname.getValue(), value);
 		}
 		
 		return variables;
