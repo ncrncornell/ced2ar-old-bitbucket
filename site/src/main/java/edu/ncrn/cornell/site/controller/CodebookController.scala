@@ -15,7 +15,6 @@ import edu.ncrn.cornell.site.view.CodebookView
 import edu.ncrn.cornell.site.view.CodebooksView
 import edu.ncrn.cornell.site.view.VarView
 import edu.ncrn.cornell.site.view.VarsView
-import edu.ncrn.cornell.site.view.AllVarsView
 
 @Controller class CodebookController {
   @Autowired private val codebookService: CodebookService = null
@@ -23,7 +22,6 @@ import edu.ncrn.cornell.site.view.AllVarsView
   @Autowired private val codebookView: CodebookView = null
   @Autowired private val varsView: VarsView = null
   @Autowired private val varView: VarView = null
-  @Autowired private val allVarsView: AllVarsView = null
 
   /**
     * controller for all codebooks page
