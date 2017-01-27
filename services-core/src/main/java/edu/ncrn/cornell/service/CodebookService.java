@@ -156,40 +156,13 @@ public class CodebookService {
 	 * @param handle
 	 * @return
 	 */
-	public Map<String, String> getCodebookVariables(String handle){
-		//hashmap with varnames as keys and corresponding varlabls as values
-		Map<String, String> variables = new HashMap<String, String>();
+	public  Map<String, Tuple2<String, String>> getCodebookVariables(String handle){
 		
-		//get all varname instances for a given codebook
-		List<FieldInst> varnames = fieldInstDao.findByRawDocIdAndFieldId(handle, "varname");
+		List<String> handles = new ArrayList<String>();
+		handles.add(handle);
 		
-		//for each varname find the labl and add to hashmap
-		for( FieldInst varname : varnames){
-			
-			Long varnameId = varname.getId();
-			List<FieldIndice> varIndices = fieldIndiceDao.findById_FieldInstId(varnameId);
-			FieldIndice varIndex = varIndices.get(0);
-			String varIndexValue = varIndex.getIndexValue();
-			
-			List<Mapping> lablMaps = mappingDao.findById_FieldId("varlabel");
-			Mapping lablMap = lablMaps.get(0);
-			String lablXpath = lablMap.getXpath();
-			
-			lablXpath = lablXpath.replace("*", varIndexValue);
-			
-			//find corresponding varlabl by canonical xpath
-			List<FieldInst> varlabls = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath);
-			//check that xpath was mapped correctly
-			if(varlabls.size() != 1){
-				System.out.println("failed to properly map xpath from varname to varlabl: "+lablXpath);
-				continue;
-			}
-			FieldInst varlabl = varlabls.get(0);
-			//insert into hashmap
-			variables.put(varname.getValue(), varlabl.getValue());
-		}
+		return getVarList(handles);
 		
-		return variables;
 	}
 	
 	

@@ -89,9 +89,9 @@ import edu.ncrn.cornell.site.view.AllVarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val codebookVars: JavaMap[String, String] =
+    val codebookVars: JavaMap[String, (String, String)] =
       codebookService.getCodebookVariables(handle)
-    varsView.varsList(codebookVars, handle)
+    varsView.varsList(codebookVars)
   }
 
   /**
@@ -131,6 +131,6 @@ import edu.ncrn.cornell.site.view.AllVarsView
     model: Model
   ): String = {
     val variables: JavaMap[String, (String, String)] = codebookService.getAllVariables
-    allVarsView.allVarsList(variables)
+    varsView.varsList(variables)
   }
 }
