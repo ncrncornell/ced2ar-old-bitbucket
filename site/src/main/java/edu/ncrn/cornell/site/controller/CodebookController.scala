@@ -14,7 +14,6 @@ import edu.ncrn.cornell.site.view.CodebookView
 import edu.ncrn.cornell.site.view.CodebooksView
 import edu.ncrn.cornell.site.view.VarView
 import edu.ncrn.cornell.site.view.VarsView
-import edu.ncrn.cornell.site.view.AllVarsView
 
 @Controller class CodebookController {
   @Autowired private val codebookService: CodebookService = null
@@ -22,7 +21,6 @@ import edu.ncrn.cornell.site.view.AllVarsView
   @Autowired private val codebookView: CodebookView = null
   @Autowired private val varsView: VarsView = null
   @Autowired private val varView: VarView = null
-  @Autowired private val allVarsView: AllVarsView = null
 
   /**
     * controller for all codebooks page
@@ -88,9 +86,9 @@ import edu.ncrn.cornell.site.view.AllVarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val codebookVars: Map[String, String] =
+    val codebookVars: Map[String, (String, String)] =
       codebookService.getCodebookVariables(handle)
-    varsView.varsList(codebookVars, handle)
+    varsView.varsList(codebookVars)
   }
 
   /**
@@ -130,6 +128,6 @@ import edu.ncrn.cornell.site.view.AllVarsView
     model: Model
   ): String = {
     val variables: Map[String, (String, String)] = codebookService.getAllVariables
-    allVarsView.allVarsList(variables)
+    varsView.varsList(variables)
   }
 }

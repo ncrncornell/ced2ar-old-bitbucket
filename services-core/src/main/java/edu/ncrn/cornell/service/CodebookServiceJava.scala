@@ -51,7 +51,7 @@ import collection.JavaConverters._
     * @param handle
     * @return
     */
-  def getCodebookVariables(handle: String): util.Map[String, String] =
+  def getCodebookVariables(handle: String): util.Map[String, (String, String)] =
     codebookService.getCodebookVariables(handle).asJava
 
   /**

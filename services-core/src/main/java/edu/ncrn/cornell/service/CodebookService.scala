@@ -126,37 +126,8 @@ class CodebookService {
     * @param handle
     * @return
     */
-  def getCodebookVariables(handle: String): Map[String, String] = {
-    //hashmap with varnames as keys and corresponding varlabls as values
-    val variables: mutable.Map[String, String] = mutable.Map()
-    //get all varname instances for a given codebook
-    val varnames: List[FieldInst] = fieldInstDao.findByRawDocIdAndFieldId(handle, "varname")
-      .asScala.toList
-    //for each varname find the labl and add to hashmap
-    for (varname <- varnames) {
-      val varnameId: Long = varname.getId
-      val varIndices: List[FieldIndice] = fieldIndiceDao.findById_FieldInstId(varnameId).asScala.toList
-      val varIndex: FieldIndice = varIndices.head
-      val varIndexValue: String = varIndex.getIndexValue
-      val lablMaps: List[Mapping] = mappingDao.findById_FieldId("varlabel").asScala.toList
-      val lablMap: Mapping = lablMaps.head
-      var lablXpath: String = lablMap.getXpath
-      lablXpath = lablXpath.replace("*", varIndexValue)
-      //find corresponding varlabl by canonical xpath
-      val varlabls: List[FieldInst] = fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, lablXpath)
-        .asScala.toList
-      //check that xpath was mapped correctly
-      if (varlabls.size != 1) {
-        println("failed to properly map xpath from varname to varlabl: " + lablXpath)
-      }
-      else {
-        val varlabl: FieldInst = varlabls.head
-        //insert into hashmap
-        variables.put(varname.getValue, varlabl.getValue)
-      }
-    }
-    variables.toMap
-  }
+  def getCodebookVariables(handle: String): Map[String, (String, String)] =
+    getVarList(List(handle))
 
   private def getVarList(handles: List[String]): Map[String, (String, String)] = {
     val variables: mutable.Map[String, (String, String)] = mutable.Map()
