@@ -93,7 +93,7 @@ class CodebookService {
       var value: String = ""
       //check for multiplicities and concatenate values accordingly
       if (fieldInsts.nonEmpty) {
-        for (fi <- fieldInsts) value += fi + " \n"
+        for (fi <- fieldInsts) value += fi.getValue + " \n"
         //create key as tuple of field display name and ordering
         val key: (String, Int) = (dispName, ordering)
         //add tuple key and instance value to the map

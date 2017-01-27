@@ -31,7 +31,7 @@ class CodebookView extends Ced2arView {
          ("View Variables")
          ),
          masterDiv(
-          detailsSorted.map{case ((fieldName,order), fieldValue) =>
+          detailsSorted.map{case ((fieldName, order), fieldValue) =>
             div(
               h3(fieldName),
               p(fieldValue)
