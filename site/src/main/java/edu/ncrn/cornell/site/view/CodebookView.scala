@@ -4,14 +4,13 @@ import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
-import scala.collection.JavaConversions._
 
 
 @Component
 class CodebookView extends Ced2arView {
 
   def codebookDetails(
-     details : java.util.Map[(String, Integer), String],
+     details : Map[(String, Int), String],
      handle : String
   ) : String = {
       val detailsSorted = details.toSeq.sortBy(_._1._2)

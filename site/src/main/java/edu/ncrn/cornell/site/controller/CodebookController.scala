@@ -1,6 +1,5 @@
 package edu.ncrn.cornell.site.controller
 
-import java.util.{Map => JavaMap}
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
@@ -41,7 +40,7 @@ import edu.ncrn.cornell.site.view.AllVarsView
     model: Model,
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean
   ): String = {
-    val handles: JavaMap[String, String] = codebookService.getAllHandles
+    val handles: Map[String, String] = codebookService.getAllHandles
     codebooksView.codebooksList(handles)
   }
 
@@ -65,7 +64,7 @@ import edu.ncrn.cornell.site.view.AllVarsView
     model: Model
   ): String = {
     println("[codebook controller]:: GET request for handle " + handle)
-    val codebookDetails: JavaMap[(String, Integer), String] =
+    val codebookDetails: Map[(String, Int), String] =
       codebookService.getCodebookDetails(handle)
     codebookView.codebookDetails(codebookDetails, handle)
   }
@@ -89,7 +88,7 @@ import edu.ncrn.cornell.site.view.AllVarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val codebookVars: JavaMap[String, String] =
+    val codebookVars: Map[String, String] =
       codebookService.getCodebookVariables(handle)
     varsView.varsList(codebookVars, handle)
   }
@@ -115,7 +114,7 @@ import edu.ncrn.cornell.site.view.AllVarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val varDetails: JavaMap[(String, Integer), String] =
+    val varDetails: Map[(String, Int), String] =
       codebookService.getVariableDetails(handle, varname)
     varView.variableDetails(varDetails, handle, varname)
   }
@@ -130,7 +129,7 @@ import edu.ncrn.cornell.site.view.AllVarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val variables: JavaMap[String, (String, String)] = codebookService.getAllVariables
+    val variables: Map[String, (String, String)] = codebookService.getAllVariables
     allVarsView.allVarsList(variables)
   }
 }

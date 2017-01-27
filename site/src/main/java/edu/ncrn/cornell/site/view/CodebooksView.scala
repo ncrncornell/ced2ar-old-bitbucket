@@ -4,13 +4,12 @@ import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
-import scala.collection.JavaConversions._
 
 @Component
 class CodebooksView extends Ced2arView{
   
   def codebooksList(
-    codebooks : java.util.Map[String, String]
+    codebooks : Map[String, String]
   ) : String = {
     val typedHtml = html(
         head(

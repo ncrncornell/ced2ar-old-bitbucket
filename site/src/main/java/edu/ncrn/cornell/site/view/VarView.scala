@@ -11,7 +11,7 @@ import scala.collection.Map
 class VarView extends Ced2arView{
   
     def variableDetails(
-       details : java.util.Map[(String, Integer), String],
+       details : Map[(String, Int), String],
        handle : String,
        varname : String
     ) : String = {

@@ -4,7 +4,6 @@ import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
-import scala.collection.JavaConversions._
 import scala.collection.Map
 
 //TODO: Combine this page with the AllVarsView page; need to add filter. See V2
@@ -14,7 +13,7 @@ import scala.collection.Map
 class VarsView extends Ced2arView{
   
   def varsList(
-        variables : java.util.Map[String, String],
+        variables : Map[String, String],
         handle : String
         ) : String = {
     val typedHtml = html(

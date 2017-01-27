@@ -4,7 +4,6 @@ import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
-import scala.collection.JavaConversions._
 import scala.collection.Map
 import scala.collection.immutable.ListMap
 
@@ -15,7 +14,7 @@ import scala.collection.immutable.ListMap
 class AllVarsView extends Ced2arView{
   
   def allVarsList(
-        variables : java.util.Map[String, (String,String)]
+        variables : Map[String, (String,String)]
         ) : String = {
     val sortedVars = ListMap(variables.toSeq.sortBy(_._1):_*)
     val typedHtml = html(
