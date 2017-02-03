@@ -22,23 +22,29 @@ class CodebookView extends Ced2arView {
         defaultMetaTags,
         defaultStyleSheetsAndScripts
       ),
-      body(masterDiv(
-        topBanner,
-        navBar,
-        ol(cls:="breadcrumb")(
-          li(a(href:= s"$servletPath/codebooks")("Codebooks")),
-          li(cls:="active")(handle)
-        ),
-        div(
-          a(href := s"$servletPath/codebooks/$handle/vars")
-         ("View Variables")
-        ),
-        div(
-          detailsSorted.map{case ((fieldName, order), fieldValue) =>
-            renderField(fieldName, fieldValue)
-          }
+      body(
+        masterDiv(
+          topBanner,
+          navBar,
+          ol(cls:="breadcrumb")(
+            li(a(href:= s"$servletPath/codebooks")("Codebooks")),
+            li(cls:="active")(handle)
+          ),
+          div(
+            a(href := s"$servletPath/codebooks/$handle/vars")
+           ("View Variables")
+          ),
+          div(
+            detailsSorted.map{case ((fieldName, order), fieldValue) =>
+              renderField(fieldName, fieldValue)
+            }
+          )
         )
-      ))
+      ),
+      div(id := "application-container"),
+      script(`type` := "application/javascript",
+        "mhtml.todo.MhtmlTodo().main();"
+      )
     )
     typedHtml.toString()
   }

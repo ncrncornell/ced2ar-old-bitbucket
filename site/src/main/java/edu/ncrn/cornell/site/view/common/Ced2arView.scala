@@ -29,37 +29,40 @@ trait Ced2arView extends HandyServletContextAware {
 
   // A few elements needed by almost every view:
 
-  val defaultMetaTags: Seq[Tag] = Seq(
+  lazy val defaultMetaTags: Seq[Tag] = Seq(
     meta(charset := "utf-8"),
     meta(name := "viewport", content := "width=device-width, initial-scale=1")
   )
 
-  val defaultStyleSheetsAndScripts: Seq[Tag] = {
-    val cssUrls = Seq(
-      "styles/main.css",
+  lazy val defaultStyleSheetsAndScripts: Seq[Tag] = {
+    lazy val cssUrls = Seq(
       "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css",
       "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css",
       "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
     )
-    val scriptUrls = Seq(
+
+    //TODO: for locally optimized js, can switch based on build settings
+    lazy val scriptUrls = Seq(
+      s"$servletPath/ced2ar3-view-fastopt.js",
+      s"$servletPath/ced2ar3-view-jsdeps.js",
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js",
       "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
     )
-    val googleFontBase = "https://fonts.googleapis.com/css?family="
-    val googleFontUrls = Seq(
+    lazy val googleFontBase = "https://fonts.googleapis.com/css?family="
+    lazy val googleFontUrls = Seq(
       "Fjord+One"
     ).map(u => googleFontBase + u)
 
     cssUrls.map{u => link( rel:= "stylesheet", `type` := "text/css", href := u)} ++
-      scriptUrls.map{u => script(src := u)} ++
+      scriptUrls.map{u => script(`type` := "application/javascript", src := u)} ++
       googleFontUrls.map{u => link( rel:= "stylesheet", `type` := "text/css", href := u) }
   }
 
-  val masterDiv = div(`class` := "container-fluid")
-  val masterTable = table(cls:= "table table-striped table-hover")
-  val indentDiv = div(`class` := "container-fluid", style := "margin-left: 3%")
+  lazy val masterDiv = div(`class` := "container-fluid")
+  lazy val masterTable = table(cls:= "table table-striped table-hover")
+  lazy val indentDiv = div(`class` := "container-fluid", style := "margin-left: 3%")
   
-  val topBanner: Seq[Tag] = Seq(
+  lazy val topBanner: Seq[Tag] = Seq(
     div(`class` := "navbar", style := "background-color: #B40404;", div(
       // TODO: factor below font-family out to headings css class using ScalaCSS
       div(style := "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;",

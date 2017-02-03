@@ -157,6 +157,7 @@
                                     <directory>${basedir}/target/scala-2.11</directory>
                                     <includes>
                                         <include>**/*.js</include>
+                                        <include>**/*.js.map</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>
