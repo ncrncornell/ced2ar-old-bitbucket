@@ -109,13 +109,7 @@ class CodebookService {
     compress(details.toList)
   }
   
-  private def compress[A](l : List[A]) : List[A] = {
-    l match{
-      case Nil => Nil
-      case null::tail => compress(tail)
-      case head::tail => head::compress(tail)
-    }
-  }
+
 
  
 
@@ -182,6 +176,10 @@ class CodebookService {
   def getCodebookVariables(handle: String, page: Int): Map[String, (String, String)] =
     getVarList(List(handle), page)
 
+    
+  /**
+   * private function to get paginated list of variables
+   */
   private def getVarList(handles: List[String], pageNumber: Integer): Map[String, (String, String)] = {
     val variables: mutable.Map[String, (String, String)] = mutable.Map()
     val request: Pageable = new PageRequest(pageNumber, PAGE_SIZE, Sort.Direction.ASC, "value")
@@ -216,6 +214,13 @@ class CodebookService {
     variables.toMap
   }
 
+  
+  /**
+   * 
+   * retreives variable details from SQL
+   * 
+   * returns in form of list of tuples (display name, List(values))
+   */
   def getVarbleDetailsList(handle: String, varname: String): List[(String,List[String])] = {
     val fieldIds: List[String] = getProfileFieldIds("variabledetails")
     val details = new mutable.ArrayBuffer[(String, List[String])]
@@ -339,6 +344,14 @@ class CodebookService {
     else {
       val pf: ProfileField = pfs.head
       pf.getOrdering
+    }
+  }
+  
+  private def compress[A](l : List[A]) : List[A] = {
+    l match{
+      case Nil => Nil
+      case null::tail => compress(tail)
+      case head::tail => head::compress(tail)
     }
   }
 }
