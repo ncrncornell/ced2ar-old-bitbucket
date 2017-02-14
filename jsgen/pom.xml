@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <scalajs.version>0.6.12</scalajs.version>
+        <scalajs.version>0.6.14</scalajs.version>
     </properties>
 
     <artifactId>ced2ar3-jsgen</artifactId>
@@ -43,14 +43,14 @@
         <dependency>
             <groupId>in.nvilla</groupId>
             <artifactId>monadic-html_sjs0.6_${scala.version.major}</artifactId>
-            <version>0.1.5</version>
+            <version>0.2.3</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>in.nvilla</groupId>
             <artifactId>monadic-rx-cats_sjs0.6_${scala.version.major}</artifactId>
-            <version>0.1.5</version>
+            <version>0.2.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -154,7 +154,7 @@
                             <outputDirectory>${basedir}/target/classes/public</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${basedir}/target/scala-2.11</directory>
+                                    <directory>${basedir}/target/scala-${scala.version.major}</directory>
                                     <includes>
                                         <include>**/*.js</include>
                                         <include>**/*.js.map</include>
