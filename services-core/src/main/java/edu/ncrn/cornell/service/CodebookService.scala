@@ -25,6 +25,8 @@ import scala.collection.mutable
 
 import collection.JavaConverters._
 
+import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+
 /**
   * This class is a set of reusable function for getting structured information from postgres.
   * Info returned in forms easily parseable for display by JSP
@@ -76,6 +78,9 @@ class CodebookService {
     }
     handles.toMap
   }
+
+  def getAllHandlesJson: String = getAllHandles.asJson.noSpaces
+
   
   /**
    * Returns an ordered list of pairs of the field display names with their content.
@@ -150,6 +155,11 @@ class CodebookService {
     details.toMap
   }
 
+//  @deprecated
+//  def getCodebookDetailsJson(handle: String): String =
+//    getCodebookDetails(handle).asJson.noSpaces
+
+
   /**
     * Retrieves all variables in the database
     *
@@ -160,6 +170,8 @@ class CodebookService {
     val handles: List[String] = handlesMap.keySet.toList
     getVarList(handles, 0)
   }
+
+  def getAllVariablesJson: String = getAllVariables.asJson.noSpaces
 
   /**
     * Gets the list of variables for a given codebook (name, label) pairs
@@ -172,11 +184,17 @@ class CodebookService {
     */
   def getCodebookVariables(handle: String): Map[String, (String, String)] =
     getVarList(List(handle), 0)
+
+  def getCodebookVariablesJson(handle: String): String =
+    getCodebookVariables(handle).asJson.noSpaces
+
     
   def getCodebookVariables(handle: String, page: Int): Map[String, (String, String)] =
     getVarList(List(handle), page)
 
-    
+  def getCodebookVariablesJson(handle: String, page: Int): String =
+    getCodebookVariables(handle, page).asJson.noSpaces
+
   /**
    * private function to get paginated list of variables
    */
