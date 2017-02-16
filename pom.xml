@@ -10,9 +10,9 @@
         <module>rdb</module>
         <module>rdb-tests</module>
         <module>services-core</module>
+        <module>services-core-tests</module>
         <module>site</module>
         <module>jsgen</module>
-        <module>services-core-tests</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -25,7 +25,7 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
   def getAllHandles: util.Map[String, String] = codebookService.getAllHandles.asJava
 
   def getAllHandlesJson: String = codebookService.getAllHandlesJson
-  
+
 
   /**
     * Retrieves all variables in the database
