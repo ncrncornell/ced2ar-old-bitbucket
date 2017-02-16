@@ -195,9 +195,10 @@ class CodebookService(
     getCodebookVariables(handle, page).asJson.noSpaces
 
   /**
-   * private function to get paginated list of variables
+   * function to get paginated list of variables; private for now since this aspect
+    * of the API is evolving
    */
-  private def getVarList(handles: List[String], pageNumber: Integer): Map[String, (String, String)] = {
+  private def getVarList(handles: List[String], pageNumber: Int): Map[String, (String, String)] = {
     val variables: mutable.Map[String, (String, String)] = mutable.Map()
     val request: Pageable = new PageRequest(pageNumber, PAGE_SIZE, Sort.Direction.ASC, "value")
     val varnamesPage: Page[FieldInst] = fieldInstDao.findByFieldIdAndRawDocIdIn("varname", handles.asJava, request)

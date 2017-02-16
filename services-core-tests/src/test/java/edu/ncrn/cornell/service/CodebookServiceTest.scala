@@ -52,7 +52,7 @@ class CodebookServiceTest extends CodebookServiceTesters {
 
 
   @Test
-  def getAllHandlesIsJson: Unit = {
+  def getAllHandlesJsonTests: Unit = {
     
     val rawDocList = List(rawDoc_ssbv602)
 
@@ -62,7 +62,7 @@ class CodebookServiceTest extends CodebookServiceTesters {
 
     assertEquals(rawDocList.size, rawDocDao.findAll().size)
 
-    getAllHandlesIsJson(codeBookService)
+    getAllHandlesJsonTests(codeBookService)
   }
 
 

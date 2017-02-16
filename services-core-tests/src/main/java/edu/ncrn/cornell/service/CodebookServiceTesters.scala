@@ -1,5 +1,7 @@
 package edu.ncrn.cornell.service
 
+import edu.ncrn.cornell.service.JsonComparison._
+
 import org.junit.gen5.api.Assertions._
 import org.junit.gen5.api.AfterEach
 import org.junit.gen5.api.BeforeAll
@@ -19,18 +21,22 @@ import io.circe.parser._
   */
 trait CodebookServiceTesters {
 
-  def getAllHandlesIsJson(codeBookService: CodebookService): Unit = {
+  def getAllHandlesJsonTests(codeBookService: CodebookService): Unit = {
     val jsonHandles = codeBookService.getAllHandlesJson
     val parseResult = parse(jsonHandles)
-    val jsonIsNonTrivial = parseResult match {
+    // Check that we probably got some JSON back ...
+    val (json, jsonIsNonTrivial): (String, Boolean) = parseResult match {
       case Right(someJson) =>
         println(someJson.toString()) //DEBUG
-        someJson.toString().length > 6
+        (someJson.toString(), someJson.toString().length > 6)
       case Left(failure) =>
         println(failure.toString)
-        false
+        ("", false)
     }
     assert(jsonIsNonTrivial)
+    //Check we got back ssbv602, fairly standard in our tests
+    assert(compareJsonLenient("""{"ssbv602" : "SIPP Synthetic Beta v6.02"}""", json))
+
   }
 
 }

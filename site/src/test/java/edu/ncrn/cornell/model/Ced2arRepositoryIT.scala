@@ -25,7 +25,7 @@ class Ced2arRepositoryIT extends BaseRepositoryIT with CodebookServiceTesters  {
   @Autowired val codeBookService: CodebookService = null
 
   @Test
-  def getAllHandlesIsJson: Unit = getAllHandlesIsJson(codeBookService)
+  def getAllHandlesJsonTests: Unit = getAllHandlesJsonTests(codeBookService)
 
 
 }
