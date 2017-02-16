@@ -12,9 +12,10 @@ import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 /**
   * Created by Brandon on 1/27/2017.
   */
-@Service class CodebookServiceJava {
-  @Autowired private val codebookService: CodebookService = null
 
+@Service
+@Autowired
+class CodebookServiceJava(private[service] val codebookService: CodebookService) {
 
   /**
     * Lists all handles and full names
@@ -24,24 +25,7 @@ import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
   def getAllHandles: util.Map[String, String] = codebookService.getAllHandles.asJava
 
   def getAllHandlesJson: String = codebookService.getAllHandlesJson
-
-
-//  /**
-//    * gathers codebook details from FieldInst table rather than parsing XML
-//    *
-//    * @param handle
-//    * @return
-//    */
-//  @deprecated
-//  def getCodebookDetails(handle: String): util.Map[(String, Integer), String] =
-//    codebookService.getCodebookDetails(handle).map(keyValue =>
-//      ((keyValue._1._1, new Integer(keyValue._1._2)), keyValue._2)
-//    ).asJava
-//
-//  @deprecated
-//  def getCodebookDetailsJson(handle: String): String =
-//    codebookService.getCodebookDetailsJson(handle)
-//
+  
 
   /**
     * Retrieves all variables in the database

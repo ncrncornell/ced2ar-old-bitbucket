@@ -46,6 +46,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>edu.ncrn.cornell</groupId>
+            <artifactId>ced2ar3-services-core-tests</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

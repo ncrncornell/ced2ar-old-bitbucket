@@ -38,15 +38,17 @@ import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
   *
   */
 @Service
-class CodebookService {
-  @Autowired private[service] val rawDocDao: RawDocDao = null
-  @Autowired private[service] val profileDao: ProfileDao = null
-  @Autowired private[service] val fieldDao: FieldDao = null
-  @Autowired private[service] val profileFieldDao: ProfileFieldDao = null
-  @Autowired private[service] val mappingDao: MappingDao = null
-  @Autowired private[service] val schemaDao: SchemaDao = null
-  @Autowired private[service] val fieldInstDao: FieldInstDao = null
-  @Autowired private[service] val fieldIndiceDao: FieldIndiceDao = null
+@Autowired
+class CodebookService(
+  private[service] val rawDocDao: RawDocDao,
+  private[service] val profileDao: ProfileDao,
+  private[service] val fieldDao: FieldDao,
+  private[service] val profileFieldDao: ProfileFieldDao,
+  private[service] val mappingDao: MappingDao,
+  private[service] val schemaDao: SchemaDao,
+  private[service] val fieldInstDao: FieldInstDao,
+  private[service] val fieldIndiceDao: FieldIndiceDao
+) {
 
   //externalize to properties once finished testing
   private val PAGE_SIZE = 25
@@ -89,7 +91,7 @@ class CodebookService {
   def getCodebookDetailsList(handle: String): List[(String,List[String])] = {
     val fieldIds: List[String] = getProfileFieldIds("codebookdetails")
     val details = new mutable.ArrayBuffer[(String, List[String])]
-    for(i <- 0 to fieldIds.size-1) {
+    for(i <-fieldIds.indices) {
       details += null
     }
     
@@ -155,9 +157,6 @@ class CodebookService {
     details.toMap
   }
 
-//  @deprecated
-//  def getCodebookDetailsJson(handle: String): String =
-//    getCodebookDetails(handle).asJson.noSpaces
 
 
   /**
