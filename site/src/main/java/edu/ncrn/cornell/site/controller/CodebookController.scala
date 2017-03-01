@@ -66,6 +66,20 @@ import edu.ncrn.cornell.site.view.VarsView
       codebookService.getCodebookDetails(handle)
     codebookView.codebookDetails(codebookDetails, handle)
   }
+  //
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/codebooks/{c:.+}"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def codebookJson(
+    @PathVariable(value = "c") handle: String,
+    @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
+    model: Model
+  ): String = codebookService.getCodebookDetailsListJson(handle)
+  //TODO: is this the right json service function? ^^
+
 
   /**
     * Controller for list of variables in a codebook

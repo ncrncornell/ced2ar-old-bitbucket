@@ -115,7 +115,9 @@ class CodebookService(
     
     compress(details.toList)
   }
-  
+
+  def getCodebookDetailsListJson(handle: String): String =
+    getCodebookDetailsList(handle).asJson.noSpaces
 
 
  
