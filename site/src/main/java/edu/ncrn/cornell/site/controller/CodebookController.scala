@@ -62,8 +62,8 @@ import edu.ncrn.cornell.site.view.VarsView
     model: Model
   ): String = {
     println("[codebook controller]:: GET request for handle " + handle)
-    val codebookDetails: Map[(String, Int), String] =
-      codebookService.getCodebookDetails(handle)
+    val codebookDetails:  List[(String,List[String])]=
+      codebookService.getCodebookDetailsList(handle)
     codebookView.codebookDetails(codebookDetails, handle)
   }
   //

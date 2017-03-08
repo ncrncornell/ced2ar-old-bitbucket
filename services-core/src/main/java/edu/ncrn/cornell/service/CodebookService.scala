@@ -104,8 +104,7 @@ class CodebookService(
         .asScala.toList
         
       if (fieldInsts.nonEmpty) {
-        var values: List[String] = List()
-        for (fi <- fieldInsts) values :+ fi.getValue
+        val values: List[String] = fieldInsts.map(fi => fi.getValue)
         details(ordering-1) = (dispName, values)
       }
       else {
@@ -118,46 +117,6 @@ class CodebookService(
 
   def getCodebookDetailsListJson(handle: String): String =
     getCodebookDetailsList(handle).asJson.noSpaces
-
-
- 
-
-  /**
-    * gathers codebook details from FieldInst table rather than parsing XML
-    *
-    * @param handle
-    * @return
-    */
-  @deprecated
-  def getCodebookDetails(handle: String): Map[(String, Int), String] = {
-    println("[getCodebookDetails]:: RETREIVING DETAILS FOR CODEBOOK " + handle)
-    //Map of field names and their corresponding instances
-    val details: mutable.Map[(String, Int), String] = mutable.Map()
-    //List of field for the codebookdetails profile
-    val fieldIds: List[String] = getProfileFieldIds("codebookdetails")
-    //iterate over fields, try to find corresponding instance for specified handle
-    for (fieldId <- fieldIds) {
-      //get ordering for display
-      val ordering: Int = getOrdering("codebookdetails", fieldId)
-      val curField: Field = fieldDao.findOne(fieldId)
-      val dispName: String = curField.getDisplayName.trim
-      val fieldInsts: List[FieldInst] = fieldInstDao.findByRawDocIdAndFieldId(handle, fieldId)
-        .asScala.toList
-      var value: String = ""
-      //check for multiplicities and concatenate values accordingly
-      if (fieldInsts.nonEmpty) {
-        for (fi <- fieldInsts) value += fi.getValue + " \n"
-        //create key as tuple of field display name and ordering
-        val key: (String, Int) = (dispName, ordering)
-        //add tuple key and instance value to the map
-        details(key) = value
-      }
-      else {
-        println("[READING FIELDISNTS]:: No FieldInst for codebook " + handle + " field " + fieldId)
-      }
-    }
-    details.toMap
-  }
 
 
 

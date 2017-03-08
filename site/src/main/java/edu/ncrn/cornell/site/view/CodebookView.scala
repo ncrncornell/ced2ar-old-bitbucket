@@ -13,10 +13,9 @@ class CodebookView extends Ced2arView {
   val collapsableFields = Set("Files")
 
   def codebookDetails(
-     details : Map[(String, Int), String],
-     handle : String
+     details: List[(String, List[String])],
+     handle: String
   ) : String = {
-    val detailsSorted = details.toSeq.sortBy(_._1._2)
     val typedHtml = html(
       head(
         defaultMetaTags,
@@ -35,8 +34,8 @@ class CodebookView extends Ced2arView {
            ("View Variables")
           ),
           div(
-            detailsSorted.map{case ((fieldName, order), fieldValue) =>
-              renderField(fieldName, fieldValue)
+            details.map{case (fieldName, fieldValues) =>
+              renderField(fieldName, fieldValues)
             }
           )
         )
@@ -49,7 +48,7 @@ class CodebookView extends Ced2arView {
     typedHtml.toString()
   }
 
-  private def renderField(fieldName: String, fieldValue: String): TypedTag[String] =
+  private def renderField(fieldName: String, fieldValues: List[String]): TypedTag[String] =
     if (collapsableFields.contains(fieldName))
       div(
         h3(
@@ -60,13 +59,13 @@ class CodebookView extends Ced2arView {
           )
         ),
         p(id := s"$fieldName-detail", `class` := "collapse",
-          fieldValue
+          fieldValues.mkString("\n")
         )
       )
     else
       div(
         h3(fieldName),
-        p(fieldValue)
+        p(fieldValues.mkString("\n"))
       )
   
 }
