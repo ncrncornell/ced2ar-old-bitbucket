@@ -78,7 +78,6 @@ import edu.ncrn.cornell.site.view.VarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = codebookService.getCodebookDetailsListJson(handle)
-  //TODO: is this the right json service function? ^^
 
 
   /**
@@ -126,10 +125,23 @@ import edu.ncrn.cornell.site.view.VarsView
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val varDetails: Map[(String, Int), String] =
-      codebookService.getVariableDetails(handle, varname)
+    val varDetails: List[(String, List[String])] =
+      codebookService.getVariableDetailsList(handle, varname)
     varView.variableDetails(varDetails, handle, varname)
   }
+  //
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/codebooks/{c:.+}/vars/{v}"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def variableJson(
+    @PathVariable(value = "c") handle: String,
+    @PathVariable(value = "v") varname: String,
+    @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
+    model: Model
+  ): String = codebookService.getVariableDetailsListJson(handle, varname)
 
   @ResponseBody
   @RequestMapping(

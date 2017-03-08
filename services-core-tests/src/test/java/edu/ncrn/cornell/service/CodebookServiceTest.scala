@@ -1,7 +1,7 @@
 package edu.ncrn.cornell.service
 
 
-import edu.ncrn.cornell.model.{FieldInst, RawDoc}
+import edu.ncrn.cornell.model.{FieldInst, ProfileField, RawDoc}
 import edu.ncrn.cornell.model.dao._
 import org.junit.gen5.api.Test
 import org.junit.gen5.junit4.runner.JUnit5
@@ -50,15 +50,29 @@ class CodebookServiceTest extends CodebookServiceTesters {
     .setCanonicalXpath("/codeBook/docDscr/citation/titlStmt/titl")
   fieldInst_ssbv602_codebookname.setValue("SIPP Synthetic Beta v6.02")
 
+  // Setup default config for ssbv602
+  protected val rawDocList = List(rawDoc_ssbv602)
+  when(rawDocDao.findAll).thenReturn(rawDocList.asJava)
+  when(fieldInstDao.findByRawDocIdAndFieldId("ssbv602", "codebookname"))
+    .thenReturn(List(fieldInst_ssbv602_codebookname).asJava)
+
+  // Setup default profiles:
+  protected val codebookdetailsProfileFields = List(
+    "codebookname", "codebookalt", "abstract",
+    "codebookdist", "codebookcit", "varfiles"
+  ).zipWithIndex.map{case (pName, pId) => makeProfileField(pId, pName)}
+
+  when(profileFieldDao.findByProfileId("codebookdetails")).thenReturn(
+    codebookdetailsProfileFields.asJava
+  )
+//  when(codeBookService.getProfileFieldIds("codebookdetails")).thenReturn(List(
+//    "codebookname", "codebookalt", "abstract",
+//    "codebookdist", "codebookcit", "varfiles"
+//  ))
+
 
   @Test
   def getAllHandlesJsonTests: Unit = {
-    
-    val rawDocList = List(rawDoc_ssbv602)
-
-    when(rawDocDao.findAll).thenReturn(rawDocList.asJava)
-    when(fieldInstDao.findByRawDocIdAndFieldId("ssbv602", "codebookname"))
-      .thenReturn(List(fieldInst_ssbv602_codebookname).asJava)
 
     assertEquals(rawDocList.size, rawDocDao.findAll().size)
 
@@ -66,4 +80,17 @@ class CodebookServiceTest extends CodebookServiceTesters {
   }
 
 
+  // TODO: Not easily made into a unit test; run just as an integration test now
+  //    @Test
+  //    def getCodebookDetailsListJsonTests: Unit = {
+  //      getCodebookDetailsListJsonTests(codeBookService)
+  //    }
+
+
+  private def makeProfileField(pId: Int, pName: String): ProfileField = {
+    val pf = new ProfileField
+    pf.setFieldId(pName)
+    pf
+  }
 }
+

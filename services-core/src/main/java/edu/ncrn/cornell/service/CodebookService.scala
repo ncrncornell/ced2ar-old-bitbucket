@@ -100,8 +100,11 @@ class CodebookService(
       val ordering: Int = getOrdering("codebookdetails", fieldId)
       val curField: Field = fieldDao.findOne(fieldId)
       val dispName: String = curField.getDisplayName.trim
+      println("dispName: " + dispName) // DEBUG
       val fieldInsts: List[FieldInst] = fieldInstDao.findByRawDocIdAndFieldId(handle, fieldId)
         .asScala.toList
+      println("fieldInsts:")
+      println(fieldInsts) // DEBUG
         
       if (fieldInsts.nonEmpty) {
         val values: List[String] = fieldInsts.map(fi => fi.getValue)
@@ -196,14 +199,14 @@ class CodebookService(
   
   /**
    * 
-   * retreives variable details from SQL
+   * retrieves variable details from SQL
    * 
    * returns in form of list of tuples (display name, List(values))
    */
-  def getVarbleDetailsList(handle: String, varname: String): List[(String,List[String])] = {
-    val fieldIds: List[String] = getProfileFieldIds("variabledetails")
+  def getVariableDetailsList(handle: String, varname: String): List[(String, List[String])] = {
+    val fieldIds: List[String] = getProfileFieldIds("vardetails")
     val details = new mutable.ArrayBuffer[(String, List[String])]
-    for(i <- 0 to fieldIds.size-1) {
+    for(i <- fieldIds.indices) {
       details += null
     }
     
@@ -211,112 +214,61 @@ class CodebookService(
       .asScala.toList
     if (varnames.size != 1) {
       println("failed to find variable " + varname + " in codebook " + handle)
-      return null
-    }
-    val variable: FieldInst = varnames.head
-    //find the xpath index of this variable for use in retrieving other fields
-    val varId: Long = variable.getId
-    val varIndices: List[FieldIndice] = fieldIndiceDao.findById_FieldInstId(varId).asScala.toList
-    val varIndex: FieldIndice = varIndices.head
-    val varIndexValue: String = varIndex.getIndexValue
-    //iterate over each field in the profile and find the instance using the indexed xpath
-    for (fieldId <- fieldIds) {
-      //get ordering for display
-      val ordering: Int = getOrdering("vardetails", fieldId)
-      val currentField: Field = fieldDao.findOne(fieldId)
-      //get the general (with wildcards) xpath for each field
-      val maps: List[Mapping] = mappingDao.findById_FieldId(fieldId).asScala.toList
-      if (maps.size != 1) {
-        println("failed to find map for field " + fieldId)
-      }
-      else {
-        val map: Mapping = maps.head
-        val generalXpath: String = map.getXpath
-        //replace wildcard with index
-        val indexedXpath: String = generalXpath.replace("*", varIndexValue)
-        //find the instance using the indexed xpath
-        val insts: List[FieldInst] =
-          fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, indexedXpath).asScala.toList
-        if (insts.size != 1) {
-          println("failed to find field instance with xpath " + indexedXpath)
+      List()
+    } else {
+      val variable: FieldInst = varnames.head
+      //find the xpath index of this variable for use in retrieving other fields
+      val varId: Long = variable.getId
+      val varIndices: List[FieldIndice] = fieldIndiceDao.findById_FieldInstId(varId).asScala.toList
+      val varIndex: FieldIndice = varIndices.head
+      val varIndexValue: String = varIndex.getIndexValue
+      //iterate over each field in the profile and find the instance using the indexed xpath
+      println("field ids length: " + fieldIds.size)
+      for (fieldId <- fieldIds) {
+        //get ordering for display
+        val ordering: Int = getOrdering("vardetails", fieldId)
+        val currentField: Field = fieldDao.findOne(fieldId)
+        //get the general (with wildcards) xpath for each field
+        val maps: List[Mapping] = mappingDao.findById_FieldId(fieldId).asScala.toList
+        if (maps.size != 1) {
+          println("failed to find map for field " + fieldId)
         }
         else {
-          val inst: FieldInst = insts.head
-          val key: (String, Int) = (currentField.getDisplayName, ordering)
-          //add to hashmap; key is display name of field and value is the text value of the FieldInst
-          details(ordering-1) = (currentField.getDisplayName, List(inst.getValue))
+          val map: Mapping = maps.head
+          val generalXpath: String = map.getXpath
+          //replace wildcard with index
+          val indexedXpath: String = generalXpath.replace("*", varIndexValue)
+          //find the instance using the indexed xpath
+          val insts: List[FieldInst] =
+            fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, indexedXpath).asScala.toList
+          if (insts.size != 1) {
+            println("failed to find field instance with xpath " + indexedXpath)
+          }
+          else {
+            val inst: FieldInst = insts.head
+            println("inst is ") //DEBUG
+            println(inst) //DEBUG
+            //add to hashmap; key is display name of field and value is the text value of the FieldInst
+            details(ordering-1) = (currentField.getDisplayName, List(inst.getValue))
+          }
         }
       }
+      compress(details.toList)
     }
-    compress(details.toList)
   }
-  
-  /**
-    * retrieves variable details profile from SQL tables
-    *
-    * @param handle
-    * @param varname
-    * @return
-    */
-  @deprecated
-  def getVariableDetails(handle: String, varname: String): Map[(String, Int), String] = {
-    //retreive vardetails profile
-    val fieldIds: List[String] = getProfileFieldIds("vardetails")
-    val details: mutable.Map[(String, Int), String] = mutable.Map()
-    //find the varname instance specified by argument
-    val varnames: List[FieldInst] = fieldInstDao.findByRawDocIdAndValue(handle, varname)
-      .asScala.toList
-    if (varnames.size != 1) {
-      println("failed to find variable " + varname + " in codebook " + handle)
-      return null
-    }
-    val variable: FieldInst = varnames.head
-    //find the xpath index of this variable for use in retrieving other fields
-    val varId: Long = variable.getId
-    val varIndices: List[FieldIndice] = fieldIndiceDao.findById_FieldInstId(varId).asScala.toList
-    val varIndex: FieldIndice = varIndices.head
-    val varIndexValue: String = varIndex.getIndexValue
-    //iterate over each field in the profile and find the instance using the indexed xpath
-    for (fieldId <- fieldIds) {
-      //get ordering for display
-      val ordering: Int = getOrdering("vardetails", fieldId)
-      val currentField: Field = fieldDao.findOne(fieldId)
-      //get the general (with wildcards) xpath for each field
-      val maps: List[Mapping] = mappingDao.findById_FieldId(fieldId).asScala.toList
-      if (maps.size != 1) {
-        println("failed to find map for field " + fieldId)
-      }
-      else {
-        val map: Mapping = maps.head
-        val generalXpath: String = map.getXpath
-        //replace wildcard with index
-        val indexedXpath: String = generalXpath.replace("*", varIndexValue)
-        //find the instance using the indexed xpath
-        val insts: List[FieldInst] =
-          fieldInstDao.findByRawDocIdAndCanonicalXpath(handle, indexedXpath).asScala.toList
-        if (insts.size != 1) {
-          println("failed to find field instance with xpath " + indexedXpath)
-        }
-        else {
-          val inst: FieldInst = insts.head
-          val key: (String, Int) = (currentField.getDisplayName, ordering)
-          //add to hashmap; key is display name of field and value is the text value of the FieldInst
-          details.put(key, inst.getValue)
-        }
-      }
 
-    }
-    details.toMap
-  }
+  def getVariableDetailsListJson(handle: String,  varname: String): String =
+    getVariableDetailsList(handle,  varname).asJson.noSpaces
+
 
   /** *** Private utility functions  ******/
-  private def getProfileFieldIds(profileId: String): List[String] = {
+  private[service] def getProfileFieldIds(profileId: String): List[String] = {
     val proFields: List[ProfileField] = profileFieldDao.findByProfileId(profileId)
       .asScala.toList
-    proFields.map(pf =>pf.getFieldId)
+    proFields.map(pf => pf.getFieldId)
   }
 
-  private def getOrdering(profileId: String, fieldId: String): Int = {
+  private[service] def getOrdering(profileId: String, fieldId: String): Int = {
     val pfs: List[ProfileField] =
       profileFieldDao.findByProfileIdAndFieldId(profileId, fieldId).asScala.toList
     if (pfs.size != 1) 99
@@ -326,7 +278,7 @@ class CodebookService(
     }
   }
   
-  private def compress[A](l : List[A]) : List[A] = {
+  private[service] def compress[A](l : List[A]) : List[A] = {
     l match{
       case Nil => Nil
       case null::tail => compress(tail)

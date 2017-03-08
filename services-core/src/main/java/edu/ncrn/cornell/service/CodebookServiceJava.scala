@@ -67,11 +67,10 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
     * @param varname
     * @return
     */
-  def getVariableDetails(handle: String, varname: String)
-  : util.Map[(String, Integer), String] =
-    codebookService.getVariableDetails(handle, varname)
-      .map(keyValue => ((keyValue._1._1, new Integer(keyValue._1._2)), keyValue._2)).asJava
-
-
+  def getVariableDetailsList(handle: String, varname: String)
+  :  util.List[(String, util.List[String])] =
+    codebookService.getVariableDetailsList(handle, varname).map{
+      case (key, value) => (key, value.asJava)
+    }.asJava
 
 }

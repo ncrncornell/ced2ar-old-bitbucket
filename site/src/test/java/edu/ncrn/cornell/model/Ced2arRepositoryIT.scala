@@ -27,5 +27,11 @@ class Ced2arRepositoryIT extends BaseRepositoryIT with CodebookServiceTesters  {
   @Test
   def getAllHandlesJsonTests: Unit = getAllHandlesJsonTests(codeBookService)
 
+  @Test
+  def getCodebookDetailsListJsonTests: Unit = getCodebookDetailsListJsonTests(codeBookService)
+
+  @Test
+  def getVariableDetailsListJsonTests: Unit = getVariableDetailsListJsonTests(codeBookService)
+
 
 }

@@ -11,11 +11,10 @@ import scala.collection.Map
 class VarView extends Ced2arView{
   
     def variableDetails(
-       details : Map[(String, Int), String],
+       details : List[(String, List[String])],
        handle : String,
        varname : String
     ) : String = {
-      val detailsSorted = details.toSeq.sortBy(_._1._2)
       val typedHtml = html(
         head(
           defaultMetaTags,
@@ -33,7 +32,7 @@ class VarView extends Ced2arView{
             li(cls:="active")(varname)
           ),
           masterDiv(
-            detailsSorted.map{case ((vLabel,order), vValue) =>
+            details.map{case (vLabel, vValue) =>
               div(
               h3(vLabel),
               p(vValue)
