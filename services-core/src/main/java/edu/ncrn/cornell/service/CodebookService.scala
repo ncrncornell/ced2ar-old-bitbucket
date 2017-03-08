@@ -90,9 +90,9 @@ class CodebookService(
    */
   def getCodebookDetailsList(handle: String): List[(String,List[String])] = {
     val fieldIds: List[String] = getProfileFieldIds("codebookdetails")
-    val details = new mutable.ArrayBuffer[(String, List[String])]
-    for(i <-fieldIds.indices) {
-      details += null
+    val details = new mutable.ArrayBuffer[Option[(String, List[String])]]
+    for(ii <-fieldIds.indices) {
+      details += None
     }
     
     for (fieldId <- fieldIds) {
@@ -108,14 +108,13 @@ class CodebookService(
         
       if (fieldInsts.nonEmpty) {
         val values: List[String] = fieldInsts.map(fi => fi.getValue)
-        details(ordering-1) = (dispName, values)
+        details(ordering-1) = Some(dispName, values)
       }
       else {
         println("[READING FIELDISNTS]:: No FieldInst for codebook " + handle + " field " + fieldId)
       }
     }
-    
-    compress(details.toList)
+    details.flatten.toList
   }
 
   def getCodebookDetailsListJson(handle: String): String =
@@ -205,9 +204,9 @@ class CodebookService(
    */
   def getVariableDetailsList(handle: String, varname: String): List[(String, List[String])] = {
     val fieldIds: List[String] = getProfileFieldIds("vardetails")
-    val details = new mutable.ArrayBuffer[(String, List[String])]
-    for(i <- fieldIds.indices) {
-      details += null
+    val details = new mutable.ArrayBuffer[Option[(String, List[String])]]
+    for(ii <- fieldIds.indices) {
+      details += None
     }
     
     val varnames: List[FieldInst] = fieldInstDao.findByRawDocIdAndValue(handle, varname)
@@ -249,11 +248,11 @@ class CodebookService(
             println("inst is ") //DEBUG
             println(inst) //DEBUG
             //add to hashmap; key is display name of field and value is the text value of the FieldInst
-            details(ordering-1) = (currentField.getDisplayName, List(inst.getValue))
+            details(ordering-1) = Some(currentField.getDisplayName, List(inst.getValue))
           }
         }
       }
-      compress(details.toList)
+      details.flatten.toList
     }
   }
 
@@ -277,12 +276,5 @@ class CodebookService(
       pf.getOrdering
     }
   }
-  
-  private[service] def compress[A](l : List[A]) : List[A] = {
-    l match{
-      case Nil => Nil
-      case null::tail => compress(tail)
-      case head::tail => head::compress(tail)
-    }
-  }
+
 }
