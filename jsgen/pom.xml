@@ -56,10 +56,24 @@
 
         <dependency>
             <groupId>com.lihaoyi</groupId>
-            <artifactId>upickle_2.12</artifactId>
+            <artifactId>upickle_${scala.version.major}</artifactId>
             <version>0.4.4</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>fr.hmil</groupId>
+            <artifactId>roshttp_${scala.version.major}</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- FIXME: BB: local repo problem? need to fix -->
+        <!--<dependency>-->
+            <!--<groupId>io.monix</groupId>-->
+            <!--<artifactId>monix_${scala.version.major}</artifactId>-->
+            <!--<version>2.2.3</version>-->
+        <!--</dependency>-->
 
     </dependencies>
 

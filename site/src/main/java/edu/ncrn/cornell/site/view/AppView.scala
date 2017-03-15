@@ -20,7 +20,7 @@ class AppView extends Ced2arView {
         masterDiv(
           div(id := "application-container"),
           script(`type` := "application/javascript",
-            "mhtml.todo.MhtmlTodo().main();"
+            "mhtml.todo.Ced2ar().main();"
           )
         )
       )

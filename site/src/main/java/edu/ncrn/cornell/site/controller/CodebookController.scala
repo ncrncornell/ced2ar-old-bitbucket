@@ -24,24 +24,6 @@ class CodebookController(
 ) {
 
   /**
-    * Single-page application for CED2AR
-    *
-    * @param model
-    * @return
-    */
-  @ResponseBody
-  @RequestMapping(
-    method = Array(RequestMethod.GET),
-    value = Array("/app"),
-    produces = Array(MediaType.TEXT_HTML_VALUE)
-  )
-  def app(
-     model: Model,
-     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean
-   ): String = appView.appContainer
-
-
-  /**
     * controller for all codebooks page
     *
     * @param model

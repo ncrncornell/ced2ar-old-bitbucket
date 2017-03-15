@@ -15,7 +15,9 @@ lazy val view = (project in file(".")).enablePlugins(ScalaJSPlugin)
     libraryDependencies ++= Seq(
       "in.nvilla" %%% "monadic-rx-cats" % mhtmlV,
       "in.nvilla" %%% "monadic-html" % mhtmlV,
-      "com.lihaoyi" %%% "upickle" % "0.4.4"
+      "com.lihaoyi" %%% "upickle" % "0.4.4",
+      "fr.hmil" %%% "roshttp" % "2.0.1",
+      "io.monix" %%% "monix" % "2.2.3"
     ),
     libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",

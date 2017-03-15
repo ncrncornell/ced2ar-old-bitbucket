@@ -7,7 +7,7 @@ import scalatags.Text.all._
 @Component
 class AboutView extends Ced2arView{
   
-  def aboutPage() : String = {
+  def aboutPage: String = {
     val typedHtml = html(
         head(
         defaultMetaTags,
