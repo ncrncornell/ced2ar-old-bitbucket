@@ -26,7 +26,7 @@ class CodebooksView extends Ced2arView{
         masterDiv(
           codebooks.map{ case (cbHandle, cbName) =>
             p(
-              a(href:=s"$servletPath/codebooks/"+cbHandle)(
+              a(href:=s"$servletPath/codebook/"+cbHandle)(
                 cbName
               )
              )

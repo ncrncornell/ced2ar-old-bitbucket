@@ -26,9 +26,9 @@ class VarView extends Ced2arView{
           topBanner,
           navBar,
           ol(cls:="breadcrumb")(
-            li(a(href:= s"$servletPath/codebooks")("Codebooks")),
-            li(a(href:= s"$servletPath/codebooks/"+handle)(handle)),
-            li(a(href:= s"$servletPath/codebooks/"+handle+"/vars")("Variables")),
+            li(a(href:= s"$servletPath/codebook")("Codebooks")),
+            li(a(href:= s"$servletPath/codebook/"+handle)(handle)),
+            li(a(href:= s"$servletPath/codebook/"+handle+"/var")("Variables")),
             li(cls:="active")(varname)
           ),
           masterDiv(

@@ -10,17 +10,36 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
 import edu.ncrn.cornell.service.CodebookService
-import edu.ncrn.cornell.site.view.CodebookView
-import edu.ncrn.cornell.site.view.CodebooksView
-import edu.ncrn.cornell.site.view.VarView
-import edu.ncrn.cornell.site.view.VarsView
+import edu.ncrn.cornell.site.view._
 
-@Controller class CodebookController {
-  @Autowired private val codebookService: CodebookService = null
-  @Autowired private val codebooksView: CodebooksView = null
-  @Autowired private val codebookView: CodebookView = null
-  @Autowired private val varsView: VarsView = null
-  @Autowired private val varView: VarView = null
+@Autowired
+@Controller 
+class CodebookController(
+  private[controller] val appView: AppView,
+  private[controller] val codebookService: CodebookService,
+  private[controller] val codebooksView: CodebooksView,
+  private[controller] val codebookView: CodebookView,
+  private[controller] val varsView: VarsView,
+  private[controller] val varView: VarView
+) {
+
+  /**
+    * Single-page application for CED2AR
+    *
+    * @param model
+    * @return
+    */
+  @ResponseBody
+  @RequestMapping(
+    method = Array(RequestMethod.GET),
+    value = Array("/app"),
+    produces = Array(MediaType.TEXT_HTML_VALUE)
+  )
+  def app(
+     model: Model,
+     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean
+   ): String = appView.appContainer
+
 
   /**
     * controller for all codebooks page
@@ -31,7 +50,7 @@ import edu.ncrn.cornell.site.view.VarsView
   @ResponseBody
   @RequestMapping(
     method = Array(RequestMethod.GET),
-    value = Array("/codebooks"),
+    value = Array("/codebook"),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
   def codebooks(
@@ -52,7 +71,7 @@ import edu.ncrn.cornell.site.view.VarsView
     */
   @ResponseBody
   @RequestMapping(
-    value = Array("/codebooks/{c:.+}"),
+    value = Array("/codebook/{c:.+}"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
@@ -69,7 +88,7 @@ import edu.ncrn.cornell.site.view.VarsView
   //
   @ResponseBody
   @RequestMapping(
-    value = Array("/codebooks/{c:.+}"),
+    value = Array("/codebook/{c:.+}"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
   )
@@ -90,7 +109,7 @@ import edu.ncrn.cornell.site.view.VarsView
     */
   @ResponseBody
   @RequestMapping(
-    value = Array("/codebooks/{c:.+}/vars"),
+    value = Array("/codebook/{c:.+}/var"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
@@ -115,7 +134,7 @@ import edu.ncrn.cornell.site.view.VarsView
     */
   @ResponseBody
   @RequestMapping(
-    value = Array("/codebooks/{c:.+}/vars/{v}"),
+    value = Array("/codebook/{c:.+}/var/{v}"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
@@ -132,7 +151,7 @@ import edu.ncrn.cornell.site.view.VarsView
   //
   @ResponseBody
   @RequestMapping(
-    value = Array("/codebooks/{c:.+}/vars/{v}"),
+    value = Array("/codebook/{c:.+}/var/{v}"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
   )
@@ -145,7 +164,7 @@ import edu.ncrn.cornell.site.view.VarsView
 
   @ResponseBody
   @RequestMapping(
-    value = Array("/vars"),
+    value = Array("/var"),
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )

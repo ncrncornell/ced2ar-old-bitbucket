@@ -92,9 +92,9 @@ trait Ced2arView extends HandyServletContextAware {
           li(a(href := s"$servletPath/groups", "Sort by Group"))
         ),*/
         li(`class` := "divider-vertical hidden-xs"),
-        li(a(href := s"$servletPath/codebooks", "Browse by Codebook")),
+        li(a(href := s"$servletPath/codebook", "Browse by Codebook")),
         li(`class` := "divider-vertical hidden-xs"),
-        li(a(href := s"$servletPath/vars", "Browse by Variable")),
+        li(a(href := s"$servletPath/var", "Browse by Variable")),
         li(`class` := "divider-vertical hidden-xs"),
         li(a(href := s"$servletPath/upload", "Upload a Codebook")),
         li(`class` := "divider-vertical hidden-xs"),

@@ -10,7 +10,7 @@ import scalatags.Text.all._
 @Component
 class CodebookView extends Ced2arView {
 
-  val collapsableFields = Set("Files")
+  val collapsibleFields = Set("Files")
 
   def codebookDetails(
      details: List[(String, List[String])],
@@ -26,11 +26,11 @@ class CodebookView extends Ced2arView {
           topBanner,
           navBar,
           ol(cls:="breadcrumb")(
-            li(a(href:= s"$servletPath/codebooks")("Codebooks")),
+            li(a(href:= s"$servletPath/codebook")("Codebooks")),
             li(cls:="active")(handle)
           ),
           div(
-            a(href := s"$servletPath/codebooks/$handle/vars")
+            a(href := s"$servletPath/codebook/$handle/var")
            ("View Variables")
           ),
           div(
@@ -39,17 +39,15 @@ class CodebookView extends Ced2arView {
             }
           )
         )
-      ),
-      div(id := "application-container"),
-      script(`type` := "application/javascript",
-        "mhtml.todo.MhtmlTodo().main();"
       )
     )
     typedHtml.toString()
   }
 
+  //TODO: if we are thinking of using the SPA as the main interface, we should probably
+  //TODO: avoid all use of interactive javascript in returned, static html views
   private def renderField(fieldName: String, fieldValues: List[String]): TypedTag[String] =
-    if (collapsableFields.contains(fieldName))
+    if (collapsibleFields.contains(fieldName))
       div(
         h3(
           a(`class` := "glyphicon glyphicon-menu-down",

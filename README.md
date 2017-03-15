@@ -7,7 +7,7 @@
 
     1. `antrun:run` (for windows only); generates JavaScript
     2. `process-test-resources`; places JavaScript files in appropriate directory
-    3. If the IntelliJ build step tries to compile code meant for sbt, you can right click an the build output log and select something like "exclude from compile" or "exclude from build".
+    3. If the IntelliJ build step tries to compile code meant for sbt, you can right click on the build output log and select something like "exclude from compile" or "exclude from build".
 
 
 # Configuring CED2AR

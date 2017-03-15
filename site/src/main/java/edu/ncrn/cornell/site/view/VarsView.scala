@@ -35,12 +35,12 @@ class VarsView extends Ced2arView{
             sortedVars.map{ case (varname, (varlabl, handle)) =>
               tr(
                 td(
-                  a(href:=s"$servletPath/codebooks/"+handle+"/vars/"+varname)
+                  a(href:=s"$servletPath/codebook/"+handle+"/var/"+varname)
                   (varname)
                 ),
                 td(varlabl),
                 td(
-                  a(href:=s"$servletPath/codebooks/"+handle)(handle)
+                  a(href:=s"$servletPath/codebook/"+handle)(handle)
                 )
               )
             }.toSeq
