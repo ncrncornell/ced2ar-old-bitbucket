@@ -1,5 +1,6 @@
 package edu.ncrn.cornell.site.controller
 
+import edu.ncrn.cornell.service.ApiInfoService
 import org.springframework.http.MediaType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
@@ -9,7 +10,11 @@ import edu.ncrn.cornell.site.view.{AboutView, AppView}
 
 @Autowired
 @Controller
-class MainController(val aboutView: AboutView, val appView: AppView) {
+class MainController(
+  protected val aboutView: AboutView,
+  protected val appView: AppView,
+  protected val apiInfoService: ApiInfoService
+) {
 
   @ResponseBody
   @RequestMapping(
@@ -17,7 +22,7 @@ class MainController(val aboutView: AboutView, val appView: AppView) {
     method = Array(RequestMethod.GET),
     produces = Array(MediaType.TEXT_HTML_VALUE)
   )
-  def welcome(model: Model): String = aboutView.aboutPage
+  def about(model: Model): String = aboutView.aboutPage
 
 
   /**
@@ -43,5 +48,19 @@ class MainController(val aboutView: AboutView, val appView: AppView) {
     method = Array(RequestMethod.GET)
   )
   def home(model: Model): String = "redirect:app"
+
+
+  /**
+    * Returns basic information about the API service.
+    * @param model
+    * @return
+    */
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/api"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def api(model: Model): String = apiInfoService.apiInfoJson
 
 }

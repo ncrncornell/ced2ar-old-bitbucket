@@ -25,5 +25,9 @@ class Ced2arConfig {
   @BeanProperty
   var uploadDir: String = _
 
+  @NotBlank
+  @BeanProperty
+  var version: String = _
+
 
 }
