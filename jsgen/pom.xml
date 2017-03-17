@@ -68,13 +68,15 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- FIXME: not sure why monix has issues here -->
-        <!--<dependency>-->
-            <!--<groupId>io.monix</groupId>-->
-            <!--<artifactId>monix_${scala.version.major}</artifactId>-->
-            <!--<version>2.2.3</version>-->
-            <!--<scope>provided</scope>-->
-        <!--</dependency>-->
+        <!-- TODO: monix has issues here, just use individual libs like monix-reactive for now
+          https://github.com/monix/monix/issues/332
+        -->
+        <dependency>
+            <groupId>io.monix</groupId>
+            <artifactId>monix-reactive_${scala.version.major}</artifactId>
+            <version>2.2.3</version>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
 
