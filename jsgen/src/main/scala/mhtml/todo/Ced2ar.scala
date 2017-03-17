@@ -29,11 +29,12 @@ object Ced2ar extends JSApp {
   //TODO: use something standard and wire in from config somehow, if it exists
   case class Port(num: Int)
   implicit val port = Port(8080)
+  val servletPath = "ced2ar"
   //TODO end of TODO
 
   object EndPoints{
     def codebook(id: String)(implicit port: Port) =
-      s"http://localhost:${port.num}/ced2ar-rdb/codebook/$id"
+      s"http://localhost:${port.num}/$servletPath/codebook/$id"
   }
 
   class Todo(val title: String, val completed: Boolean)
@@ -51,7 +52,7 @@ object Ced2ar extends JSApp {
       val request = HttpRequest(EndPoints.codebook(handle))
         .withHeader("Content-Type", "application/javascript")
 
-      val detailsStr = request.send().onComplete({
+      request.send().onComplete({
         case res: Success[SimpleHttpResponse] =>
           details := (decode[List[(String, List[String])]](res.get.body) match {
             case Left(detailFailure) =>
