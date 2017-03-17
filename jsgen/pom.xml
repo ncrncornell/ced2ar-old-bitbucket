@@ -100,6 +100,7 @@
                                         <exec executable="cmd.exe"
                                               spawn="false"
                                               failonerror="true">
+                                            <env key="JAVA_OPTS" value="-Xmx3G"/>
                                             <arg value="/c"/>
                                             <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
                                             <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
@@ -139,6 +140,9 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <environmentVariables>
+                                <JAVA_OPTS>-Xmx3G</JAVA_OPTS>
+                            </environmentVariables>
                             <executable>sbt</executable>
                             <!-- for mac -->
                             <!--executable>/usr/local/Cellar/sbt/0.13.9/bin/sbt</executable-->
