@@ -51,14 +51,16 @@ object Ced2ar extends JSApp {
   println(localApiUri) // DEBUG
 
   //TODO: move to util package or something
-  class SpecifyUri(val prompt: String) {
+  class SpecifyUri(val prompt: String, formId: String, defaultUrl: String) {
     val rxName = Var("world")
     def app: (xml.Node, Rx[String]) = {
       val div =
         <div>
-          <input type="text"
-                 placeholder={prompt}
-                 oninput={Utils.inputEvent(rxName := _.value)}/>
+          <form onsubmit={Utils.inputEvent(rxName := _.value)}>
+            <input type="text" placeholder={prompt}
+                   id = {formId} value= {defaultUrl} /> <!--FIXME: make a constructor param -->
+            <input type="submit" value="OK"/>
+          </form>
           <h2>Hello {rxName}!</h2>
         </div>
       (div, rxName)
@@ -95,23 +97,45 @@ object Ced2ar extends JSApp {
     uriMaybe
   }
 
-  val apiUriApp = new SpecifyUri("Enter the API URI for the CED2AR server to use:")
+  val apiUriApp = new SpecifyUri(
+    "Enter the API URI for the CED2AR server to use:",
+    "apiUriApp",
+    "http://localhost:8080/ced2ar-rdb/api"
+  )
+
   // Do a basic check to see if localApiUri exists and is compatible
-  val currentApiUri = checkApiUri(localApiUri).map {
-    case None => apiUriApp.app._2.map(uriString => checkApiUri(uriString))
+  val currentApiUri: Rx[Option[URI]] = checkApiUri(localApiUri).map {
+    case None => checkApiUri(apiUriApp.app._2.value).value
     case Some(uri) => Some(uri) // TODO prompt user if this is ok
   }
 
   //TODO: use currentApiUri directly or wire in from it
 
+  val defaultPort = 8080
   case class Port(num: Int)
-  implicit val port = Port(8080)
+  implicit val port: Rx[Port] = currentApiUri.map{
+    case Some(curUri: URI) => Option(curUri.getPort) match {
+      case Some(prt) => Port(prt)
+      case None => Port(defaultPort)
+    }
+    case None => Port(defaultPort) // default
+    case Some(x) =>
+      println(s"error, type is ${x.getClass.getName}, but expected URI")
+      Port(defaultPort)
+  }
   val servletPath = "ced2ar"
   //TODO end of TODO
 
   object EndPoints{
-    def codebook(id: String)(implicit port: Port) =
-      s"http://localhost:${port.num}/$servletPath/codebook/$id"
+    def codebook(id: String)(implicit port: Rx[Port]): String = {
+      val curPort = Option(port.value.num) match {
+        case None => defaultPort
+        case Some(portVal) =>
+          println(s"got a portVal: $portVal")
+          portVal
+      }
+      s"http://localhost:$curPort/$servletPath/codebook/$id"
+    }
   }
 
   class Todo(val title: String, val completed: Boolean)
@@ -174,8 +198,8 @@ object Ced2ar extends JSApp {
       <div>
         {currentApiUri.map{
           case None => apiUriApp.app._1
-          case curUri: URI => <p>Current API URI: {curUri.toString}</p>
-          case _ => <p>Unknown error matching URI</p>
+          case Some(curUri) => <p>Current API URI: {curUri.toString}</p>
+          case whatsit => <p>Unknown error matching URI, got class: {whatsit.getClass.getName}</p>
         }}
         <ol cls="breadcrumb">
           <li><a href={s"codebook"}></a>Codebooks</li>
@@ -196,7 +220,7 @@ object Ced2ar extends JSApp {
 
   object View {
 
-     val testCodebook = new Codebook("ssbv602")
+     val testCodebook = currentApiUri.map{cau => new Codebook("ssbv602")}
 
     def index: Node = {
       <div>
@@ -212,7 +236,7 @@ object Ced2ar extends JSApp {
         </footer>
 
         <p>Testing codebook view:</p>
-          {testCodebook.view(testCodebook.model, testCodebook.handle)}
+          {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
       </div>
     }
   }
