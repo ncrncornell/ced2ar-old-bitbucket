@@ -3,9 +3,9 @@ name := "ced2ar3-view"
 //TODO: set this from maven; also note setting sjs plugin version in plugins.sbt
 scalaVersion in ThisBuild := "2.12.1" // or any other Scala version >= 2.10.2
 
-//lazy val mhtmlV = "latest.integration"
+lazy val mhtmlV = "latest.integration"
 //lazy val mhtmlV = "0.1.1"
-lazy val mhtmlV = "0.2.3"
+//lazy val mhtmlV = "0.2.3"
 
 val circeVersion = "0.7.0"
 
