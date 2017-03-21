@@ -43,8 +43,8 @@ trait Ced2arView extends HandyServletContextAware {
 
     //TODO: for locally optimized js, can switch based on build settings
     lazy val scriptUrls = Seq(
-      s"$servletPath/ced2ar3-view-fastopt.js",
       s"$servletPath/ced2ar3-view-jsdeps.js",
+      s"$servletPath/ced2ar3-view-fastopt.js",
       "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js",
       "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
     )

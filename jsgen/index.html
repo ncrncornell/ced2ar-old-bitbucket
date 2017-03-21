@@ -1,16 +1,18 @@
 <!DOCTYPE html>
+<!-- NOTE: this page is used for development only; in general, you'll want to make sure
+  -- that it closely matches the contents of /app served by CED2AR -->
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>mhtml - TodoMVC</title>
-    <link rel="stylesheet" href="node_modules/todomvc-common/base.css"/>
-    <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css"/>
+    <!--<link rel="stylesheet" href="node_modules/todomvc-common/base.css"/>-->
+    <!--<link rel="stylesheet" href="node_modules/todomvc-app-css/index.css"/>-->
 </head>
 <body>
-  <script type="text/javascript" src="node_modules/todomvc-common/base.js"></script>
-  <script type="text/javascript" src="./target/scala-2.11/mhtml-todo-fastopt.js"></script>
+  <script type="text/javascript" src="./target/scala-2.12/ced2ar3-view-jsdeps.js"></script>
+  <script type="text/javascript" src="./target/scala-2.12/ced2ar3-view-fastopt.js"></script>
   <div id="application-container"></div>
-  <script type="text/javascript"> mhtml.todo.MhtmlTodo().main(); </script>
+  <script type="text/javascript"> mhtml.todo.Ced2ar().main(); </script>
   </body>
 </html>
