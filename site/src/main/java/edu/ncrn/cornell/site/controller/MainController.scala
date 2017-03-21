@@ -5,11 +5,12 @@ import org.springframework.http.MediaType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.{RequestMapping, RequestMethod, RequestParam, ResponseBody}
+import org.springframework.web.bind.annotation._
 import edu.ncrn.cornell.site.view.{AboutView, AppView}
 
 @Autowired
 @Controller
+@CrossOrigin //TODO: get allowed origins from config properties
 class MainController(
   protected val aboutView: AboutView,
   protected val appView: AppView,

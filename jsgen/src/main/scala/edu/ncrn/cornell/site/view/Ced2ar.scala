@@ -1,37 +1,46 @@
 // This implementation is mostly copied from Binding.scala TodoMVC example:
 // https://github.com/ThoughtWorksInc/todo/blob/master/js/src/main/scala/com/thoughtworks/todo/Main.scala
-package mhtml.todo
+package edu.ncrn.cornell.site.view
+
 import java.net.URI
 
 import scala.scalajs.js.JSApp
 import scala.xml.Elem
 import scala.xml.Node
 import mhtml._
-import cats.implicits._, mhtml.implicits.cats._
-
+import cats.implicits._
+import mhtml.implicits.cats._
 import org.scalajs.dom
-import org.scalajs.dom.Event
-import org.scalajs.dom.KeyboardEvent
+import org.scalajs.dom.{DOMList, Event, KeyboardEvent}
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.ext.LocalStorage
+import org.scalajs.dom.ext.PimpedNodeList
 import org.scalajs.dom.raw.HTMLInputElement
+import org.scalajs.dom.raw.NodeList
 import upickle.default.read
 import upickle.default.write
 import fr.hmil.roshttp.HttpRequest
 import monix.execution.Scheduler.Implicits.global
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.{Failure, Success, Try}
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import io.circe._
 import io.circe.parser._
 
+import scala.collection.breakOut
 
 
 object Ced2ar extends JSApp {
 
   object Utils {
+
+//    def domList[T](dl: DOMList[T]): List[T] = {
+//      val size = dl.length
+//      (0 until size).map(ii => dl.item(ii))(breakOut)
+//    }
+
     def fromFuture[T](future: Future[T]): Rx[Option[Try[T]]] = {
       val result = Var(Option.empty[Try[T]])
       future.onComplete(x => result := Some(x))
@@ -49,6 +58,8 @@ object Ced2ar extends JSApp {
   }
 
 
+
+
   def localApiUri = dom.window.location.href.replaceFirst("/app", "/api")
 
   //TODO: move to util package or something
@@ -58,14 +69,23 @@ object Ced2ar extends JSApp {
     def app: (Node, Rx[URI]) = {
       val div =
         <div>
-          <form onsubmit={Utils.inputEvent{iev =>
-            println(s"iev value is ${iev.value}")
-            currentUrl := URI.create(iev.value)
-          }}>
-            <input type="text" placeholder={prompt}
-                   id = {formId} /> <!--FIXME: make defaultUrl a constructor param -->
-            <input type="submit" value="OK"/>
-          </form>
+          <input type="text" placeholder={prompt}
+                 id = {formId} /> <!--FIXME: make defaultUrl a constructor param -->
+          <button onclick={Utils.inputEvent{iev =>
+            //DEBUG:
+            println("Hello from onclick")
+            iev.parentElement.childNodes.toIterable.foreach(node =>
+              println("nodeName is " + node.nodeName)
+            )
+            //DEBUG END
+            val text = iev.parentElement.childNodes.toIterable
+              .find(child => child.nodeName == "input") match {
+              case Some(elem) => elem.nodeValue
+              case None => ""
+            }
+            println(s"text is $text") // DEBUG
+            currentUrl := URI.create(text)
+          }}>OK</button>
         </div>
       (div, currentUrl)
     }
@@ -102,7 +122,7 @@ object Ced2ar extends JSApp {
   }
 
   val defaultPort = 8080
-  val servletPath = "ced2ar-rdb" //TODO: make an Rx?
+  val servletPath = "ced2ar" //TODO: make an Rx?
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
