@@ -7,6 +7,8 @@ import scala.scalajs.js.JSApp
 import scala.xml.Elem
 import scala.xml.Node
 import mhtml._
+import cats.implicits._, mhtml.implicits.cats._
+
 import org.scalajs.dom
 import org.scalajs.dom.Event
 import org.scalajs.dom.KeyboardEvent
@@ -50,17 +52,20 @@ object Ced2ar extends JSApp {
   def localApiUri = dom.window.location.href.replaceFirst("/app", "/api")
 
   //TODO: move to util package or something
+  //FIXME: Need to change form to not use onsubmit but just button-based events!!!!!!!!!
   class SpecifyUri(val prompt: String, formId: String, defaultUrl: String) {
-    val currentUrl = Var(defaultUrl)
-    def app: (Node, Rx[String]) = {
+    val currentUrl = Var(URI.create(defaultUrl))
+    def app: (Node, Rx[URI]) = {
       val div =
         <div>
-          <form onsubmit={Utils.inputEvent(currentUrl := _.value)}>
+          <form onsubmit={Utils.inputEvent{iev =>
+            println(s"iev value is ${iev.value}")
+            currentUrl := URI.create(iev.value)
+          }}>
             <input type="text" placeholder={prompt}
-                   id = {formId} value= {defaultUrl} /> <!--FIXME: make defaultUrl a constructor param -->
+                   id = {formId} /> <!--FIXME: make defaultUrl a constructor param -->
             <input type="submit" value="OK"/>
           </form>
-          <h2>Hello {currentUrl}!</h2>
         </div>
       (div, currentUrl)
     }
@@ -81,7 +86,7 @@ object Ced2ar extends JSApp {
       request.send().onComplete({
         case res: Success[SimpleHttpResponse] => testResult := Some(true)
         case err: Failure[SimpleHttpResponse] =>
-          println("Error retrieving api info: " + err.toString)
+          println(s"Error retrieving api info at $uriString: " + err.toString)
           testResult := Some(false)
       })
       testResult.map {
@@ -97,34 +102,37 @@ object Ced2ar extends JSApp {
   }
 
   val defaultPort = 8080
+  val servletPath = "ced2ar-rdb" //TODO: make an Rx?
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
     "apiUriApp",
-    s"http://localhost:$defaultPort/ced2ar-rdb/api"
+    s"http://localhost:$defaultPort/$servletPath/api"
   )
 
-  // Do a basic check to see if localApiUri exists and is compatible
-  val currentApiUri: Rx[Option[URI]] = checkApiUri(localApiUri).flatMap {
-    case None => apiUriApp.app._2.flatMap(url => checkApiUri(url))
-    case Some(uri) => Rx(Some(uri)) // TODO prompt user if this is ok
+
+  val currentApiUri: Rx[URI] = (checkApiUri(localApiUri)
+    |@| apiUriApp.app._2.flatMap(uri => checkApiUri(uri.toString))
+  ).map{
+    case (Some(lUri), Some(sUri)) => sUri
+    case (Some(lUri), None) => lUri
+    case (None, Some(sUri)) => sUri
+    case (None, None) =>  URI.create(s"http://localhost:$defaultPort/$servletPath/error")
   }
 
-  //TODO: use currentApiUri directly or wire in from it
 
   case class Port(num: Int)
-  implicit val port: Rx[Port] = currentApiUri.map{
-    case Some(curUri) => Option(curUri.getPort) match {
+
+  implicit val port: Rx[Port] = currentApiUri.map{ curUri =>
+    Option(curUri.getPort) match {
       case Some(prt) => Port(prt)
       case None => Port(defaultPort)
     }
-    case None => Port(defaultPort) // default
   }
-  currentApiUri.map{uri => println(s"uri is ${uri.toString}")}
-  port.map(prt => println(s"current port is ${prt.num}")) // DEBUG
 
-  val servletPath = "ced2ar-rdb"
-  //TODO end of TODO
+  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
+  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
+
 
   object EndPoints{
     def codebook(id: String): Rx[String] = port.map{ curPort =>
@@ -195,11 +203,12 @@ object Ced2ar extends JSApp {
       }
 
       <div>
-        {currentApiUri.map{
-          case None => apiUriApp.app._1
-          case Some(curUri) => <p>Current API URI: {curUri.toString} with port {curUri.getPort}</p>
-          case whatsit => <p>Unknown error matching URI, got class: {whatsit.getClass.getName}</p>
+        <p>
+        {currentApiUri.map{curUri =>
+          s"Current API URI: ${curUri.toString} with port ${curUri.getPort}"
         }}
+        </p>
+        {apiUriApp.app._1}
         <ol cls="breadcrumb">
           <li><a href={s"codebook"}></a>Codebooks</li>
           <li cls="active">{handle}</li>
