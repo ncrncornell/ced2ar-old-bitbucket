@@ -142,26 +142,28 @@ object Ced2ar extends JSApp {
 
   class Codebook(val handle: String) {
     def model: Rx[List[(String, List[String])]] = {
-      val details: Var[List[(String, List[String])]] = Var(Nil)
 
       val request: Rx[HttpRequest] = EndPoints.codebook(handle).map(ep =>
         HttpRequest(ep).withHeader("Content-Type", "application/javascript")
       )
 
-      request.impure.foreach{ req =>
-        req.send().onComplete({
-          case res: Success[SimpleHttpResponse] =>
-            details := (decode[List[(String, List[String])]](res.get.body) match {
-              case Left(detailFailure) =>
-                println("Error decoding codebook details: " + detailFailure.toString)
-                Nil
-              case Right(newDetails) => newDetails
-            })
-          case err: Failure[SimpleHttpResponse] =>
-            println("Error retrieving codebook details: " + err.toString)
-            details := Nil
-        })
-      }
+      val details: Rx[List[(String, List[String])]] = request.flatMap(req =>
+        Utils.fromFuture(req.send()).map {
+          case Some(resTry) => resTry match {
+            case res: Success[SimpleHttpResponse] =>
+              decode[List[(String, List[String])]](res.get.body) match {
+                case Left(detailFailure) =>
+                  println("Error decoding codebook details: " + detailFailure.toString)
+                  Nil
+                case Right(newDetails) => newDetails
+              }
+            case err: Failure[SimpleHttpResponse] =>
+              println("Error retrieving codebook details: " + err.toString)
+              Nil
+          }
+          case None => Nil
+        }
+      )
       details
     }
 
