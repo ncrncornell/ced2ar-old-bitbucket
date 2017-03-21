@@ -48,7 +48,6 @@ object Ced2ar extends JSApp {
 
 
   def localApiUri = dom.window.location.href.replaceFirst("/app", "/api")
-  println(localApiUri) // DEBUG
 
   //TODO: move to util package or something
   class SpecifyUri(val prompt: String, formId: String, defaultUrl: String) {
@@ -97,8 +96,7 @@ object Ced2ar extends JSApp {
     uriMaybe
   }
 
-  val defaultPort = 8081
-
+  val defaultPort = 8080
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
@@ -117,20 +115,15 @@ object Ced2ar extends JSApp {
   case class Port(num: Int)
   implicit val port: Rx[Port] = currentApiUri.map{
     case Some(curUri) => Option(curUri.getPort) match {
-      case Some(prt) =>
-        println("case 1")
-        Port(prt)
-      case None =>
-        println("case 2")
-        Port(defaultPort)
+      case Some(prt) => Port(prt)
+      case None => Port(defaultPort)
     }
-    case None =>
-      println("case 3")
-      Port(defaultPort) // default
+    case None => Port(defaultPort) // default
   }
+  currentApiUri.map{uri => println(s"uri is ${uri.toString}")}
   port.map(prt => println(s"current port is ${prt.num}")) // DEBUG
 
-  val servletPath = "ced2ar"
+  val servletPath = "ced2ar-rdb"
   //TODO end of TODO
 
   object EndPoints{
@@ -148,14 +141,14 @@ object Ced2ar extends JSApp {
   case class TodoList(text: String, hash: String, items: Rx[Seq[Todo]])
 
   class Codebook(val handle: String) {
-    def model: Var[List[(String, List[String])]] = {
+    def model: Rx[List[(String, List[String])]] = {
       val details: Var[List[(String, List[String])]] = Var(Nil)
 
       val request: Rx[HttpRequest] = EndPoints.codebook(handle).map(ep =>
         HttpRequest(ep).withHeader("Content-Type", "application/javascript")
       )
 
-      request.map{ req =>
+      request.impure.foreach{ req =>
         req.send().onComplete({
           case res: Success[SimpleHttpResponse] =>
             details := (decode[List[(String, List[String])]](res.get.body) match {
@@ -172,7 +165,7 @@ object Ced2ar extends JSApp {
       details
     }
 
-    def view(details: Var[List[(String, List[String])]], handle: String): Node = {
+    def view(details: Rx[List[(String, List[String])]], handle: String): Node = {
       val collapsibleFields = Set("Files")
 
       def renderField(fieldName: String, fieldValues: List[String]): Node = {
