@@ -11,7 +11,7 @@ import mhtml._
 import cats.implicits._
 import mhtml.implicits.cats._
 import org.scalajs.dom
-import org.scalajs.dom.{DOMList, Event, KeyboardEvent}
+import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.ext.LocalStorage
 import org.scalajs.dom.ext.PimpedNodeList
@@ -71,20 +71,20 @@ object Ced2ar extends JSApp {
         <div>
           <input type="text" placeholder={prompt}
                  id = {formId} /> <!--FIXME: make defaultUrl a constructor param -->
-          <button onclick={Utils.inputEvent{iev =>
-            //DEBUG:
-            println("Hello from onclick")
-            iev.parentElement.childNodes.toIterable.foreach(node =>
-              println("nodeName is " + node.nodeName)
-            )
-            //DEBUG END
-            val text = iev.parentElement.childNodes.toIterable
-              .find(child => child.nodeName == "input") match {
-              case Some(elem) => elem.nodeValue
-              case None => ""
+          <button onclick={ (ev: dom.Event) => {
+            val text: String = ev.srcElement.parentNode.childNodes.toIterable
+              .find(child => child.nodeName === "INPUT") match {
+              case Some(elem: html.Input) =>
+                println("found some element")
+                elem.value
+              case None =>
+                println("found no element")
+                defaultUrl
+              case _ =>
+                println(s"Error: unrecognized element for SpecifyUri($formId)")
+                defaultUrl
             }
-            println(s"text is $text") // DEBUG
-            currentUrl := URI.create(text)
+            currentUrl := URI.create(text) //FIXME: need to convert Unicode input to ascii
           }}>OK</button>
         </div>
       (div, currentUrl)
@@ -122,12 +122,12 @@ object Ced2ar extends JSApp {
   }
 
   val defaultPort = 8080
-  val servletPath = "ced2ar" //TODO: make an Rx?
+  val defaultServletPath = "ced2ar-web" //TODO: make an Rx?
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
     "apiUriApp",
-    s"http://localhost:$defaultPort/$servletPath/api"
+    s"http://localhost:$defaultPort/$defaultServletPath/api"
   )
 
 
@@ -137,11 +137,11 @@ object Ced2ar extends JSApp {
     case (Some(lUri), Some(sUri)) => sUri
     case (Some(lUri), None) => lUri
     case (None, Some(sUri)) => sUri
-    case (None, None) =>  URI.create(s"http://localhost:$defaultPort/$servletPath/error")
+    case (None, None) =>  URI.create(s"http://localhost:$defaultPort/$defaultServletPath/error")
   }
 
-
-  case class Port(num: Int)
+  sealed case class Port(num: Int)
+  sealed case class ServletPath(path: String)
 
   implicit val port: Rx[Port] = currentApiUri.map{ curUri =>
     Option(curUri.getPort) match {
@@ -150,23 +150,22 @@ object Ced2ar extends JSApp {
     }
   }
 
-  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
-  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
+  implicit val servletPath: Rx[ServletPath] = currentApiUri.map{ curUri =>
+    Option(curUri.getPath) match {
+      case Some(path) => ServletPath(path.replaceFirst("/api", ""))
+      case None => ServletPath(defaultServletPath)
+    }
+  }
+  //  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
+  //  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
 
 
   object EndPoints{
-    def codebook(id: String): Rx[String] = port.map{ curPort =>
-      s"http://localhost:${curPort.num}/$servletPath/codebook/$id"
+    def codebook(id: String): Rx[String] =
+      (port |@| servletPath).map{(curPort, sPath) =>
+        s"http://localhost:${curPort.num}/${sPath.path}/codebook/$id"
     }
   }
-
-  class Todo(val title: String, val completed: Boolean)
-  object Todo {
-    def apply(title: String, completed: Boolean) = new Todo(title, completed)
-    def unapply(todo: Todo) = Option((todo.title, todo.completed))
-  }
-
-  case class TodoList(text: String, hash: String, items: Rx[Seq[Todo]])
 
   class Codebook(val handle: String) {
     def model: Rx[List[(String, List[String])]] = {
