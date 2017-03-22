@@ -121,14 +121,15 @@ object Ced2ar extends JSApp {
     uriMaybe
   }
 
+  val defaultScheme = "https"
+  val defaultHost = "localhost"
   val defaultPort = 8080
   val defaultServletPath = "ced2ar-web"
-  val defaultHost = "localhost"
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
     "apiUriApp",
-    s"http://localhost:$defaultPort/$defaultServletPath/api"
+    s"$defaultScheme://$defaultHost:$defaultPort/$defaultServletPath/api"
   )
 
 
@@ -138,13 +139,14 @@ object Ced2ar extends JSApp {
     case (Some(lUri), Some(sUri)) => sUri
     case (Some(lUri), None) => lUri
     case (None, Some(sUri)) => sUri
-    case (None, None) =>  URI.create(s"http://$defaultHost:$defaultPort/$defaultServletPath/error")
+    case (None, None) =>
+      URI.create(s"$defaultScheme://$defaultHost:$defaultPort/$defaultServletPath/api")
   }
 
   sealed case class Port(num: Int)
   sealed case class ServletPath(path: String)
   sealed case class Host(host: String)
-
+  sealed case class UriScheme(scheme: String)
 
   implicit val port: Rx[Port] = currentApiUri.map{ curUri =>
     Option(curUri.getPort) match {
@@ -164,17 +166,28 @@ object Ced2ar extends JSApp {
       case None => Host(defaultHost)
     }
   }
+  implicit val uriScheme: Rx[UriScheme] = currentApiUri.map{ curUri =>
+    Option(curUri.getScheme) match {
+      case Some(scheme) => UriScheme(scheme)
+      case None => UriScheme(defaultScheme)
+    }
+  }
 
-  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
-  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
-  servletPath.impure.foreach(spath => println(s"current spath is ${spath.path}")) // DEBUG
+//  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
+//  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
+//  servletPath.impure.foreach(spath => println(s"current spath is ${spath.path}")) // DEBUG
 
 
   object EndPoints{
-    def codebook(id: String): Rx[String] =
-      (host |@| port |@| servletPath).map{(curHost, curPort, sPath) =>
-        s"http://${curHost.host}:${curPort.num}/${sPath.path}/codebook/$id"
+
+    val baseUri: Rx[String] = (uriScheme |@| host |@| port |@| servletPath).map {
+      (curScheme, curHost, curPort, sPath) =>
+        s"${curScheme.scheme}://${curHost.host}:${curPort.num}/${sPath.path}"
     }
+
+    def codebook(id: String): Rx[String] = baseUri.map{baseUriStr =>
+        s"$baseUriStr/codebook/$id"
+      }
   }
 
   class Codebook(val handle: String) {
