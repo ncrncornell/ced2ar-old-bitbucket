@@ -5,7 +5,7 @@
 
 	<groupId>edu.ncrn.cornell</groupId>
 	<artifactId>ced2ar3</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>${ced2ar.version}</version>
     <modules>
         <module>rdb</module>
         <module>rdb-tests</module>
@@ -27,6 +27,7 @@
 	</parent>
 
 	<properties>
+        <ced2ar.version>3.0.0-RC1-SNAPSHOT</ced2ar.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
         <scala.version.major>2.12</scala.version.major>

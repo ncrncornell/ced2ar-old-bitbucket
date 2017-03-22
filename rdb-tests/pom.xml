@@ -5,7 +5,7 @@
     <parent>
         <artifactId>ced2ar3</artifactId>
         <groupId>edu.ncrn.cornell</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${ced2ar.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
