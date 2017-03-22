@@ -3,6 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <properties>
+        <circe.version>0.7.0</circe.version>
+    </properties>
+
     <parent>
         <artifactId>ced2ar3</artifactId>
         <groupId>edu.ncrn.cornell</groupId>
@@ -25,17 +29,17 @@
         <dependency>
             <groupId>io.circe</groupId>
             <artifactId>circe-core_${scala.version.major}</artifactId>
-            <version>0.7.0</version>
+            <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
             <artifactId>circe-generic_${scala.version.major}</artifactId>
-            <version>0.7.0</version>
+            <version>${circe.version}</version>
         </dependency>
         <dependency>
             <groupId>io.circe</groupId>
             <artifactId>circe-parser_${scala.version.major}</artifactId>
-            <version>0.7.0</version>
+            <version>${circe.version}</version>
         </dependency>
 
         <dependency>

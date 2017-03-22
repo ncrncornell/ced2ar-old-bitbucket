@@ -122,7 +122,8 @@ object Ced2ar extends JSApp {
   }
 
   val defaultPort = 8080
-  val defaultServletPath = "ced2ar-web" //TODO: make an Rx?
+  val defaultServletPath = "ced2ar-web"
+  val defaultHost = "localhost"
 
   val apiUriApp = new SpecifyUri(
     "Enter the API URI for the CED2AR server to use:",
@@ -137,33 +138,42 @@ object Ced2ar extends JSApp {
     case (Some(lUri), Some(sUri)) => sUri
     case (Some(lUri), None) => lUri
     case (None, Some(sUri)) => sUri
-    case (None, None) =>  URI.create(s"http://localhost:$defaultPort/$defaultServletPath/error")
+    case (None, None) =>  URI.create(s"http://$defaultHost:$defaultPort/$defaultServletPath/error")
   }
 
   sealed case class Port(num: Int)
   sealed case class ServletPath(path: String)
+  sealed case class Host(host: String)
+
 
   implicit val port: Rx[Port] = currentApiUri.map{ curUri =>
     Option(curUri.getPort) match {
-      case Some(prt) => Port(prt)
+      case Some(prt) => if (prt < 0) Port(80) else Port(prt)
       case None => Port(defaultPort)
     }
   }
-
   implicit val servletPath: Rx[ServletPath] = currentApiUri.map{ curUri =>
     Option(curUri.getPath) match {
-      case Some(path) => ServletPath(path.replaceFirst("/api", ""))
+      case Some(path) => ServletPath(path.replaceFirst("/api", "").replaceFirst("/", ""))
       case None => ServletPath(defaultServletPath)
     }
   }
-  //  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
-  //  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
+  implicit val host: Rx[Host] = currentApiUri.map{ curUri =>
+    Option(curUri.getHost) match {
+      case Some(hostStr) => Host(hostStr)
+      case None => Host(defaultHost)
+    }
+  }
+
+  currentApiUri.impure.foreach{uri => println(s"uri is ${uri.toString}")} // DEBUG
+  port.impure.foreach(prt => println(s"current port is ${prt.num}")) // DEBUG
+  servletPath.impure.foreach(spath => println(s"current spath is ${spath.path}")) // DEBUG
 
 
   object EndPoints{
     def codebook(id: String): Rx[String] =
-      (port |@| servletPath).map{(curPort, sPath) =>
-        s"http://localhost:${curPort.num}/${sPath.path}/codebook/$id"
+      (host |@| port |@| servletPath).map{(curHost, curPort, sPath) =>
+        s"http://${curHost.host}:${curPort.num}/${sPath.path}/codebook/$id"
     }
   }
 
@@ -224,7 +234,7 @@ object Ced2ar extends JSApp {
       <div>
         <p>
         {currentApiUri.map{curUri =>
-          s"Current API URI: ${curUri.toString} with port ${curUri.getPort}"
+          s"Current API URI: ${curUri.toString}"
         }}
         </p>
         {apiUriApp.app._1}
