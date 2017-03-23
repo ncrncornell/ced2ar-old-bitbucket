@@ -63,7 +63,6 @@ object Ced2ar extends JSApp {
   def localApiUri = dom.window.location.href.replaceFirst("/app", "/api")
 
   //TODO: move to util package or something
-  //FIXME: Need to change form to not use onsubmit but just button-based events!!!!!!!!!
   class SpecifyUri(val prompt: String, formId: String, defaultUrl: String) {
     val currentUrl = Var(URI.create(defaultUrl))
     def app: (Node, Rx[URI]) = {
@@ -269,6 +268,35 @@ object Ced2ar extends JSApp {
   }
 
   object View {
+    val ced2ar = "CED<sup>2</sup>AR"
+
+    lazy val cssUrls = Seq(
+      "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css",
+      "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css",
+      "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
+    )
+
+    def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
+    def masterTable(content: Node): Node =
+      <table cls = "table table-striped table-hover">{content}</table>
+    def indentDiv(content: Node): Node =
+      <div class = "container-fluid" style = "margin-left: 3%">{content}</div>
+
+    lazy val topBanner: Node =
+      <div class = "navbar" style = "background-color: #B40404;">
+        <div>
+          <div style = "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
+            <h1 style = "color: #FFFFFF">{" " * 3 + ced2ar}</h1>
+            <h5 style = "color: #FFFFFF">{" " * 5 +
+              "Development Server - The Comprehensive Extensible Data Documentation and Access Repository"
+            }</h5>
+          </div>
+          <div class = "row">
+            <div class = "col-sm-12"> </div>
+          </div>
+        </div>
+      </div>
+
 
     val testCodebook: Rx[Codebook] = currentApiUri.map{cau => new Codebook("ssbv602")}
 

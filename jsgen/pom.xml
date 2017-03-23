@@ -108,7 +108,7 @@
                                             <arg value="C:\Program Files (x86)\sbt\bin\sbt.bat"/>
                                             <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
                                             <!--<arg value="${scala.js.opt}"/>-->
-                                            <arg value="fastOptJS"/>
+                                            <arg value="fastOptJS::webpack"/>
                                         </exec>
                                     </target>
                                 </configuration>

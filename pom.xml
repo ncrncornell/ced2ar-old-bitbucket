@@ -36,7 +36,7 @@
             ${scala.version.major}.${scala.version.minor}
         </scala.version>
         <junit.gen5.version>5.0.0-ALPHA</junit.gen5.version>
-        <scala.js.opt>fastOptJS</scala.js.opt>
+        <scala.js.opt>fastOptJS::webpack</scala.js.opt>
         <scala.js.optshort>fast</scala.js.optshort>
     </properties>
 
@@ -76,7 +76,7 @@
                 <!-- see https://youtrack.jetbrains.com/issue/IDEA-107048 -->
             </dependencies>
             <properties>
-                <scala.js.opt>fullOptJS</scala.js.opt>
+                <scala.js.opt>fullOptJS::webpack</scala.js.opt>
                 <scala.js.optshort></scala.js.optshort>
             </properties>
         </profile>

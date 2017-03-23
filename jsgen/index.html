@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<!-- NOTE: this page is used for development only; in general, you'll want to make sure
+<!-- NOTE: this page is used for development or custom-use only;
+  -- in general, you'll want to make sure
   -- that it closely matches the contents of /app served by CED2AR -->
 <html>
 <head>
@@ -10,9 +11,7 @@
     <!--<link rel="stylesheet" href="node_modules/todomvc-app-css/index.css"/>-->
 </head>
 <body>
-  <script type="text/javascript" src="./target/scala-2.12/ced2ar3-view-jsdeps.js"></script>
-  <script type="text/javascript" src="./target/scala-2.12/ced2ar3-view-fastopt.js"></script>
   <div id="application-container"></div>
-  <script type="text/javascript"> edu.ncrn.cornell.site.view.Ced2ar().main(); </script>
-  </body>
+  <script type="text/javascript" src="./target/scala-2.12/scalajs-bundler/main/ced2ar3-view-fastopt-bundle.js"></script>
+ </body>
 </html>

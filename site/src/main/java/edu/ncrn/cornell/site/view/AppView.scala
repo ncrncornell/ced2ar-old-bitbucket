@@ -19,8 +19,10 @@ class AppView extends Ced2arView {
       body(
         masterDiv(
           div(id := "application-container"),
-          script(`type` := "application/javascript",
-            "edu.ncrn.cornell.site.view.Ced2ar().main();"
+          script(
+            `type` := "application/javascript",
+            src := //FIXME: config to use fullopt from pom.
+            s"$servletPath/scalajs-bundler/main/ced2ar3-view-fastopt-bundle.js"
           )
         )
       )
