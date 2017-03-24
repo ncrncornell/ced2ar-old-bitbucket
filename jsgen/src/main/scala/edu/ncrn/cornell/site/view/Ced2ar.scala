@@ -5,8 +5,7 @@ package edu.ncrn.cornell.site.view
 import java.net.URI
 
 import scala.scalajs.js.JSApp
-import scala.xml.Elem
-import scala.xml.Node
+import scala.xml.{Elem, Group, Node, Text}
 import mhtml._
 import cats.implicits._
 import mhtml.implicits.cats._
@@ -268,9 +267,11 @@ object Ced2ar extends JSApp {
   }
 
   object View {
-    val ced2ar = "CED<sup>2</sup>AR"
+    val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
+//    def masterDiv(content: Rx[Node]): Node = <div class="container-fluid">{content}</div>
+
     def masterTable(content: Node): Node =
       <table cls = "table table-striped table-hover">{content}</table>
     def indentDiv(content: Node): Node =
@@ -280,7 +281,8 @@ object Ced2ar extends JSApp {
       <div class = "navbar" style = "background-color: #B40404;">
         <div>
           <div style = "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
-            <h1 style = "color: #FFFFFF">{" " * 3 + ced2ar}</h1>
+            <!-- <h1 style = "color: #FFFFFF">{" " * 3 + ced2ar}</h1> -->
+            <h1 style = "color: #FFFFFF">{Text(" " * 3)}{ced2ar}</h1>
             <h5 style = "color: #FFFFFF">{" " * 5 +
               "Development Server - The Comprehensive Extensible Data Documentation and Access Repository"
             }</h5>
@@ -296,21 +298,22 @@ object Ced2ar extends JSApp {
 
     def index: Node = {masterDiv(
       <div>
-        <p>Testing codebook view:</p>
-          {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
+        {topBanner}
+        {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
       </div>
     )}
   }
 
   def main(): Unit = {
     val cssUrls = Seq(
-      "/target/bootstrap.min.css",
-      "/target/bootstrap-theme.min.css"
+      "./target/bootstrap.min.css",
+      "./target/bootstrap-theme.min.css"
     )
     dom.document.getElementsByTagName("head").headOption match {
       case Some(head) =>
-        val linkRelCss = cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>)
-        // mount(head, linkRelCss) //FIXME
+        val linkRelCss =
+         Group(cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>))
+        mount(head, linkRelCss)
       case None => println("WARNING: no <head> element in enclosing document!")
     }
 
