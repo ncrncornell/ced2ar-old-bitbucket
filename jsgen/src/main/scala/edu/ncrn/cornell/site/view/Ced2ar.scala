@@ -269,6 +269,8 @@ object Ced2ar extends JSApp {
   object View {
     val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
+    def space(nn: Int): Node = Group((0 until nn).map{_ => <span>&nbsp;</span>})
+
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
 
     def masterTable(content: Node): Node =
@@ -280,10 +282,10 @@ object Ced2ar extends JSApp {
       <div class = "navbar" style = "background-color: #B40404;">
         <div>
           <div style = "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
-            <h1 style = "color: #FFFFFF"><!-- FIXME: {Text("&nbsp;").text}-->{ced2ar}</h1>
-            <h5 style = "color: #FFFFFF">{" " * 5 +
-              "Development Server - The Comprehensive Extensible Data Documentation and Access Repository"
-            }</h5>
+            <h1 style = "color: #FFFFFF">{space(3)}{ced2ar}</h1>
+            <h5 style = "color: #FFFFFF">{space(5)}
+              Development Server - The Comprehensive Extensible Data Documentation and Access Repository
+            </h5>
           </div>
           <div class = "row">
             <div class = "col-sm-12"> </div>
