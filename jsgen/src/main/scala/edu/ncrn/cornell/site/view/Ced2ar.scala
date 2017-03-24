@@ -5,7 +5,7 @@ package edu.ncrn.cornell.site.view
 import java.net.URI
 
 import scala.scalajs.js.JSApp
-import scala.xml.{Elem, Group, Node, Text}
+import scala.xml._
 import mhtml._
 import cats.implicits._
 import mhtml.implicits.cats._
@@ -270,7 +270,6 @@ object Ced2ar extends JSApp {
     val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
-//    def masterDiv(content: Rx[Node]): Node = <div class="container-fluid">{content}</div>
 
     def masterTable(content: Node): Node =
       <table cls = "table table-striped table-hover">{content}</table>
@@ -281,8 +280,7 @@ object Ced2ar extends JSApp {
       <div class = "navbar" style = "background-color: #B40404;">
         <div>
           <div style = "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
-            <!-- <h1 style = "color: #FFFFFF">{" " * 3 + ced2ar}</h1> -->
-            <h1 style = "color: #FFFFFF">{Text(" " * 3)}{ced2ar}</h1>
+            <h1 style = "color: #FFFFFF"><!-- FIXME: {Text("&nbsp;").text}-->{ced2ar}</h1>
             <h5 style = "color: #FFFFFF">{" " * 5 +
               "Development Server - The Comprehensive Extensible Data Documentation and Access Repository"
             }</h5>
@@ -293,12 +291,40 @@ object Ced2ar extends JSApp {
         </div>
       </div>
 
+    lazy val navBar: Node = <nav class = "navbar navbar-inverse">
+      <div class = "navbar-collapse">
+        <ul class = "nav navbar-nav">
+          <li class = "divider-vertical hidden-xs"/>
+          <li class = "dropdown">
+            <a href = "#" class = "dropdown-toggle" data-toggle = "dropdown">
+              Browse Variables <b class = "caret"/>
+            </a>
+            <ul class = "dropdown-menu">
+              <li><a href ="#">View All</a></li>
+              <li><a href ="#">Sort Alphabetically</a></li>
+              <li><a href ="#">Sort by Group</a></li>
+            </ul>
+          </li>
+          {
+            val navItems = Seq(
+              "Browse by Codebook", "Browse by Variable", "Upload a Codebook",
+              "Documentation", "About"
+            )
+            navItems.map(nItem => Group(
+                <li class="divider-vertical hidden-xs"/>
+                <li><a href="#">{nItem}</a></li>
+            ))
+          }
+        </ul>
+      </div>
+    </nav>
 
     val testCodebook: Rx[Codebook] = currentApiUri.map{cau => new Codebook("ssbv602")}
 
     def index: Node = {masterDiv(
       <div>
         {topBanner}
+        {navBar}
         {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
       </div>
     )}
