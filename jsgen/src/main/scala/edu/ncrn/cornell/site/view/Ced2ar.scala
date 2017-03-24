@@ -270,12 +270,6 @@ object Ced2ar extends JSApp {
   object View {
     val ced2ar = "CED<sup>2</sup>AR"
 
-    lazy val cssUrls = Seq(
-      "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css",
-      "//netdna.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css",
-      "http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
-    )
-
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
     def masterTable(content: Node): Node =
       <table cls = "table table-striped table-hover">{content}</table>
@@ -300,15 +294,26 @@ object Ced2ar extends JSApp {
 
     val testCodebook: Rx[Codebook] = currentApiUri.map{cau => new Codebook("ssbv602")}
 
-    def index: Node = {
+    def index: Node = {masterDiv(
       <div>
         <p>Testing codebook view:</p>
           {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
       </div>
-    }
+    )}
   }
 
   def main(): Unit = {
+    val cssUrls = Seq(
+      "/target/bootstrap.min.css",
+      "/target/bootstrap-theme.min.css"
+    )
+    dom.document.getElementsByTagName("head").headOption match {
+      case Some(head) =>
+        val linkRelCss = cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>)
+        // mount(head, linkRelCss) //FIXME
+      case None => println("WARNING: no <head> element in enclosing document!")
+    }
+
     val div = dom.document.getElementById("application-container")
     mount(div, View.index)
   }

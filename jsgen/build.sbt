@@ -1,4 +1,4 @@
-import java.nio.file.Files
+import java.nio.file.{Files, StandardCopyOption}
 
 name := "ced2ar3-view"
 
@@ -10,26 +10,28 @@ lazy val mhtmlV = "0.3.0-RC1" //TODO: also set from mvn if possible
 val circeVersion = "0.7.0"
 
 lazy val copyCss = TaskKey[Unit]("copyCss")
-// FIXME; need: copyCss dependsOn webpack
-val cssInPath = "target/scala-2.12/scalajs-bundler/main/node_modules/bootstrap/dist/css"
-val cssOutPath = "scala-2.12/scalajs-bundler"
-
+val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
+val cssInPaths = List("bootstrap/dist/css")
 
 lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     // TODO: maybe later? requires system has yarn installed:
-    // useYarn := true
+    useYarn := true
     // Execute the tests in browser-like environment:
-    requiresDOM in Test := true
+    ,requiresDOM in Test := true
     ,copyCss <<= (baseDirectory, target, streams) map {
       (base, trg, strms) =>
-        val absOutPath: File = new File(trg, cssOutPath)
-        new File(base, cssInPath).listFiles().foreach { file =>
-          strms.log.info(
-            s"copying ${file.toPath.toString} to ${absOutPath.toPath.toString}"
-          )
-          Files.copy(file.toPath, new File(absOutPath, file.name).toPath)
+        cssInPaths.map{csp => new File(nodeModulesDir, csp).toPath.toString}.foreach{cssInPath =>
+          new File(base, cssInPath).listFiles().foreach { file =>
+            strms.log.info(
+              s"copying ${file.toPath.toString} to ${trg.toPath.toString}"
+            )
+            Files.copy(
+              file.toPath, new File(trg, file.name).toPath,
+              StandardCopyOption.REPLACE_EXISTING
+            )
+          }
         }
     }
     ,webpackConfigFile in fullOptJS := Some(baseDirectory.value / "prod.webpack.config.js")

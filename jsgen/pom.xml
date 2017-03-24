@@ -109,6 +109,7 @@
                                             <!-- FIXME: http://stackoverflow.com/questions/41191324/how-can-a-maven-property-be-used-in-a-maven-attribute -->
                                             <!--<arg value="${scala.js.opt}"/>-->
                                             <arg value="fastOptJS::webpack"/>
+                                            <arg value="copyCss"/>
                                         </exec>
                                     </target>
                                 </configuration>
@@ -151,6 +152,7 @@
                             <!--executable>/usr/local/Cellar/sbt/0.13.9/bin/sbt</executable-->
                             <arguments>
                                 <argument>${scala.js.opt}</argument>
+                                <argument>copyCss</argument>
                             </arguments>
                         </configuration>
                     </plugin>
