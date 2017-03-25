@@ -8,6 +8,7 @@ import scala.scalajs.js.JSApp
 import scala.xml._
 import mhtml._
 import cats.implicits._
+import com.sun.xml.internal.fastinfoset.UnparsedEntity
 import mhtml.implicits.cats._
 import org.scalajs.dom
 import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
@@ -269,7 +270,7 @@ object Ced2ar extends JSApp {
   object View {
     val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
-    def space(nn: Int): Node = Group((0 until nn).map{_ => <span>&nbsp;</span>})
+    def space(nn: Int): Node = Group((0 until nn).map{_ => EntityRef("nbsp")})
 
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
 
