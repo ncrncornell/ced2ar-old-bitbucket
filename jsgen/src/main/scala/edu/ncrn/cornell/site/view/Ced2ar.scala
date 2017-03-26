@@ -270,7 +270,7 @@ object Ced2ar extends JSApp {
   object View {
     val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
-    def space(nn: Int): Node = Group((0 until nn).map{_ => EntityRef("nbsp")})
+    def space(nn: Int): Node = Group(Seq.fill(nn)(EntityRef("nbsp")))
 
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
 
@@ -341,7 +341,7 @@ object Ced2ar extends JSApp {
     dom.document.getElementsByTagName("head").headOption match {
       case Some(head) =>
         val linkRelCss =
-         Group(cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>))
+          Group(cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>))
         mount(head, linkRelCss)
       case None => println("WARNING: no <head> element in enclosing document!")
     }
