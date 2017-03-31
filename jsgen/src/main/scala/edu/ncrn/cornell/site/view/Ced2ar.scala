@@ -36,10 +36,6 @@ object Ced2ar extends JSApp {
 
   object Utils {
 
-//    def domList[T](dl: DOMList[T]): List[T] = {
-//      val size = dl.length
-//      (0 until size).map(ii => dl.item(ii))(breakOut)
-//    }
 
     def fromFuture[T](future: Future[T]): Rx[Option[Try[T]]] = {
       val result = Var(Option.empty[Try[T]])
@@ -47,14 +43,6 @@ object Ced2ar extends JSApp {
       result
     }
 
-    def inputEvent(f: HTMLInputElement => Unit): Event => Unit = {
-      event: Event =>
-        event.target match {
-          case e: HTMLInputElement =>
-            f(e)
-          case _ =>
-        }
-    }
   }
 
 
