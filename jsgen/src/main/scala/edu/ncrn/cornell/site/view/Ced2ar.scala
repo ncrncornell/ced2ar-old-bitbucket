@@ -322,6 +322,7 @@ object Ced2ar extends JSApp {
   }
 
   def main(): Unit = {
+    println("Hello!")
     val cssUrls = Seq(
       "./target/bootstrap.min.css",
       "./target/bootstrap-theme.min.css"

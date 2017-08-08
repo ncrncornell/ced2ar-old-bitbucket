@@ -10,8 +10,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <scalajs.version>0.6.14</scalajs.version>
-        <mhtml.version>0.3.0</mhtml.version>
+        <scalajs.version>0.6.18</scalajs.version>
+        <mhtml.version>0.3.2</mhtml.version>
     </properties>
 
     <artifactId>ced2ar3-jsgen</artifactId>
