@@ -9,6 +9,7 @@ import scala.xml._
 import mhtml._
 import cats.implicits._
 import com.sun.xml.internal.fastinfoset.UnparsedEntity
+import edu.ncrn.cornell.site.view.editor.{Editor, NeptuneStyles}
 import mhtml.implicits.cats._
 import org.scalajs.dom
 import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
@@ -28,6 +29,8 @@ import scala.util.{Failure, Success, Try}
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import io.circe._
 import io.circe.parser._
+
+import scalacss.ProdDefaults._
 
 import scala.collection.breakOut
 
@@ -337,5 +340,9 @@ object Ced2ar extends JSApp {
 
     val div = dom.document.getElementById("application-container")
     mount(div, View.index)
+
+    //TODO: make a component:
+    NeptuneStyles.addToDocument()
+    Editor.neptune(dom.document.getElementById("my-editor"))
   }
 }

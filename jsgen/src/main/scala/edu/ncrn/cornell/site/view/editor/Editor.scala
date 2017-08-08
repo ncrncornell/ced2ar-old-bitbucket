@@ -1,0 +1,146 @@
+package edu.ncrn.cornell.site.view.editor
+
+import org.scalajs.dom
+import dom.{ document, window }
+import dom.html._
+import dom.raw.MouseEvent
+import scala.scalajs.js.annotation.JSExportTopLevel
+import scalacss.ProdDefaults._
+
+/**
+
+  MIT license follows:
+
+  Copyright (c) 2017 Amir Karimi
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+  */
+
+@JSExportTopLevel("Editor")
+object Editor {
+  case class Action(icon: String, title: String, command: () => Unit)
+
+  object Act {
+    def apply(icon: String, title: String)(command: => Unit): Action = {
+      Action.apply(icon, title, () => command)
+    }
+  }
+
+  case class Settings(actions: Seq[Action] = actions, styleWithCss: Boolean = false)
+
+  val actions = Seq(
+    Act("<b>B</b>", "Bold") {
+      exec("bold")
+    },
+    Act("<i>I</i>", "Italic") {
+      exec("italic")
+    },
+    Act("<u>U</u>", "Underline") {
+      exec("underline")
+    },
+    Act("<strike>S</strike>", "strikeThrough") {
+      exec("strikeThrough")
+    },
+    Act("<b>H<sub>1</sub></b>", "Heading 1") {
+      exec("formatBlock", "<H1>")
+    },
+    Act("<b>H<sub>2</sub></b>", "Heading 2") {
+      exec("formatBlock", "<H2>")
+    },
+    Act("&#182;", "Paragraph") {
+      exec("formatBlock", "<P>")
+    },
+    Act("&#8220; &#8221;", "Quote") {
+      exec("formatBlock", "<BLOCKQUOTE>")
+    },
+    Act("&#35;", "Ordered List") {
+      exec("insertOrderedList")
+    },
+    Act("&#8226;", "Unordered List") {
+      exec("insertUnorderedList")
+    },
+    Act("&lt;/&gt;", "Code") {
+      exec("formatBlock", "<PRE>")
+    },
+    Act("&#8213;", "Horizontal Line") {
+      exec("insertHorizontalRule")
+    },
+    Act("&#128279;", "Link") {
+      val url = window.prompt("Enter the link URL")
+      if (url.nonEmpty) exec("createLink", url)
+    },
+    Act("&#128247;", "Image") {
+      val url = window.prompt("Enter the image URL")
+      if (url.nonEmpty) exec("insertImage", url)
+    }
+  )
+
+  private def exec(command: String) = {
+    document.execCommand(command, false, null)
+  }
+
+  private def exec(command: String, value: scalajs.js.Any) = {
+    document.execCommand(command, false, value)
+  }
+
+  @JSExportTopLevel("neptune")
+  def neptune(element: dom.Element, settings: Settings = Settings()): Html = {
+    element match {
+      case element: dom.html.Element => element.className = NeptuneStyles.neptune.htmlClass
+      case other => // Don't know how to settup className for non-html element
+    }
+
+    val actionbar = document.createElement("div").asInstanceOf[Div]
+    actionbar.className = NeptuneStyles.neptuneActionbar.htmlClass // TODO: settings.classes.actionbar
+    element.appendChild(actionbar)
+
+    val content = document.createElement("div").asInstanceOf[Html]
+    content.contentEditable = "true"
+    content.className = NeptuneStyles.neptuneContent.htmlClass
+    content.onkeydown = preventTab
+    element.appendChild(content)
+
+    actions.foreach { action =>
+      val button = document.createElement("button").asInstanceOf[Button]
+      button.className = NeptuneStyles.neptuneButton.htmlClass // TODO: settings.classes.button
+      button.innerHTML = action.icon
+      button.title = action.title
+      button.onclick = { (e: MouseEvent) => action.command() }
+      actionbar.appendChild(button)
+    }
+
+    if (settings.styleWithCss) exec("styleWithCSS")
+
+    content
+  }
+
+  val preventTab: (dom.KeyboardEvent => Any) = { e => 
+    if (e.keyCode == 9) e.preventDefault()
+  }
+}
+
+//
+//object Main {
+//
+//  def main(args: Array[String]): Unit = {
+//    NeptuneStyles.addToDocument()
+//    // TODO
+//    Neptune.neptune(document.getElementById("my-editor"))
+//  }
+//}
