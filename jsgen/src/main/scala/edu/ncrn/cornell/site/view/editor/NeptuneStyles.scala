@@ -5,6 +5,8 @@ import scalacss.DevDefaults._
 
   /**
 
+  Adapted from https://github.com/amirkarimi/neptune
+
   MIT license follows:
 
   Copyright (c) 2017 Amir Karimi

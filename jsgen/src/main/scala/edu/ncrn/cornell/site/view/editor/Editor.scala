@@ -1,13 +1,18 @@
 package edu.ncrn.cornell.site.view.editor
 
 import org.scalajs.dom
-import dom.{ document, window }
+import dom.{document, window}
 import dom.html._
 import dom.raw.MouseEvent
+import edu.ncrn.cornell.site.view.component.Component
+import mhtml.{Rx, Var}
+
 import scala.scalajs.js.annotation.JSExportTopLevel
-import scalacss.ProdDefaults._
+import scala.xml.Node
 
 /**
+
+  Adapted from https://github.com/amirkarimi/neptune
 
   MIT license follows:
 
@@ -130,17 +135,31 @@ object Editor {
     content
   }
 
-  val preventTab: (dom.KeyboardEvent => Any) = { e => 
-    if (e.keyCode == 9) e.preventDefault()
+  //TODO: To be a replacement for neptune editor, but in mhtml
+  def editor(settings: Settings = Settings()): Component[Node] = {
+    // TODO: settings.classes.actionbar
+    val actionBar = <div class={NeptuneStyles.neptuneActionbar.htmlClass}>{
+      actions.map { action =>
+        <button class={ NeptuneStyles.neptuneButton.htmlClass }
+          title={ action.title }
+          onclick={ (ev: MouseEvent) => action.command() }
+        >{ action.icon }</button>
+      }
+    }</div>
+
+    val content =
+      Rx(<div class={NeptuneStyles.neptuneContent.htmlClass}
+           contentEditable="true" onkeydown={preventTab _} />)
+
+    val view = <div>{actionBar}{content}</div>
+
+    if (settings.styleWithCss) exec("styleWithCSS")
+    Component(view, content)
   }
+
+
+  def preventTab(kev: dom.KeyboardEvent): Unit =
+    if (kev.keyCode == 9) kev.preventDefault()
+
 }
 
-//
-//object Main {
-//
-//  def main(args: Array[String]): Unit = {
-//    NeptuneStyles.addToDocument()
-//    // TODO
-//    Neptune.neptune(document.getElementById("my-editor"))
-//  }
-//}
