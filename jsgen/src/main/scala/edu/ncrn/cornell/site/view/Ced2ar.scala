@@ -315,17 +315,21 @@ object Ced2ar extends JSApp {
 
     val testCodebook: Rx[Codebook] = currentApiUri.map{cau => new Codebook("ssbv602")}
 
+    val testEditor = Editor.editor()
+
     def index: Node = {masterDiv(
       <div>
         {topBanner}
         {navBar}
         {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
+        {testEditor.view}
       </div>
     )}
   }
 
   def main(): Unit = {
     println("Hello!")
+    NeptuneStyles.addToDocument()
     val cssUrls = Seq(
       "./target/bootstrap.min.css",
       "./target/bootstrap-theme.min.css"
@@ -341,8 +345,5 @@ object Ced2ar extends JSApp {
     val div = dom.document.getElementById("application-container")
     mount(div, View.index)
 
-    //TODO: make a component:
-    NeptuneStyles.addToDocument()
-    Editor.neptune(dom.document.getElementById("my-editor"))
   }
 }
