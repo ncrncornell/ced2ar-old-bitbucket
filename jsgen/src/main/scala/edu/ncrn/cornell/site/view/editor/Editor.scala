@@ -1,13 +1,18 @@
 package edu.ncrn.cornell.site.view.editor
 
+import scala.scalajs.js
 import org.scalajs.dom
 import dom.{document, window}
-import dom.raw.MouseEvent
+import dom.raw.{MouseEvent, MutationObserver, MutationObserverInit, MutationRecord}
 import edu.ncrn.cornell.site.view.component.Component
 import mhtml.{Rx, Var}
+import org.scalajs.dom.html.Div
 
+import scala.concurrent.Future
 import scala.scalajs.js.annotation.JSExportTopLevel
 import scala.xml.{EntityRef, Group, Node, Text}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
 
@@ -103,8 +108,7 @@ object Editor {
     document.execCommand(command, false, value)
   }
 
-  //TODO: To be a replacement for neptune editor, but in mhtml
-  def editor(settings: Settings = Settings()): Component[Node] = {
+  def editor(settings: Settings = Settings()): Component[String] = {
     // TODO: settings.classes.actionbar
     val actionBar = <div class={NeptuneStyles.neptuneActionbar.htmlClass}>{
       actions.map { action =>
@@ -115,11 +119,41 @@ object Editor {
       }
     }</div>
 
-    val content =
-      Rx(<div class={NeptuneStyles.neptuneContent.htmlClass}
-           contentEditable="true" onkeydown={preventTab _} />)
 
-    val view = <div>{actionBar}{content}</div>
+    val content: Var[String] = Var("")
+
+    def updateContent(domNode: dom.html.Div): Unit = {
+      println("hello from updateContent")
+      Future[Unit] { //onmount workaround requires wrapping in Future
+        println("hello from updateContent (Future)")
+        val observerCallback = new Function2[js.Array[MutationRecord], MutationObserver, Unit] {
+          def apply(muts: js.Array[MutationRecord], obs: MutationObserver) = {
+            println("hello from observerCallback::apply")
+            //content := makeContentStore(updateContent, domNode.innerHTML)
+            content := domNode.innerHTML
+          }
+        }
+
+        val contentObserver: MutationObserver = new MutationObserver(observerCallback)
+        val contentObserverParams = new js.Object{
+          val subtree = true
+          val attributes = true
+          val childList =true
+          val characterData = true
+          val characterDataOldValue =true
+        }.asInstanceOf[MutationObserverInit]
+        contentObserver.observe(domNode, contentObserverParams)
+      }
+      ()
+    }
+
+    val contentStore = <div
+      class={NeptuneStyles.neptuneContent.htmlClass}
+      contentEditable="true" onkeydown={preventTab _}
+      mhtml-onmount={ updateContent _ }
+    />
+
+    val view = <div>{actionBar}{contentStore}</div>
 
     //if (settings.styleWithCss) exec("styleWithCSS")
     exec("styleWithCSS")

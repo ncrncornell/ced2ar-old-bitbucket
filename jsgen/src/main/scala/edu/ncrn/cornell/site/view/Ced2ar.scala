@@ -323,6 +323,9 @@ object Ced2ar extends JSApp {
         {navBar}
         {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
         {testEditor.view}
+        <h3>Begin editor output</h3>
+        {testEditor.model}
+        <h3>End editor output</h3>
       </div>
     )}
   }
