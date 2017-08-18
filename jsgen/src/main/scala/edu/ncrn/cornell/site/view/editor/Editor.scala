@@ -67,29 +67,29 @@ object Editor {
     Act(<b>H<sub>2</sub></b>, "Heading 2") {
       exec("formatBlock", "<H2>")
     },
-    Act(EntityRef("#182"), "Paragraph") {
+    Act(<div>¶</div>, "Paragraph") {
       exec("formatBlock", "<P>")
     },
-    Act(Group(Seq(EntityRef("#8220"), EntityRef("#8221"))), "Quote") {
+    Act(<div>“”</div>, "Quote") {
       exec("formatBlock", "<BLOCKQUOTE>")
     },
-    Act(EntityRef("#35"), "Ordered List") {
+    Act(<div>#</div>, "Ordered List") {
       exec("insertOrderedList")
     },
-    Act(EntityRef("#8226"), "Unordered List") {
+    Act(<div>•</div>, "Unordered List") {
       exec("insertUnorderedList")
     },
-    Act(Group(Seq(EntityRef("lt"), Text("/"), EntityRef("gt"))), "Code") {
+    Act(<div>&lt;/&gt;</div>, "Code") {
       exec("formatBlock", "<PRE>")
     },
-    Act(EntityRef("#8213"), "Horizontal Line") {
+    Act(<div>―</div>, "Horizontal Line") {
       exec("insertHorizontalRule")
     },
-    Act(EntityRef("#128279"), "Link") {
+    Act(<div>🔗</div>, "Link") {
       val url = window.prompt("Enter the link URL")
       if (url.nonEmpty) exec("createLink", url)
     },
-    Act(EntityRef("#128247"), "Image") {
+    Act(<div>📷</div>, "Image") {
       val url = window.prompt("Enter the image URL")
       if (url.nonEmpty) exec("insertImage", url)
     }
