@@ -9,7 +9,9 @@ import scala.xml._
 import mhtml._
 import cats.implicits._
 import com.sun.xml.internal.fastinfoset.UnparsedEntity
-import edu.ncrn.cornell.site.view.editor.{Editor, NeptuneStyles}
+import edu.ncrn.cornell.site.view.components.About
+import edu.ncrn.cornell.site.view.editor.Editor
+import edu.ncrn.cornell.site.view.routing.Router
 import mhtml.implicits.cats._
 import org.scalajs.dom
 import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
@@ -30,8 +32,6 @@ import fr.hmil.roshttp.response.SimpleHttpResponse
 import io.circe._
 import io.circe.parser._
 
-import scalacss.ProdDefaults._
-
 import scala.collection.breakOut
 
 
@@ -40,6 +40,7 @@ object Ced2ar extends JSApp {
   object Utils {
 
 
+    //TODO: use version now in in mhtml:
     def fromFuture[T](future: Future[T]): Rx[Option[Try[T]]] = {
       val result = Var(Option.empty[Try[T]])
       future.onComplete(x => result := Some(x))
@@ -47,8 +48,6 @@ object Ced2ar extends JSApp {
     }
 
   }
-
-
 
 
   def localApiUri = dom.window.location.href.replaceFirst("/app", "/api")
@@ -300,14 +299,17 @@ object Ced2ar extends JSApp {
             </ul>
           </li>
           {
-            val navItems = Seq(
-              "Browse by Codebook", "Browse by Variable", "Upload a Codebook",
-              "Documentation", "About"
+            val navItems = Map[String, String](
+              "Browse by Codebook" -> "#",
+              "Browse by Variable" -> "#",
+              "Upload a Codebook" -> "#",
+              "Documentation" -> "#",
+              "About" -> (Router.delim + "about")
             )
-            navItems.map(nItem => Group(
+            Group(navItems.toSeq.map(nItem =>  Group(
                 <li class="divider-vertical hidden-xs"/>
-                <li><a href="#">{nItem}</a></li>
-            ))
+                <li><a href={ nItem._2 }>{ nItem._1 }</a></li>
+            )))
           }
         </ul>
       </div>
@@ -317,22 +319,46 @@ object Ced2ar extends JSApp {
 
     val testEditor = Editor.editor()
 
+    val demoView = <div>
+      {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
+      {testEditor.view}
+      <h3>Begin editor output</h3>
+      {testEditor.model}
+      <h3>End editor output</h3>
+    </div>
+
+    val routePath: Rx[String] = Rx(dom.window.location.hash).merge{
+      val updatedHash = Var(dom.window.location.hash)
+      dom.window.onhashchange = (ev: Event) => {
+        updatedHash := dom.window.location.hash
+      }
+      updatedHash.map(hash => hash.replaceFirst(Router.delim, ""))
+    }
+
+    val aboutComp = About()
+
+    private def thisRoute(path: String): Node = {
+      val (curPath, childPath) = Router.splitRoute(path)
+
+      println(s"curPath is $curPath; path (dx) is $path") // DEBUG
+
+      if (curPath == "about") aboutComp.view
+      else demoView
+    }
+    val router = Router(routePath, thisRoute)
+
+
     def index: Node = {masterDiv(
       <div>
         {topBanner}
         {navBar}
-        {testCodebook.map{cb =>  cb.view(cb.model, cb.handle)}}
-        {testEditor.view}
-        <h3>Begin editor output</h3>
-        {testEditor.model}
-        <h3>End editor output</h3>
+        {router.view}
       </div>
     )}
   }
 
   def main(): Unit = {
     println("Hello!")
-    NeptuneStyles.addToDocument()
     val cssUrls = Seq(
       "./target/bootstrap.min.css",
       "./target/bootstrap-theme.min.css"

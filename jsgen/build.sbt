@@ -7,7 +7,7 @@ scalaVersion in ThisBuild := "2.12.1" // or any other Scala version >= 2.10.2
 
 lazy val mhtmlV = "0.3.2" //TODO: also set from mvn if possible
 
-val circeVersion = "0.7.0"
+val circeVersion = "0.8.0"
 
 lazy val copyCss = TaskKey[Unit]("copyCss")
 val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"

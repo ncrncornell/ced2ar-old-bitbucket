@@ -12,6 +12,7 @@
     <properties>
         <scalajs.version>0.6.18</scalajs.version>
         <mhtml.version>0.3.2</mhtml.version>
+        <circe.version>0.8.0</circe.version>
     </properties>
 
     <artifactId>ced2ar3-jsgen</artifactId>
@@ -77,6 +78,30 @@
             <artifactId>monix-reactive_${scala.version.major}</artifactId>
             <version>2.2.3</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.japgolly.scalacss</groupId>
+            <artifactId>core_${scala.version.major}</artifactId>
+            <version>0.5.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-core_${scala.version.major}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-generic_${scala.version.major}</artifactId>
+            <version>${circe.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.circe</groupId>
+            <artifactId>circe-parser_${scala.version.major}</artifactId>
+            <version>${circe.version}</version>
         </dependency>
 
     </dependencies>
