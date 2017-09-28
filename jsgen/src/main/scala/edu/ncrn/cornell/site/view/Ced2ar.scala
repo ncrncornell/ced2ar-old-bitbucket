@@ -61,16 +61,20 @@ object Ced2ar extends JSApp {
           <input type="text" placeholder={prompt}
                  id = {formId} /> <!--FIXME: make defaultUrl a constructor param -->
           <button onclick={ (ev: dom.Event) => {
-            val text: String = ev.srcElement.parentNode.childNodes.toIterable
-              .find(child => child.nodeName === "INPUT") match {
-              case Some(elem: html.Input) =>
-                println("found some element")
-                elem.value
-              case None =>
-                println("found no element")
-                defaultUrl
-              case _ =>
-                println(s"Error: unrecognized element for SpecifyUri($formId)")
+            val text: String = ev.target match {
+              case elem: dom.Element => elem.parentNode.childNodes.toIterable
+                .find(child => child.nodeName === "INPUT") match {
+                case Some(elem: html.Input) =>
+                  println("found some element")
+                  elem.value
+                case None =>
+                  println("found no element")
+                  defaultUrl
+                case _ =>
+                  println(s"Error: unrecognized element for SpecifyUri($formId)")
+                  defaultUrl
+              }
+              case _ => println("Event error!")
                 defaultUrl
             }
             currentUrl := URI.create(text) //FIXME: need to convert Unicode input to ascii
