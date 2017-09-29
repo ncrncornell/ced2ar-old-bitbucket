@@ -4,7 +4,6 @@ package edu.ncrn.cornell.site.view
 
 import java.net.URI
 
-import scala.scalajs.js.JSApp
 import scala.xml._
 import mhtml._
 import cats.implicits._
@@ -33,9 +32,13 @@ import io.circe._
 import io.circe.parser._
 
 import scala.collection.breakOut
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
-object Ced2ar extends JSApp {
+object Ced2ar {
+
+  @JSExportTopLevel("edu.ncrn.cornell.site.view")
+  protected def getInstance(): this.type = this
 
   object Utils {
 
@@ -357,7 +360,8 @@ object Ced2ar extends JSApp {
     )}
   }
 
-  def main(): Unit = {
+  @JSExport
+  def main(args: Array[String]): Unit = {
     println("Hello!")
     val cssUrls = Seq(
       "./target/css/bootstrap.min.css",
