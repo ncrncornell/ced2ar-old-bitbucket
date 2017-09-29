@@ -64,12 +64,8 @@ object Ced2ar extends JSApp {
             val text: String = ev.target match {
               case elem: dom.Element => elem.parentNode.childNodes.toIterable
                 .find(child => child.nodeName === "INPUT") match {
-                case Some(elem: html.Input) =>
-                  println("found some element")
-                  elem.value
-                case None =>
-                  println("found no element")
-                  defaultUrl
+                case Some(elem: html.Input) => elem.value.trim
+                case None => defaultUrl
                 case _ =>
                   println(s"Error: unrecognized element for SpecifyUri($formId)")
                   defaultUrl
@@ -364,8 +360,8 @@ object Ced2ar extends JSApp {
   def main(): Unit = {
     println("Hello!")
     val cssUrls = Seq(
-      "./target/bootstrap.min.css",
-      "./target/bootstrap-theme.min.css"
+      "./target/css/bootstrap.min.css",
+      "./target/css/bootstrap-theme.min.css"
     )
     dom.document.getElementsByTagName("head").headOption match {
       case Some(head) =>

@@ -19,7 +19,8 @@ import scalacss.ProdDefaults._
 
   MIT license follows:
 
-  Copyright (c) 2017 Amir Karimi, Cornell University
+  Copyright (c) 2017 Amir Karimi
+  Copyright (c) 2017 Cornell University
 
   */
 

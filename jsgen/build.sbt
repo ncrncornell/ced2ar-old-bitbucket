@@ -11,7 +11,11 @@ val circeVersion = "0.8.0"
 
 lazy val copyCss = TaskKey[Unit]("copyCss")
 val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
-val cssInPaths = List("bootstrap/dist/css", "bootstrap/dist/fonts")
+val cssInPaths = Map(
+  "bootstrap/dist/css" -> "/css/",
+  "bootstrap/dist/js" -> "/js/",
+  "bootstrap/dist/fonts" -> "/fonts/"
+)
 
 lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
@@ -23,16 +27,19 @@ lazy val view = (project in file("."))
     ,scalaJSUseMainModuleInitializer := true
     ,copyCss <<= (baseDirectory, target, streams) map {
       (base, trg, strms) =>
-        cssInPaths.map{csp => new File(nodeModulesDir, csp).toPath.toString}.foreach{cssInPath =>
-          new File(base, cssInPath).listFiles().foreach { file =>
-            strms.log.info(
-              s"copying ${file.toPath.toString} to ${trg.toPath.toString}"
-            )
-            Files.copy(
-              file.toPath, new File(trg, file.name).toPath,
-              StandardCopyOption.REPLACE_EXISTING
-            )
-          }
+        cssInPaths.toSeq.map{csp => (new File(nodeModulesDir, csp._1).toPath.toString, csp._2)}
+          .foreach{ case (cssInPath, relTarget) =>
+            new File(base, cssInPath).listFiles().foreach { file =>
+              strms.log.info(
+                s"copying ${file.toPath.toString} to ${trg.toPath.toString + relTarget}"
+              )
+              val newFile = new File(new File(trg.getName, relTarget), file.name)
+              newFile.mkdirs()
+              Files.copy(
+                file.toPath, newFile.toPath,
+                StandardCopyOption.REPLACE_EXISTING
+              )
+            }
         }
     }
     ,webpackConfigFile in fullOptJS := Some(baseDirectory.value / "prod.webpack.config.js")
