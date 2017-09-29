@@ -1,29 +1,30 @@
 package edu.ncrn.cornell.site.controller
 
 import edu.ncrn.cornell.service.ApiInfoService
+import edu.ncrn.cornell.site.controller.util.HandyServletContextAware
 import org.springframework.http.MediaType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation._
-import edu.ncrn.cornell.site.view.{AboutView, AppView}
+import edu.ncrn.cornell.site.view.AppView
+import org.springframework.web.servlet.View
+import org.springframework.web.servlet.view.RedirectView
 
 @Autowired
 @Controller
 @CrossOrigin //TODO: get allowed origins from config properties
 class MainController(
-  protected val aboutView: AboutView,
   protected val appView: AppView,
   protected val apiInfoService: ApiInfoService
-) {
+) extends HandyServletContextAware {
 
   @ResponseBody
   @RequestMapping(
     value = Array("/about"),
-    method = Array(RequestMethod.GET),
-    produces = Array(MediaType.TEXT_HTML_VALUE)
+    method = Array(RequestMethod.GET)
   )
-  def about(model: Model): String = aboutView.aboutPage
+  def about(model: Model): View = new RedirectView(s"$servletPath/app#/about")
 
 
   /**
