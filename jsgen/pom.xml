@@ -193,20 +193,62 @@
                 <version>3.0.2</version>
                 <executions>
                     <execution>
-                        <id>copy-resources</id>
+                        <id>copy-resources-js</id>
                         <!-- here the phase you need -->
                         <phase>process-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${basedir}/target/classes/public</outputDirectory>
+                            <outputDirectory>${basedir}/../site/target/classes/public</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>${basedir}/target/scala-${scala.version.major}</directory>
                                     <includes>
                                         <include>**/*.js</include>
                                         <include>**/*.js.map</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-css</id>
+                        <!-- here the phase you need -->
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/../site/target/classes/public/target</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target</directory>
+                                    <includes>
+                                        <include>*.css</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-fonts</id>
+                        <!-- here the phase you need -->
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/../site/target/classes/public/fonts</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target</directory>
+                                    <includes>
+                                        <include>*.ttf</include>
+                                        <include>*.woff</include>
+                                        <include>*.woff2</include>
                                     </includes>
                                     <filtering>false</filtering>
                                 </resource>

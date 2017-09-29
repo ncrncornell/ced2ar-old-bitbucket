@@ -1,7 +1,7 @@
 package edu.ncrn.cornell.site.view.editor
 
 import scala.language.postfixOps
-import scalacss.DevDefaults._
+import scalacss.ProdDefaults._
 
 /**
   * Copyright (c) 2017 Amir Karimi

@@ -10,7 +10,7 @@ import mhtml._
 import cats.implicits._
 import com.sun.xml.internal.fastinfoset.UnparsedEntity
 import edu.ncrn.cornell.site.view.components.About
-import edu.ncrn.cornell.site.view.editor.Editor
+import edu.ncrn.cornell.site.view.editor.{Editor, NeptuneStyles}
 import edu.ncrn.cornell.site.view.routing.Router
 import mhtml.implicits.cats._
 import org.scalajs.dom

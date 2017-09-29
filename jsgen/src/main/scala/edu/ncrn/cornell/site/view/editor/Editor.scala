@@ -8,11 +8,10 @@ import edu.ncrn.cornell.site.view.component.Component
 import mhtml.{Rx, Var}
 import org.scalajs.dom.html.Div
 
-import scala.concurrent.Future
-import scala.scalajs.js.annotation.JSExportTopLevel
-import scala.xml.{EntityRef, Group, Node, Text}
-
+import scala.concurrent.{Future, Promise}
+import scala.xml.Node
 import scala.concurrent.ExecutionContext.Implicits.global
+import scalacss.ProdDefaults._
 
 /**
 
@@ -20,29 +19,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
   MIT license follows:
 
-  Copyright (c) 2017 Amir Karimi
+  Copyright (c) 2017 Amir Karimi, Cornell University
 
-  Permission is hereby granted, free of charge, to any person obtaining a copy
-  of this software and associated documentation files (the "Software"), to deal
-  in the Software without restriction, including without limitation the rights
-  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  copies of the Software, and to permit persons to whom the Software is
-  furnished to do so, subject to the following conditions:
-
-  The above copyright notice and this permission notice shall be included in all
-  copies or substantial portions of the Software.
-
-  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-  SOFTWARE.
   */
 
-@JSExportTopLevel("Editor")
+
 object Editor {
+
+  val stylesLoaded: Promise[Unit] = Promise()
+
   case class Action(icon: Node, title: String, command: () => Unit)
 
   object Act {
@@ -109,60 +94,56 @@ object Editor {
   }
 
   def editor(settings: Settings = Settings()): Component[String] = {
+
+    stylesLoaded.isCompleted match {
+      case true => ()
+      case false =>
+        NeptuneStyles.addToDocument()
+        stylesLoaded.completeWith(Future(()))
+    }
+
     // TODO: settings.classes.actionbar
     val actionBar = <div class={NeptuneStyles.neptuneActionbar.htmlClass}>{
       actions.map { action =>
         <button class={ NeptuneStyles.neptuneButton.htmlClass }
-          title={ action.title }
-          onclick={ (ev: MouseEvent) => action.command() }
+                title={ action.title }
+                onclick={ (ev: MouseEvent) => action.command() }
         >{ action.icon }</button>
       }
     }</div>
 
-
     val content: Var[String] = Var("")
 
-    def updateContent(domNode: dom.html.Div): Unit = {
-      println("hello from updateContent")
-      Future[Unit] { //onmount workaround requires wrapping in Future
-        println("hello from updateContent (Future)")
-        val observerCallback = new Function2[js.Array[MutationRecord], MutationObserver, Unit] {
-          def apply(muts: js.Array[MutationRecord], obs: MutationObserver) = {
-            println("hello from observerCallback::apply")
-            //content := makeContentStore(updateContent, domNode.innerHTML)
-            content := domNode.innerHTML
-          }
-        }
-
-        val contentObserver: MutationObserver = new MutationObserver(observerCallback)
-        val contentObserverParams = new js.Object{
-          val subtree = true
-          val attributes = true
-          val childList =true
-          val characterData = true
-          val characterDataOldValue =true
-        }.asInstanceOf[MutationObserverInit]
-        contentObserver.observe(domNode, contentObserverParams)
+    def updateContent(domNode: Div): Unit = {
+      def observerCallback(muts: js.Array[MutationRecord], obs: MutationObserver) = {
+        content := domNode.innerHTML
       }
-      ()
+      val contentObserver: MutationObserver = new MutationObserver(observerCallback _)
+      val contentObserverParams = new js.Object{
+        val subtree = true
+        val attributes = true
+        val childList =true
+        val characterData = true
+        val characterDataOldValue =true
+      }.asInstanceOf[MutationObserverInit]
+      contentObserver.observe(domNode, contentObserverParams)
     }
 
     val contentStore = <div
       class={NeptuneStyles.neptuneContent.htmlClass}
       contentEditable="true" onkeydown={preventTab _}
       mhtml-onmount={ updateContent _ }
-    />
+      />
 
-    val view = <div>{actionBar}{contentStore}</div>
+    val view = <div>{ actionBar }{ contentStore }</div>
 
-    //if (settings.styleWithCss) exec("styleWithCSS")
-    exec("styleWithCSS")
+    if (settings.styleWithCss) exec("styleWithCSS")
     Component(view, content)
   }
-
 
   def preventTab(kev: dom.KeyboardEvent): Unit =
     if (kev.keyCode == 9) kev.preventDefault()
 
 }
+
 

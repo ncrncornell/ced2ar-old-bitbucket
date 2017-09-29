@@ -11,7 +11,7 @@ val circeVersion = "0.8.0"
 
 lazy val copyCss = TaskKey[Unit]("copyCss")
 val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
-val cssInPaths = List("bootstrap/dist/css")
+val cssInPaths = List("bootstrap/dist/css", "bootstrap/dist/fonts")
 
 lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
