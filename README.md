@@ -11,6 +11,9 @@
     ![IntelliJ Spring Boot Config](IntellijSpringBoot.png)
     4. Browse to [http://localhost:8080/ced2ar-rdb/app](http://localhost:8080/ced2ar-rdb/app), or if you've changed the default `spring.port` or ` server.contextPath` change `8080` or `/ced2ar-rdb` as appropriate. Note that `/app` takes you to the [SPA](https://en.wikipedia.org/wiki/Single-page_application) whereas `/codebook` will take you to a good entrypoint for the [MVC](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) application.
 
+Unfortunately, there is a [long-standing bug](https://youtrack.jetbrains.com/issue/IDEA-107048) in IntelliJ, so you may be better off using `mvn spring-boot:run` (should work for other IDEs as well):
+
+![IntelliJ Maven Run Config](IntellijMavenRun.png)
 
 # Configuring CED2AR
 
