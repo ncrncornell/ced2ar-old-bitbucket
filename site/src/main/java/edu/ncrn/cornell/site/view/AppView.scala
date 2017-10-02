@@ -17,7 +17,8 @@ lazy val appContainer: String =
     |    <title>CED2AR</title>
     |</head>
     |<body>
-    |  <div id="application-container"></dib>
+    |  <div id="application-container"></div>
+    |  <div id="body-scripts"></div>
     |  <script type="application/javascript"
     |    src="$servletPath/target/scala-$scalaMajorVer/scalajs-bundler/main/ced2ar3-view-fastopt-bundle.js"
     |  ></script>

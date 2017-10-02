@@ -131,6 +131,16 @@ object Ced2ar {
       "./target/css/bootstrap.min.css",
       "./target/css/bootstrap-theme.min.css"
     )
+
+    //TODO: for locally optimized js, can switch based on build settings
+    val bodyScriptUrls = Seq(
+      "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js", //FIXME:  Localize, if needed
+      "./target/js/bootstrap.min.js"
+    )
+    val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
+      <script type="application/javascript" src={scriptUrl}></script>
+    ))
+
     dom.document.getElementsByTagName("head").headOption match {
       case Some(head) =>
         val linkRelCss =
@@ -139,8 +149,11 @@ object Ced2ar {
       case None => println("WARNING: no <head> element in enclosing document!")
     }
 
-    val div = dom.document.getElementById("application-container")
-    mount(div, View.index)
+    val appContainer = dom.document.getElementById("application-container")
+    val bodyScriptContainer = dom.document.getElementById("body-scripts")
+
+    mount(appContainer, View.index)
+    mount(bodyScriptContainer, bodyScripts)
 
   }
 }

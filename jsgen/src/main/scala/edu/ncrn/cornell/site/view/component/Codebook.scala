@@ -3,14 +3,13 @@ package edu.ncrn.cornell.site.view.component
 import edu.ncrn.cornell.site.view.Utils
 import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
 
-import scala.xml.Node
+import scala.xml.{Group, Node, Text}
 import mhtml._
 
 import scala.util.{Failure, Success}
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import monix.execution.Scheduler.Implicits.global
-
 import io.circe._
 import io.circe.parser._
 
@@ -57,9 +56,9 @@ object Codebook {
                  href={s"#$fieldName-detail"} data-toggle="collapse">
                 {fieldName}
               </a>
-              <p id={s"$fieldName-detail"} class="collapse">
-                {fieldValues.mkString("\n")}
-              </p>
+              <div id={s"$fieldName-detail"} class="collapse in">
+                <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
+              </div>
             </h3>
           </div>
         else
