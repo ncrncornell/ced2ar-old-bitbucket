@@ -1,4 +1,4 @@
-package edu.ncrn.cornell.site.view.editor
+package edu.ncrn.cornell.site.view.component.editor
 
 import scala.language.postfixOps
 import scalacss.ProdDefaults._

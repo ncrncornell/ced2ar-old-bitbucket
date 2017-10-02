@@ -1,6 +1,5 @@
-package edu.ncrn.cornell.site.view.components
+package edu.ncrn.cornell.site.view.component
 
-import edu.ncrn.cornell.site.view.component.Component
 import mhtml._
 
 import scala.xml.Node

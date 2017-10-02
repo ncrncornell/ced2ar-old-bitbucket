@@ -1,5 +1,6 @@
 package edu.ncrn.cornell.site.view
 
+import edu.ncrn.cornell.site.view.component.Codebook.CodebookDetails
 import mhtml.Rx
 
 import scala.xml.Node
@@ -14,5 +15,7 @@ package object component {
     * sometimes alter Component[D] based on input data of type T
     */
   case class TaggedComponent[D,T](view: Node, model: Rx[D], tag: T) extends AbstractComponent[D](view, model)
+
+  type Codebook = TaggedComponent[CodebookDetails, String]
 
 }
