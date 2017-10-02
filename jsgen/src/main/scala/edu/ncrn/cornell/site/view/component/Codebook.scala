@@ -56,7 +56,7 @@ object Codebook {
                  href={s"#$fieldName-detail"} data-toggle="collapse">
                 {fieldName}
               </a>
-              <div id={s"$fieldName-detail"} class="collapse in">
+              <div id={s"$fieldName-detail"} class="collapse">
                 <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
               </div>
             </h3>

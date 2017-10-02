@@ -14,7 +14,8 @@ val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
 val cssInPaths = Map(
   "bootstrap/dist/css" -> "/css/",
   "bootstrap/dist/js" -> "/js/",
-  "bootstrap/dist/fonts" -> "/fonts/"
+  "bootstrap/dist/fonts" -> "/fonts/",
+  "jquery/dist" -> "/js/"
 )
 
 lazy val view = (project in file("."))
@@ -59,6 +60,7 @@ lazy val view = (project in file("."))
       "io.circe" %%% "circe-parser"
     ).map(_ % circeVersion)
     ,npmDependencies in Compile ++= Seq(
-      "bootstrap" -> "3.3.7"
+      "bootstrap" -> "3.3.7",
+      "jquery" -> "3.2.1"
     )
   )

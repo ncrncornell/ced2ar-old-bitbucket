@@ -134,7 +134,7 @@ object Ced2ar {
 
     //TODO: for locally optimized js, can switch based on build settings
     val bodyScriptUrls = Seq(
-      "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js", //FIXME:  Localize, if needed
+      "./target/js/jquery.slim.min.js",
       "./target/js/bootstrap.min.js"
     )
     val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
