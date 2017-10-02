@@ -6,6 +6,9 @@ import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
 import scala.xml.{Group, Node, Text}
 import mhtml._
 
+import org.scalajs.dom
+
+
 import scala.util.{Failure, Success}
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
@@ -49,13 +52,23 @@ object Codebook {
       val collapsibleFields = Set("Files")
 
       def renderField(fieldName: String, fieldValues: List[String]): Node = {
+
+        val glyphClicked: Var[Boolean] = Var(false)
+        val glyphClass: Rx[String] = glyphClicked.map {
+          case false => "glyphicon-menu-down"
+          case true => "glyphicon-menu-right"
+        }
+
         if (collapsibleFields.contains(fieldName))
           <div>
             <h3>
-              <a class="glyphicon glyphicon-menu-down"
-                 href={s"#$fieldName-detail"} data-toggle="collapse">
-                {fieldName}
-              </a>
+              { glyphClass.map{ gclass =>
+                <a class={s"glyphicon $gclass"}
+                   href={s"#$fieldName-detail"} data-toggle="collapse"
+                   onclick={ (ev: dom.Event) => { glyphClicked.update(click => !click) } }>
+                  {fieldName}
+                </a>
+              }}
               <div id={s"$fieldName-detail"} class="collapse">
                 <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
               </div>
