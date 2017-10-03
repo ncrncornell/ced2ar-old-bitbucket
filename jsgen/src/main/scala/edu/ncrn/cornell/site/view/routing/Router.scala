@@ -4,31 +4,63 @@ import mhtml.{Rx, Var}
 
 import scala.xml.Node
 import Router._
+import org.scalajs.dom
+import org.scalajs.dom.Event
+import edu.ncrn.cornell.site.view.utils.Utils._
+
+import scala.collection.mutable.WrappedArray
+
 
 /**
   * A recursive, component-level router. In general each component should define its own route
   * if a route is needed at all.
   */
-case class Router(remainingPath: Rx[String], route: String => Node) {
-  val view: Rx[Node] = remainingPath.map{rPath => route(rPath)}
+case class Router(remainingPath: Rx[String], route: Rx[String] => Node) {
+  val view: Node = route(remainingPath)
 
 }
 object Router {
 
-  val delim: String = "#/"
+  val routePath: Rx[String] = Rx(dom.window.location.hash).merge{
+    val updatedHash = Var(dom.window.location.hash)
+    dom.window.onhashchange = (ev: Event) => {
+      updatedHash := dom.window.location.hash
+    }
+    updatedHash.map(hash => hash.replaceFirst("#/", ""))
+  }
+
+  def pathUptoIdx(pathParts: Array[String], idx: Int): String =
+    "#/" + pathParts.take(idx + 1).mkString("/")
+
+  val breadCrumbs: Rx[Node] = routePath.map { routeHash =>
+    val crumbs = routeHash.split('/')
+    val (otherCrumbs, thisCrumb) = crumbs.splitAt(crumbs.length-1)
+    <ol class="breadcrumb">
+      { otherCrumbs.zipWithIndex.toIterable.mapToNode { case (cr: String, idx: Int) =>
+        <li class="breadcrumb-item">
+          <a href={pathUptoIdx(otherCrumbs, idx)}>{ cr }</a>
+        </li>
+      } }
+      { thisCrumb.toIterable.mapToNode(cr => <li class="breadcrumb-item active">{ cr }</li> ) }
+    </ol>
+
+  }
 
   //TODO: handle case where not splittable
 
   /**
     * Utiltiy to split route
-    * @param routeIn
+    * @param routeInRx
     * @return (current route, child route)
     */
-  def splitRoute(routeIn: String): (String, String) = {
-    val (fst, snd) =
-      if (routeIn.contains(delim))
-        routeIn.splitAt(routeIn.indexOfSlice(delim))
-      else (routeIn, "")
-    (fst, snd.replaceFirst(delim, ""))
+  def splitRoute(routeInRx: Rx[String]): (Rx[String], Rx[String]) = {
+    val splitRx = routeInRx.map { routeIn =>
+      val (fst, snd) =
+        if (routeIn.contains("/"))
+          routeIn.splitAt(routeIn.indexOfSlice("/"))
+        else (routeIn, "")
+      (fst, snd.replaceFirst("/", ""))
+    }
+    (splitRx.map(tup => tup._1), splitRx.map(tup => tup._2))
   }
 }

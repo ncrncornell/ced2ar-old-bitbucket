@@ -6,15 +6,18 @@ package edu.ncrn.cornell.site.view
 import scala.xml._
 import mhtml._
 import cats.implicits._
+import edu.ncrn.cornell.site.view.component.CodebookList.CodebookNames
 import edu.ncrn.cornell.site.view.component._
 import edu.ncrn.cornell.site.view.component.editor.{Editor, NeptuneStyles}
 import edu.ncrn.cornell.site.view.routing.{HostConfig, Router}
+import edu.ncrn.cornell.site.view.utils.Utils._
 import mhtml.implicits.cats._
 import org.scalajs.dom
 import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.ext.LocalStorage
 import org.scalajs.dom.ext.PimpedNodeList
+
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 
 
@@ -67,11 +70,11 @@ object Ced2ar {
           </li>
           {
             val navItems = Map[String, String](
-              "Browse by Codebook" -> "#",
+              "Browse by Codebook" ->  "#/codebook",
               "Browse by Variable" -> "#",
               "Upload a Codebook" -> "#",
               "Documentation" -> "#",
-              "About" -> (Router.delim + "about")
+              "About" -> "#/about"
             )
             Group(navItems.toSeq.map(nItem =>  Group(
                 <li class="divider-vertical hidden-xs"/>
@@ -82,7 +85,7 @@ object Ced2ar {
       </div>
     </nav>
 
-    val testCodebook: Rx[Codebook] = HostConfig.currentApiUri.map{cau => Codebook("ssbv602")}
+    val testCodebook: Rx[Codebook] = Rx(Codebook("ssbv602"))
 
     val testEditor = Editor.editor()
 
@@ -94,31 +97,25 @@ object Ced2ar {
       <h3>End editor output</h3>
     </div>
 
-    val routePath: Rx[String] = Rx(dom.window.location.hash).merge{
-      val updatedHash = Var(dom.window.location.hash)
-      dom.window.onhashchange = (ev: Event) => {
-        updatedHash := dom.window.location.hash
-      }
-      updatedHash.map(hash => hash.replaceFirst(Router.delim, ""))
-    }
-
     val aboutComp = About()
 
-    private def thisRoute(path: String): Node = {
-      val (curPath, childPath) = Router.splitRoute(path)
-
-      println(s"curPath is $curPath; path (dx) is $path") // DEBUG
-
-      if (curPath == "about") aboutComp.view
-      else demoView
+    private def thisRoute(path: Rx[String]): Node = {
+      val (curPathRx, childPathRx) = Router.splitRoute(path)
+      lazy val codebookList = CodebookList(childPathRx)
+      curPathRx.map{curPath =>
+        if (curPath == "about") aboutComp.view
+        else if (curPath == "codebook") codebookList.view
+        else demoView
+      }.toNode()
     }
-    val router = Router(routePath, thisRoute)
+    val router = Router(Router.routePath, thisRoute)
 
 
     def index: Node = {masterDiv(
       <div>
         {topBanner}
         {navBar}
+        {Router.breadCrumbs}
         {router.view}
       </div>
     )}

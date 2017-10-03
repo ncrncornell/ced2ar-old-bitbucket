@@ -39,6 +39,18 @@ class CodebookController(
     val handles: Map[String, String] = codebookService.getAllHandles
     codebooksView.codebooksList(handles)
   }
+  //
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/codebook"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def codebooksJson(
+    model: Model,
+    @RequestParam(value = "auth", defaultValue = "false") auth: Boolean
+  ): String = codebookService.getAllHandlesJson
+
 
   /**
     * Controller for codebook titlepage
