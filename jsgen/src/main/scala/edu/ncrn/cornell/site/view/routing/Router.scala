@@ -45,12 +45,11 @@ object Router {
     if (crumbs.nonEmpty) {
       <ol class="breadcrumb">
         {otherCrumbs.zipWithIndex.mapToNode { case (cr: String, idx: Int) =>
-        <li class="breadcrumb-item">
-          <a href={pathUptoIdx(otherCrumbs, idx)}>{ cr }</a>
-        </li>
-      }}{thisCrumb.mapToNode(cr => <li class="breadcrumb-item active">
-        {cr}
-      </li>)}
+          <li class="breadcrumb-item">
+            <a href={pathUptoIdx(otherCrumbs, idx)}>{ cr }</a>
+          </li>
+        }}
+        {thisCrumb.mapToNode(cr => <li class="breadcrumb-item active">{ cr }</li>)}
       </ol>
     }
     else <div></div>
