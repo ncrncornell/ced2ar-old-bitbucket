@@ -29,22 +29,33 @@ object Router {
     updatedHash.map(hash => hash.replaceFirst("#/", ""))
   }
 
-  def pathUptoIdx(pathParts: Array[String], idx: Int): String =
+  def pathUptoIdx(pathParts: Iterable[String], idx: Int): String =
     "#/" + pathParts.take(idx + 1).mkString("/")
 
   val breadCrumbs: Rx[Node] = routePath.map { routeHash =>
-    val crumbs = routeHash.split('/')
+    val ignoreInitCrumbs = Set("", "app", "about")
+    val pathSplit: WrappedArray[String] = routeHash.split('/')
+    val crumbs: WrappedArray[String] = pathSplit.headOption match {
+      case Some(cr) =>
+        if (ignoreInitCrumbs.contains(cr)) pathSplit.drop(1)
+        else pathSplit
+      case None => pathSplit
+    }
     val (otherCrumbs, thisCrumb) = crumbs.splitAt(crumbs.length-1)
-    <ol class="breadcrumb">
-      { otherCrumbs.zipWithIndex.toIterable.mapToNode { case (cr: String, idx: Int) =>
+    if (crumbs.nonEmpty) {
+      <ol class="breadcrumb">
+        {otherCrumbs.zipWithIndex.mapToNode { case (cr: String, idx: Int) =>
         <li class="breadcrumb-item">
           <a href={pathUptoIdx(otherCrumbs, idx)}>{ cr }</a>
         </li>
-      } }
-      { thisCrumb.toIterable.mapToNode(cr => <li class="breadcrumb-item active">{ cr }</li> ) }
-    </ol>
-
+      }}{thisCrumb.mapToNode(cr => <li class="breadcrumb-item active">
+        {cr}
+      </li>)}
+      </ol>
+    }
+    else <div></div>
   }
+
 
   //TODO: handle case where not splittable
 
