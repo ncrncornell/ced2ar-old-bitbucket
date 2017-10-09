@@ -1,6 +1,6 @@
 package edu.ncrn.cornell.site.view
 
-import edu.ncrn.cornell.site.view.component.Codebook.CodebookDetails
+import edu.ncrn.cornell.service.api._
 import edu.ncrn.cornell.site.view.component.CodebookList.CodebookNames
 import mhtml.Rx
 
@@ -19,5 +19,7 @@ package object component {
 
   type Codebook = TaggedComponent[CodebookDetails, String]
   type CodebookList = Component[CodebookNames]
+  //
+  type Variable = TaggedComponent[VarDetails, String]
 
 }

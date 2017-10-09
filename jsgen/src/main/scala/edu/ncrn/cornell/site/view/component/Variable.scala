@@ -1,33 +1,32 @@
 package edu.ncrn.cornell.site.view.component
 
-import edu.ncrn.cornell.service.api.CodebookDetails
+import edu.ncrn.cornell.service.api.VarDetails
 import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
 import edu.ncrn.cornell.site.view.utils.Utils
-
-import scala.xml.{Group, Node, Text}
+import fr.hmil.roshttp.HttpRequest
+import fr.hmil.roshttp.response.SimpleHttpResponse
+import io.circe.parser._
 import mhtml._
+import monix.execution.Scheduler.Implicits.global
 import org.scalajs.dom
 
 import scala.util.{Failure, Success}
-import fr.hmil.roshttp.HttpRequest
-import fr.hmil.roshttp.response.SimpleHttpResponse
-import monix.execution.Scheduler.Implicits.global
-import io.circe._
-import io.circe.parser._
+import scala.xml.{Group, Node, Text}
 
 
-object Codebook {
+object Variable {
 
-  def model(handle: String): Rx[CodebookDetails] = {
-    val request: Rx[HttpRequest] = EndPoints.codebook(handle).map(ep =>
+
+  def model(handle: String): Rx[VarDetails] = {
+    val request: Rx[HttpRequest] = EndPoints.variable(handle).map(ep =>
       HttpRequest(ep).withHeader("Content-Type", "application/javascript")
     )
 
-    val details: Rx[CodebookDetails] = request.flatMap(req =>
+    val details: Rx[VarDetails] = request.flatMap(req =>
       Utils.fromFuture(req.send()).map {
         case Some(resTry) => resTry match {
           case res: Success[SimpleHttpResponse] =>
-            decode[CodebookDetails](res.get.body) match {
+            decode[VarDetails](res.get.body) match {
               case Left(detailFailure) =>
                 println("Error decoding codebook details: " + detailFailure.toString)
                 Nil
@@ -43,8 +42,8 @@ object Codebook {
     details
   }
 
-  def view(details: Rx[CodebookDetails], handle: String): Node = {
-    val collapsibleFields = Set("Files")
+  def view(details: Rx[VarDetails], handle: String): Node = {
+    val collapsibleFields = Set("Values")
 
     def renderField(fieldName: String, fieldValues: List[String]): Node = {
 
@@ -105,8 +104,8 @@ object Codebook {
 
   }
 
-  def apply(handle: String): Codebook = {
+  def apply(handle: String): Variable = {
     val details = model(handle)
-    TaggedComponent[CodebookDetails, String](view(details, handle), details, handle)
+    TaggedComponent[VarDetails, String](view(details, handle), details, handle)
   }
 }

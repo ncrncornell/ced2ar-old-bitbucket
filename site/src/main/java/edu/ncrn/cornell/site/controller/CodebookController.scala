@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation._
 import edu.ncrn.cornell.service.CodebookService
+import edu.ncrn.cornell.service.api._
 import edu.ncrn.cornell.site.view._
 
 @Autowired
@@ -72,7 +73,7 @@ class CodebookController(
     model: Model
   ): String = {
     println("[codebook controller]:: GET request for handle " + handle)
-    val codebookDetails:  List[(String,List[String])]=
+    val codebookDetails: CodebookDetails =
       codebookService.getCodebookDetailsList(handle)
     codebookView.codebookDetails(codebookDetails, handle)
   }
@@ -135,7 +136,7 @@ class CodebookController(
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val varDetails: List[(String, List[String])] =
+    val varDetails: VarDetails =
       codebookService.getVariableDetailsList(handle, varname)
     varView.variableDetails(varDetails, handle, varname)
   }

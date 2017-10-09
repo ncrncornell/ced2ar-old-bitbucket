@@ -17,6 +17,27 @@ val cssInPaths = Map(
   "bootstrap/dist/fonts" -> "/fonts/",
   "jquery/dist" -> "/js/"
 )
+val apiSourceDir = "../services-core/src/main/java/edu/ncrn/cornell/service"
+val sourceDirMap = Map("api" -> "/edu/ncrn/cornell/service/api/")
+def copyFiles(
+  base: File, trg: File, strms: TaskStreams,
+  relSourceRoot: String, relPathMap: Map[String, String]
+): Seq[File] = relPathMap.toSeq.map{csp => (new File(relSourceRoot, csp._1).toPath.toString, csp._2)}
+  .flatMap{ case (relPathMap, relTarget) =>
+    val outDirFiles: Array[File] = new File(base, relPathMap).listFiles().map { file =>
+      val newFile = new File(new File(trg.toPath.toString, relTarget).getCanonicalFile, file.name)
+      strms.log.info(
+        s"copying ${file.toPath.toString} to ${newFile.toPath.toString}"
+      )
+      newFile.mkdirs()
+      Files.copy(
+        file.toPath, newFile.toPath,
+        StandardCopyOption.REPLACE_EXISTING
+      )
+      newFile
+    }
+    outDirFiles
+  }
 
 lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
@@ -28,21 +49,12 @@ lazy val view = (project in file("."))
     ,jsEnv in Test := new org.scalajs.jsenv.phantomjs.PhantomJSEnv()
     ,scalaJSUseMainModuleInitializer := true
     ,copyCss <<= (baseDirectory, target, streams) map {
-      (base, trg, strms) =>
-        cssInPaths.toSeq.map{csp => (new File(nodeModulesDir, csp._1).toPath.toString, csp._2)}
-          .foreach{ case (cssInPath, relTarget) =>
-            new File(base, cssInPath).listFiles().foreach { file =>
-              strms.log.info(
-                s"copying ${file.toPath.toString} to ${trg.toPath.toString + relTarget}"
-              )
-              val newFile = new File(new File(trg.getName, relTarget), file.name)
-              newFile.mkdirs()
-              Files.copy(
-                file.toPath, newFile.toPath,
-                StandardCopyOption.REPLACE_EXISTING
-              )
-            }
-        }
+      (base: File, trg: File, strms: TaskStreams) =>
+        copyFiles(base, trg, strms, nodeModulesDir, cssInPaths)
+    }
+    ,sourceGenerators in Compile <+= (baseDirectory, sourceManaged in Compile, streams) map {
+      (base: File, trg: File, strms: TaskStreams) =>
+        copyFiles(base, trg, strms, apiSourceDir, sourceDirMap)
     }
     ,webpackConfigFile in fullOptJS := Some(baseDirectory.value / "prod.webpack.config.js")
     ,webpackConfigFile in fastOptJS := Some(baseDirectory.value / "dev.webpack.config.js")
