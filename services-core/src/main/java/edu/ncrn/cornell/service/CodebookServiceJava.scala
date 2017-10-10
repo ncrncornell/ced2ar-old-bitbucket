@@ -22,7 +22,7 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
     *
     * @return
     */
-  def getAllHandles: util.Map[String, String] = codebookService.getAllHandles.asJava
+  def getAllHandles: util.List[(String, String)] = codebookService.getAllHandles.asJava
 
   def getAllHandlesJson: String = codebookService.getAllHandlesJson
 

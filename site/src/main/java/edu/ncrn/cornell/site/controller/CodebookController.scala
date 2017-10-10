@@ -37,7 +37,7 @@ class CodebookController(
     model: Model,
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean
   ): String = {
-    val handles: Map[String, String] = codebookService.getAllHandles
+    val handles = codebookService.getAllHandles
     codebooksView.codebooksList(handles)
   }
   //

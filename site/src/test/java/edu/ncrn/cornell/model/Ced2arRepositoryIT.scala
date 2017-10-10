@@ -3,7 +3,7 @@ package edu.ncrn.cornell.model
 import edu.ncrn.cornell.Ced2arApplication
 import edu.ncrn.cornell.model.testing.BaseRepositoryIT
 import edu.ncrn.cornell.service.{CodebookService, CodebookServiceTesters}
-import org.junit.Test
+import org.junit.{Ignore, Test}
 //import org.junit.gen5.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -24,6 +24,7 @@ class Ced2arRepositoryIT extends BaseRepositoryIT with CodebookServiceTesters  {
 
   @Autowired val codeBookService: CodebookService = null
 
+  @Ignore("Try to fix generic decode issues and go back to Map")
   @Test
   def getAllHandlesJsonTests: Unit = getAllHandlesJsonTests(codeBookService)
 

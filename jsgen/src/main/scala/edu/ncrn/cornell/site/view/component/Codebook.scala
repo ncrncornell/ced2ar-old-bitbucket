@@ -1,19 +1,14 @@
 package edu.ncrn.cornell.site.view.component
 
-import edu.ncrn.cornell.service.api.CodebookDetails
+import edu.ncrn.cornell.service.api._
+import edu.ncrn.cornell.site.view.comm.Request.requestDecodeIterable
 import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
 import edu.ncrn.cornell.site.view.utils.Utils
 
 import scala.xml.{Group, Node, Text}
 import mhtml._
 import org.scalajs.dom
-
-import scala.util.{Failure, Success}
 import fr.hmil.roshttp.HttpRequest
-import fr.hmil.roshttp.response.SimpleHttpResponse
-import monix.execution.Scheduler.Implicits.global
-import io.circe._
-import io.circe.parser._
 
 
 object Codebook {
@@ -23,24 +18,7 @@ object Codebook {
       HttpRequest(ep).withHeader("Content-Type", "application/javascript")
     )
 
-    val details: Rx[CodebookDetails] = request.flatMap(req =>
-      Utils.fromFuture(req.send()).map {
-        case Some(resTry) => resTry match {
-          case res: Success[SimpleHttpResponse] =>
-            decode[CodebookDetails](res.get.body) match {
-              case Left(detailFailure) =>
-                println("Error decoding codebook details: " + detailFailure.toString)
-                Nil
-              case Right(newDetails) => newDetails
-            }
-          case err: Failure[SimpleHttpResponse] =>
-            println("Error retrieving codebook details: " + err.toString)
-            Nil
-        }
-        case None => Nil
-      }
-    )
-    details
+    requestDecodeIterable[CodebookItem, CodebookCollection](request)
   }
 
   def view(details: Rx[CodebookDetails], handle: String): Node = {

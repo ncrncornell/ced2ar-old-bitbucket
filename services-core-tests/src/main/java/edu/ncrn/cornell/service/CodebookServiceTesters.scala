@@ -34,7 +34,8 @@ trait CodebookServiceTesters {
     }
     assert(jsonIsNonTrivial)
     //Check we got back ssbv602, fairly standard in our tests
-    assert(compareJsonLenient("""{"ssbv602" : "SIPP Synthetic Beta v6.02"}""", json))
+    println(s"json is $json")
+    assert(compareJsonLenient("""[["ssbv602",  "SIPP Synthetic Beta v6.02"]]""", json))
   }
 
   def getCodebookDetailsListJsonTests(codeBookService: CodebookService): Unit = {

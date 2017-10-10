@@ -1,7 +1,7 @@
 package edu.ncrn.cornell.site.view
 
 import edu.ncrn.cornell.service.api._
-import edu.ncrn.cornell.site.view.component.CodebookList.CodebookNames
+import edu.ncrn.cornell.site.view.component.CodebookList._
 import mhtml.Rx
 
 import scala.xml.Node
@@ -18,7 +18,7 @@ package object component {
   final case class TaggedComponent[D,T](view: Node, model: Rx[D], tag: T) extends AbstractComponent[D](view, model)
 
   type Codebook = TaggedComponent[CodebookDetails, String]
-  type CodebookList = Component[CodebookNames]
+  type CodebookList = Component[CodebookNameMap]
   //
   type Variable = TaggedComponent[VarDetails, String]
 

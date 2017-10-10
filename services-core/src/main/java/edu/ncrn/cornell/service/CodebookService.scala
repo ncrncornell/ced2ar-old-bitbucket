@@ -19,13 +19,15 @@ import edu.ncrn.cornell.model.dao.ProfileDao
 import edu.ncrn.cornell.model.dao.ProfileFieldDao
 import edu.ncrn.cornell.model.dao.RawDocDao
 import edu.ncrn.cornell.model.dao.SchemaDao
+import edu.ncrn.cornell.service.api.{CodebookNameCollection, CodebookNames}
 import org.springframework.stereotype.Service
 
 import scala.collection.mutable
-
 import collection.JavaConverters._
-
-import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 
 /**
   * This class is a set of reusable function for getting structured information from postgres.
@@ -58,7 +60,7 @@ class CodebookService(
     *
     * @return
     */
-  def getAllHandles: Map[String, String] = {
+  def getAllHandles: CodebookNames = {
     val handles: mutable.Map[String, String] = mutable.Map[String, String]()
     val docs: List[RawDoc] = rawDocDao.findAll().asScala.toList
     for (doc <- docs) {
@@ -78,7 +80,7 @@ class CodebookService(
 
       }
     }
-    handles.toMap
+    handles.toList
   }
 
   def getAllHandlesJson: String = getAllHandles.asJson.noSpaces
@@ -128,8 +130,8 @@ class CodebookService(
     * @return a map of (name,label) pairs
     */
   def getAllVariables: Map[String, (String, String)] = {
-    val handlesMap: Map[String, String] = getAllHandles
-    val handles: List[String] = handlesMap.keySet.toList
+    val handlesMap: CodebookNames = getAllHandles
+    val handles: List[String] = handlesMap.map(hnd => hnd._1)
     getVarList(handles, 0)
   }
 

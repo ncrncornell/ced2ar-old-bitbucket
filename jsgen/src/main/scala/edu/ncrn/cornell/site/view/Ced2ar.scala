@@ -6,7 +6,6 @@ package edu.ncrn.cornell.site.view
 import scala.xml._
 import mhtml._
 import cats.implicits._
-import edu.ncrn.cornell.site.view.component.CodebookList.CodebookNames
 import edu.ncrn.cornell.site.view.component._
 import edu.ncrn.cornell.site.view.component.editor.{Editor, NeptuneStyles}
 import edu.ncrn.cornell.site.view.routing.{HostConfig, Router}

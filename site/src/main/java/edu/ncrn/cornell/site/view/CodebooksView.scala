@@ -1,5 +1,6 @@
 package edu.ncrn.cornell.site.view
 
+import edu.ncrn.cornell.service.api.CodebookNames
 import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
@@ -9,7 +10,7 @@ import scalatags.Text.all._
 class CodebooksView extends Ced2arView{
   
   def codebooksList(
-    codebooks : Map[String, String]
+    codebooks : CodebookNames
   ) : String = {
     val typedHtml = html(
         head(
