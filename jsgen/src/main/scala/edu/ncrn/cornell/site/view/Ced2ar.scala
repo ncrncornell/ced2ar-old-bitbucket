@@ -84,15 +84,24 @@ object Ced2ar {
       </div>
     </nav>
 
-    val testCodebook: Rx[Codebook] = Rx(Codebook("ssbv602"))
 
     val testEditor = Editor.editor()
 
+    val configView = <div>
+      <p>
+        {HostConfig.currentApiUri.map { curUri =>
+          s"Current API URI: ${curUri.toString}"
+        }}
+      </p>
+      {HostConfig.apiUriApp.app._1}
+    </div>
+
     val demoView = <div>
-      {testCodebook.map{cb =>  cb.view}}
-      {testEditor.view}
+      {configView}
+      <h2>Demo editor</h2>
+      {testEditor.view()}
       <h3>Begin editor output</h3>
-      {testEditor.model}
+      {testEditor.model()}
       <h3>End editor output</h3>
     </div>
 
@@ -102,8 +111,8 @@ object Ced2ar {
       val (curPathRx, childPathRx) = Router.splitRoute(path)
       lazy val codebookList = CodebookList(childPathRx)
       curPathRx.map{curPath =>
-        if (curPath == "about") aboutComp.view
-        else if (curPath == "codebook") codebookList.view
+        if (curPath == "about") aboutComp.view()
+        else if (curPath == "codebook") codebookList.view()
         else demoView
       }.toNode()
     }

@@ -19,7 +19,7 @@ import edu.ncrn.cornell.model.dao.ProfileDao
 import edu.ncrn.cornell.model.dao.ProfileFieldDao
 import edu.ncrn.cornell.model.dao.RawDocDao
 import edu.ncrn.cornell.model.dao.SchemaDao
-import edu.ncrn.cornell.service.api.{CodebookNameCollection, CodebookNames}
+import edu.ncrn.cornell.service.api._
 import org.springframework.stereotype.Service
 
 import scala.collection.mutable
@@ -129,7 +129,7 @@ class CodebookService(
     *
     * @return a map of (name,label) pairs
     */
-  def getAllVariables: Map[String, (String, String)] = {
+  def getAllVariables: VarNames= {
     val handlesMap: CodebookNames = getAllHandles
     val handles: List[String] = handlesMap.map(hnd => hnd._1)
     getVarList(handles, 0)
@@ -146,14 +146,14 @@ class CodebookService(
     * @param handle
     * @return
     */
-  def getCodebookVariables(handle: String): Map[String, (String, String)] =
+  def getCodebookVariables(handle: String): VarNames =
     getVarList(List(handle), 0)
 
   def getCodebookVariablesJson(handle: String): String =
     getCodebookVariables(handle).asJson.noSpaces
 
     
-  def getCodebookVariables(handle: String, page: Int): Map[String, (String, String)] =
+  def getCodebookVariables(handle: String, page: Int): VarNames =
     getVarList(List(handle), page)
 
   def getCodebookVariablesJson(handle: String, page: Int): String =
@@ -163,7 +163,7 @@ class CodebookService(
    * function to get paginated list of variables; private for now since this aspect
     * of the API is evolving
    */
-  private def getVarList(handles: List[String], pageNumber: Int): Map[String, (String, String)] = {
+  private def getVarList(handles: List[String], pageNumber: Int): VarNames = {
     val variables: mutable.Map[String, (String, String)] = mutable.Map()
     val request: Pageable = new PageRequest(pageNumber, PAGE_SIZE, Sort.Direction.ASC, "value")
     val varnamesPage: Page[FieldInst] = fieldInstDao.findByFieldIdAndRawDocIdIn("varname", handles.asJava, request)
@@ -194,7 +194,7 @@ class CodebookService(
         variables.put(varname.getValue, value)
       }
     }
-    variables.toMap
+    variables.toList
   }
 
   
@@ -204,7 +204,7 @@ class CodebookService(
    * 
    * returns in form of list of tuples (display name, List(values))
    */
-  def getVariableDetailsList(handle: String, varname: String): List[(String, List[String])] = {
+  def getVariableDetailsList(handle: String, varname: String): VarDetails = {
     val fieldIds: List[String] = getProfileFieldIds("vardetails")
     val details = new mutable.ArrayBuffer[Option[(String, List[String])]]
     for(ii <- fieldIds.indices) {

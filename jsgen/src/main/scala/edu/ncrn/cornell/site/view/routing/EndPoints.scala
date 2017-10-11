@@ -12,6 +12,9 @@ object EndPoints {
   def codebook(id: String): Rx[String] = HostConfig.baseUri.map{baseUriStr =>
     s"$baseUriStr/codebook/$id"
   }
+  def variable: Rx[String] = HostConfig.baseUri.map{baseUriStr =>
+    s"$baseUriStr/var"
+  }
   def variable(cid: String): Rx[String] = codebook(cid).map{codebookUri =>
     s"$codebookUri/var"
   }

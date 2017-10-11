@@ -106,6 +106,6 @@ object Variable {
 
   def apply(handle: String): Variable = {
     val details = model(handle)
-    TaggedComponent[VarDetails, String](view(details, handle), details, handle)
+    TaggedComponent.applyLazy[VarDetails, String](view(details, handle), details, handle)
   }
 }

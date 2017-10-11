@@ -2,8 +2,8 @@ package edu.ncrn.cornell.site.view.component
 
 import edu.ncrn.cornell.service.api._
 import edu.ncrn.cornell.site.view.comm.Request.requestDecodeIterable
-import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
-import edu.ncrn.cornell.site.view.utils.Utils
+import edu.ncrn.cornell.site.view.routing.{EndPoints, Router}
+import edu.ncrn.cornell.site.view.utils.Utils._
 
 import scala.xml.{Group, Node, Text}
 import mhtml._
@@ -59,20 +59,8 @@ object Codebook {
     }
 
     <div>
-      <p>
-        {HostConfig.currentApiUri.map { curUri =>
-        s"Current API URI: ${curUri.toString}"
-      }}
-      </p>{HostConfig.apiUriApp.app._1}<ol cls="breadcrumb">
-      <li>
-        <a href={s"codebook"}></a>
-        Codebooks</li>
-      <li cls="active">
-        {handle}
-      </li>
-    </ol>
       <div>
-        <a href={s"codebook/$handle/var"}>View Variables</a>
+        <a href={s"#/codebook/$handle/var"}>View Variables</a>
       </div>
       <div>
         {details.map(cd => cd.map {
@@ -83,8 +71,21 @@ object Codebook {
 
   }
 
-  def apply(handle: String): Codebook = {
+  def apply(route: Rx[String], handle: String): Codebook = {
     val details = model(handle)
-    TaggedComponent[CodebookDetails, String](view(details, handle), details, handle)
+    def thisRoute(path: Rx[String]): Node = {
+      val (curPathRx, childPathRx) = Router.splitRoute(path)
+      lazy val varList = VariableList(Option(handle), childPathRx)
+      val nodeRx: Rx[Node] = curPathRx.map{curPath: String =>
+        if (curPath == "") view(details, handle)
+        else varList.view()
+        //TODO add check on codebook handle above?
+        //else Rx(<div>Make An Error page</div>)
+      }
+      nodeRx.toNode()
+    }
+    val router = Router(route, thisRoute)
+
+    TaggedComponent.applyLazy[CodebookDetails, String](router.view, details, handle)
   }
 }

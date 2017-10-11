@@ -125,7 +125,7 @@ object About {
       </div>
     </div>
 
-    Component(view, Rx(()))
+    Component.applyLazy(view, Rx(()))
   }
 
 

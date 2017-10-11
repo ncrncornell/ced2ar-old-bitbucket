@@ -110,10 +110,23 @@ class CodebookController(
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val codebookVars: Map[String, (String, String)] =
+    val codebookVars: VarNames =
       codebookService.getCodebookVariables(handle)
     varsView.varsList(codebookVars)
   }
+  //
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/codebook/{c:.+}/var"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def varsJson(
+    @PathVariable(value = "c") handle: String,
+    @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
+    model: Model
+  ): String = codebookService.getCodebookVariablesJson(handle)
+
 
   /**
     * Controller for variable details page
@@ -164,7 +177,19 @@ class CodebookController(
     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
     model: Model
   ): String = {
-    val variables: Map[String, (String, String)] = codebookService.getAllVariables
+    val variables: VarNames= codebookService.getAllVariables
     varsView.varsList(variables)
   }
+  //
+  @ResponseBody
+  @RequestMapping(
+    value = Array("/var"),
+    method = Array(RequestMethod.GET),
+    produces = Array(MediaType.APPLICATION_JSON_UTF8_VALUE)
+  )
+  def allVarsJson(
+     @RequestParam(value = "auth", defaultValue = "false") auth: Boolean,
+     model: Model
+  ): String = codebookService.getAllVariablesJson
+
 }

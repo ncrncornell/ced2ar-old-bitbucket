@@ -38,4 +38,10 @@ object Utils {
     result
   }
 
+  def stripUriHash(uriString: String): String = {
+    val hashIndex = uriString.indexOf("#")
+    val endPos: Int = if (hashIndex > 0) hashIndex else uriString.length
+    uriString.substring(0, endPos)
+  }
+
 }

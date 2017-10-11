@@ -44,7 +44,7 @@ object CodebookList {
     val (curPathRx, childPathRx) = Router.splitRoute(path)
     val nodeRx: Rx[Node] = curPathRx.map{curPath: String =>
       if (curPath == "") view(model)
-      else Codebook(curPath).view
+      else Codebook(childPathRx, curPath).view()
       //TODO add check on codebook handle above?
       //else Rx(<div>Make An Error page</div>)
     }
@@ -54,7 +54,7 @@ object CodebookList {
   def apply(route: Rx[String]): CodebookList = {
     val router = Router(route, thisRoute)
 
-    Component[CodebookNameMap](router.view, model)
+    Component.applyLazy[CodebookNameMap](router.view, model)
   }
 
 }

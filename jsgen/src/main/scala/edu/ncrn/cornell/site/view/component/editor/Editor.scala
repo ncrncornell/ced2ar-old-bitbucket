@@ -139,7 +139,7 @@ object Editor {
     val view = <div>{ actionBar }{ contentStore }</div>
 
     if (settings.styleWithCss) exec("styleWithCSS")
-    Component(view, content)
+    Component.applyLazy(view, content)
   }
 
   def preventTab(kev: dom.KeyboardEvent): Unit =

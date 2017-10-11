@@ -1,18 +1,18 @@
 package edu.ncrn.cornell.site.view
 
+import edu.ncrn.cornell.service.api.VarNames
 import edu.ncrn.cornell.site.view.common.Ced2arView
 import org.springframework.stereotype.Component
 
 import scalatags.Text.all._
-import scala.collection.Map
 import scala.collection.immutable.ListMap
 
 
 @Component
 class VarsView extends Ced2arView{
   
-  def varsList(variables : Map[String, (String,String)]) : String = {
-    val sortedVars = ListMap(variables.toSeq.sortBy(_._1):_*)
+  def varsList(variables : VarNames) : String = {
+    val sortedVars = ListMap(variables.sortBy(_._1):_*)
     val typedHtml = html(
         head(
         defaultMetaTags,

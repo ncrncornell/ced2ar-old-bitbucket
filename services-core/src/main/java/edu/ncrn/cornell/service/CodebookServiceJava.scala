@@ -2,12 +2,11 @@ package edu.ncrn.cornell.service
 
 import java.util
 
+import edu.ncrn.cornell.service.api._
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 import collection.JavaConverters._
-
-import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 
 /**
   * Created by Brandon on 1/27/2017.
@@ -22,7 +21,7 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
     *
     * @return
     */
-  def getAllHandles: util.List[(String, String)] = codebookService.getAllHandles.asJava
+  def getAllHandles: util.List[CodebookNameItem] = codebookService.getAllHandles.asJava
 
   def getAllHandlesJson: String = codebookService.getAllHandlesJson
 
@@ -32,7 +31,7 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
     *
     * @return a map of (name,label) pairs
     */
-  def getAllVariables: util.Map[String, (String, String)] =
+  def getAllVariables: util.List[VarNameItem] =
     codebookService.getAllVariables.asJava
 
   def getAllVariablesJson: String = codebookService.getAllVariablesJson
@@ -47,15 +46,14 @@ class CodebookServiceJava(private[service] val codebookService: CodebookService)
     * @param handle
     * @return
     */
-  def getCodebookVariables(handle: String): util.Map[String, (String, String)] =
+  def getCodebookVariables(handle: String): util.List[VarNameItem] =
     codebookService.getCodebookVariables(handle).asJava
 
   def getCodebookVariablesJson(handle: String): String =
     codebookService.getCodebookVariablesJson(handle)
 
   def getCodebookVariables(handle: String, page: Integer)
-  : util.Map[String, (String, String)] =
-    codebookService.getCodebookVariables(handle, page).asJava
+  : util.List[VarNameItem] = codebookService.getCodebookVariables(handle, page).asJava
 
   def getCodebookVariablesJson(handle: String, page: Integer): String =
     codebookService.getCodebookVariablesJson(handle, page)

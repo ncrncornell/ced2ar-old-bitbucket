@@ -17,6 +17,8 @@ import fr.hmil.roshttp.response.SimpleHttpResponse
 import monix.execution.Scheduler.Implicits.global
 
 
+import edu.ncrn.cornell.site.view.utils.Utils._
+
 object HostConfig {
 
 
@@ -57,7 +59,7 @@ object HostConfig {
     */
   def checkApiUri(uriString: String): Rx[Option[URI]] = {
     val uriMaybe: Rx[Option[URI]] = try {
-      val uri = URI.create(uriString)
+      val uri = URI.create(stripUriHash(uriString))
       val request = HttpRequest(uriString)
         .withHeader("Content-Type", "application/javascript")
       val testResult: Var[Option[Boolean]] = Var(None)
