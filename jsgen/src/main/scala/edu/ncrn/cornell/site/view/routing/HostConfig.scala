@@ -48,7 +48,7 @@ object HostConfig {
             currentUrl := URI.create(text) //FIXME: need to convert Unicode input to ascii
           }}>OK</button>
         </div>
-      (div, currentUrl)
+      (div, currentUrl.dropRepeats)
     }
   }
 
@@ -102,7 +102,7 @@ object HostConfig {
     case (None, Some(sUri)) => sUri
     case (None, None) =>
       URI.create(s"$defaultScheme://$defaultHost:$defaultPort/$defaultServletPath/api")
-  }
+  }.dropRepeats
 
   sealed case class Port(num: Int)
   sealed case class ServletPath(path: String)

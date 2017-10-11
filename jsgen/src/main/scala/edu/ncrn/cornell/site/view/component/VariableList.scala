@@ -43,9 +43,9 @@ object VariableList {
         <tbody>
           {vm.varNames.mapToNode { case (varName, (varLabel, cbHandle)) =>
           <tr>
-            <td><a href={s"/codebook/$cbHandle/var/$varName"}>{ varName }</a></td>
+            <td><a href={s"#/codebook/$cbHandle/var/$varName"}>{ varName }</a></td>
             <td>{ varLabel }</td>
-            <td><a href={s"/codebook/$cbHandle"}>{ cbHandle }</a></td>
+            <td><a href={s"#/codebook/$cbHandle"}>{ cbHandle }</a></td>
           </tr>
           }}
         </tbody>
@@ -65,7 +65,12 @@ object VariableList {
       val (curPathRx, childPathRx) = Router.splitRoute(path)
       val nodeRx: Rx[Node] = curPathRx.map{curPath: String =>
         if (curPath == "") modelView
-        else Variable(curPath).view()
+        else thisModel.map{tm => tm.varNames.get(curPath) match {
+          case Some(vd) =>
+            println(s"vlist router; cb=${vd._2}, vid=$curPath")
+            Variable(vd._2, curPath).view()
+          case None => <div>Error/404</div>
+        }}.toNode()
         //TODO add check on codebook handle above?
         //else Rx(<div>Make An Error page</div>)
       }

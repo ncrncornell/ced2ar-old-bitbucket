@@ -42,7 +42,8 @@ object Ced2ar {
       <div class = "navbar" style = "background-color: #B40404;">
         <div>
           <div style = "font-family: 'Fjord One', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;">
-            <h1 style = "color: #FFFFFF">{space(3)}{ced2ar}</h1>
+            <a href="#/"><h1 style = "color: #FFFFFF">{ space(3) }{ ced2ar }</h1>
+            </a>
             <h5 style = "color: #FFFFFF">{space(5)}
               Development Server - The Comprehensive Extensible Data Documentation and Access Repository
             </h5>
@@ -70,8 +71,8 @@ object Ced2ar {
           {
             val navItems = Map[String, String](
               "Browse by Codebook" ->  "#/codebook",
-              "Browse by Variable" -> "#",
-              "Upload a Codebook" -> "#",
+              "Browse by Variable" -> "#/var",
+              "Upload a Codebook" -> "/",
               "Documentation" -> "#",
               "About" -> "#/about"
             )
@@ -110,9 +111,11 @@ object Ced2ar {
     private def thisRoute(path: Rx[String]): Node = {
       val (curPathRx, childPathRx) = Router.splitRoute(path)
       lazy val codebookList = CodebookList(childPathRx)
+      lazy val varList = VariableList(None, childPathRx)
       curPathRx.map{curPath =>
         if (curPath == "about") aboutComp.view()
         else if (curPath == "codebook") codebookList.view()
+        else if (curPath == "var") varList.view()
         else demoView
       }.toNode()
     }

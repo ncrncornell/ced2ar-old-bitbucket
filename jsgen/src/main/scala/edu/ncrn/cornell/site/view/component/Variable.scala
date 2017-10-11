@@ -1,6 +1,6 @@
 package edu.ncrn.cornell.site.view.component
 
-import edu.ncrn.cornell.service.api.VarDetails
+import edu.ncrn.cornell.service.api._
 import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
 import edu.ncrn.cornell.site.view.utils.Utils
 import fr.hmil.roshttp.HttpRequest
@@ -17,8 +17,8 @@ import scala.xml.{Group, Node, Text}
 object Variable {
 
 
-  def model(handle: String): Rx[VarDetails] = {
-    val request: Rx[HttpRequest] = EndPoints.variable(handle).map(ep =>
+  def model(cbHandle: String, varId: VarNameId): Rx[VarDetails] = {
+    val request: Rx[HttpRequest] = EndPoints.variable(cbHandle, varId).map(ep =>
       HttpRequest(ep).withHeader("Content-Type", "application/javascript")
     )
 
@@ -42,10 +42,10 @@ object Variable {
     details
   }
 
-  def view(details: Rx[VarDetails], handle: String): Node = {
+  def view(details: Rx[VarDetails], cbHandle: CodebookId): Node = {
     val collapsibleFields = Set("Values")
 
-    def renderField(fieldName: String, fieldValues: List[String]): Node = {
+    def renderField(fieldName: VarNameId, fieldValues: List[VarValue]): Node = {
 
       val glyphClicked: Var[Boolean] = Var(false)
       val glyphClass: Rx[String] = glyphClicked.map {
@@ -80,32 +80,17 @@ object Variable {
     }
 
     <div>
-      <p>
-        {HostConfig.currentApiUri.map { curUri =>
-        s"Current API URI: ${curUri.toString}"
-      }}
-      </p>{HostConfig.apiUriApp.app._1}<ol cls="breadcrumb">
-      <li>
-        <a href={s"codebook"}></a>
-        Codebooks</li>
-      <li cls="active">
-        {handle}
-      </li>
-    </ol>
       <div>
-        <a href={s"codebook/$handle/var"}>View Variables</a>
-      </div>
-      <div>
-        {details.map(cd => cd.map {
-        case (fieldName, fieldValues) => renderField(fieldName, fieldValues)
-      })}
+        { details.map(vd => vd.map {
+          case (fieldName, fieldValues) => renderField(fieldName, fieldValues)
+        })}
       </div>
     </div>
 
   }
 
-  def apply(handle: String): Variable = {
-    val details = model(handle)
-    TaggedComponent.applyLazy[VarDetails, String](view(details, handle), details, handle)
+  def apply(cbHandle: String, varId: VarNameId): Variable = {
+    val details = model(cbHandle, varId)
+    TaggedComponent.applyLazy[VarDetails, String](view(details, cbHandle), details, cbHandle)
   }
 }

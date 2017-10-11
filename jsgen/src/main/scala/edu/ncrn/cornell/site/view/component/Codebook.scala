@@ -13,15 +13,15 @@ import fr.hmil.roshttp.HttpRequest
 
 object Codebook {
 
-  def model(handle: String): Rx[CodebookDetails] = {
-    val request: Rx[HttpRequest] = EndPoints.codebook(handle).map(ep =>
+  def model(cbHandle: String): Rx[CodebookDetails] = {
+    val request: Rx[HttpRequest] = EndPoints.codebook(cbHandle).map(ep =>
       HttpRequest(ep).withHeader("Content-Type", "application/javascript")
     )
 
     requestDecodeIterable[CodebookItem, CodebookCollection](request)
   }
 
-  def view(details: Rx[CodebookDetails], handle: String): Node = {
+  def view(details: Rx[CodebookDetails], cbHandle: CodebookId): Node = {
     val collapsibleFields = Set("Files")
 
     def renderField(fieldName: String, fieldValues: List[String]): Node = {
@@ -60,7 +60,7 @@ object Codebook {
 
     <div>
       <div>
-        <a href={s"#/codebook/$handle/var"}>View Variables</a>
+        <a href={s"#/codebook/$cbHandle/var"}>View Variables</a>
       </div>
       <div>
         {details.map(cd => cd.map {

@@ -32,9 +32,6 @@ package object api {
   type CodebookNames = CodebookNameCollection[CodebookNameItem]
   type CodebookNameMap = Map[CodebookId, CodebookName]
 
-  type VarDetailCollection[+A] = List[A]
-  type VarDetails = VarDetailCollection[(String, List[String])]
-
   type VarLabel = String
   type VarNameValue = (VarLabel, CodebookId)
   type VarNameId = String
@@ -43,6 +40,10 @@ package object api {
   type VarNames = VarNameCollection[VarNameItem]
   type VarNameMap = ListMap[VarNameId, VarNameValue]
 
+  type VarValue = String
+  type VarDetailItem = (VarNameId, List[VarValue])
+  type VarDetailCollection[+A] = List[A]
+  type VarDetails = VarDetailCollection[VarDetailItem]
 
 
 
