@@ -72,7 +72,7 @@ object Ced2ar {
             val navItems = Map[String, String](
               "Browse by Codebook" ->  "#/codebook",
               "Browse by Variable" -> "#/var",
-              "Upload a Codebook" -> "/",
+              "Upload a Codebook" -> "/upload",
               "Documentation" -> "#",
               "About" -> "#/about"
             )

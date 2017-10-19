@@ -68,8 +68,8 @@ object VariableList {
         else thisModel.map{tm => tm.varNames.get(curPath) match {
           case Some(vd) =>
             println(s"vlist router; cb=${vd._2}, vid=$curPath")
-            Variable(vd._2, curPath).view()
-          case None => <div>Error/404</div>
+            Variable(vd._2, curPath).view() // DEBUG
+          case None => <div>Error/404: variable not found</div>
         }}.toNode()
         //TODO add check on codebook handle above?
         //else Rx(<div>Make An Error page</div>)
