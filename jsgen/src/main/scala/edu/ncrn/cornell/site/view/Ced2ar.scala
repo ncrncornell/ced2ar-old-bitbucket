@@ -29,7 +29,7 @@ object Ced2ar {
   object View {
     val ced2ar = Group(Seq(Text("CED"), <sup>2</sup>, Text("AR")))
 
-    def space(nn: Int): Node = Group(Seq.fill(nn)(EntityRef("nbsp")))
+    def space(nn: Int): Node = Group(Seq.fill(nn)(<span>{" "}</span>))
 
     def masterDiv(content: Node): Node = <div class="container-fluid">{content}</div>
 

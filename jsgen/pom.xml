@@ -11,7 +11,7 @@
 
     <properties>
         <scalajs.version>0.6.18</scalajs.version>
-        <mhtml.version>0.3.2</mhtml.version>
+        <mhtml.version>0.4.0-RC1</mhtml.version>
         <circe.version>0.8.0</circe.version>
     </properties>
 

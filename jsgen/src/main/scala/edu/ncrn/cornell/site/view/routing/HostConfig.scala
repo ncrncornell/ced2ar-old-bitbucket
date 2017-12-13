@@ -84,7 +84,8 @@ object HostConfig {
 
   val defaultScheme = "https"
   val defaultHost = "localhost"
-  val defaultPort = 8080
+  def schemeToDefaultPort(scheme: String) = if (scheme == "http") 8080 else 443
+  val defaultPort = schemeToDefaultPort(defaultScheme)
   val defaultServletPath = "ced2ar-web"
 
   val apiUriApp = new SpecifyUri(
@@ -109,12 +110,6 @@ object HostConfig {
   sealed case class Host(host: String)
   sealed case class UriScheme(scheme: String)
 
-  implicit val port: Rx[Port] = currentApiUri.map{ curUri =>
-    Option(curUri.getPort) match {
-      case Some(prt) => if (prt < 0) Port(80) else Port(prt)
-      case None => Port(defaultPort)
-    }
-  }
   implicit val servletPath: Rx[ServletPath] = currentApiUri.map{ curUri =>
     Option(curUri.getPath) match {
       case Some(path) => ServletPath(path.replaceFirst("/api", "").replaceFirst("/", ""))
@@ -131,6 +126,12 @@ object HostConfig {
     Option(curUri.getScheme) match {
       case Some(scheme) => UriScheme(scheme)
       case None => UriScheme(defaultScheme)
+    }
+  }
+  implicit val port: Rx[Port] = (currentApiUri |@| uriScheme).map{ (curUri, curSchm) =>
+    Option(curUri.getPort) match {
+      case Some(prt) => if (prt < 0) Port(schemeToDefaultPort(curSchm.scheme)) else Port(prt)
+      case None => Port(defaultPort)
     }
   }
 
