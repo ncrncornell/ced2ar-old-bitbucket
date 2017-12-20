@@ -42,8 +42,12 @@ def copyFiles(
 lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
+    scalacOptions ++= Seq(
+      "-feature"
+      ,"-language:higherKinds"
+    )
     // TODO: maybe later? requires system has yarn installed:
-    useYarn := true
+    ,useYarn := true
     // Execute the tests in browser-like environment:
     ,scalaJSUseMainModuleInitializer := true
     ,jsEnv in Test := new org.scalajs.jsenv.phantomjs.PhantomJSEnv()

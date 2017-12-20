@@ -132,36 +132,44 @@ object Ced2ar {
     )}
   }
 
+
+  //
+  // Handle pre-main initialization, as required by Scala.JS:
+  //
+
+  // Load JS deps
+  private val bodyScriptContainer = dom.document.getElementById("body-scripts")
+
+  //TODO: for locally optimized js, can switch based on build settings
+  val bodyScriptUrls = Seq(
+    "./target/js/jquery.slim.min.js",
+    "./target/js/bootstrap.min.js"
+  )
+  val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
+    <script type="application/javascript" src={scriptUrl}></script>
+  ))
+  mount(bodyScriptContainer, bodyScripts)
+
+  // Load CSS deps
+  val cssUrls = Seq(
+    "./target/css/bootstrap.min.css",
+    "./target/css/bootstrap-theme.min.css"
+  )
+  dom.document.getElementsByTagName("head").headOption match {
+    case Some(head) =>
+      val linkRelCss =
+        Group(cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>))
+      mount(head, linkRelCss)
+    case None => println("WARNING: no <head> element in enclosing document!")
+  }
+
   @JSExport
   def main(args: Array[String]): Unit = {
-    println("Hello!")
-    val cssUrls = Seq(
-      "./target/css/bootstrap.min.css",
-      "./target/css/bootstrap-theme.min.css"
-    )
-
-    //TODO: for locally optimized js, can switch based on build settings
-    val bodyScriptUrls = Seq(
-      "./target/js/jquery.slim.min.js",
-      "./target/js/bootstrap.min.js"
-    )
-    val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
-      <script type="application/javascript" src={scriptUrl}></script>
-    ))
-
-    dom.document.getElementsByTagName("head").headOption match {
-      case Some(head) =>
-        val linkRelCss =
-          Group(cssUrls.map(cssUrl => <link rel="stylesheet" href={cssUrl}/>))
-        mount(head, linkRelCss)
-      case None => println("WARNING: no <head> element in enclosing document!")
-    }
+    println("Hello from CED2AR main!")
 
     val appContainer = dom.document.getElementById("application-container")
-    val bodyScriptContainer = dom.document.getElementById("body-scripts")
 
     mount(appContainer, View.index)
-    mount(bodyScriptContainer, bodyScripts)
 
   }
 }

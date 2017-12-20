@@ -37,8 +37,10 @@ object Codebook {
           <h3>
             { glyphClass.map{ gclass =>
               <a class={s"glyphicon $gclass"}
-                 href={s"#$fieldName-detail"} data-toggle="collapse"
-                 onclick={ (ev: dom.Event) => { glyphClicked.update(click => !click) } }>
+                 onclick={ (ev: dom.Event) => {
+                   JQuery(s"#$fieldName-detail").collapseToggle
+                   glyphClicked.update(click => !click) }
+                 } >
                 {fieldName}
               </a>
             }}

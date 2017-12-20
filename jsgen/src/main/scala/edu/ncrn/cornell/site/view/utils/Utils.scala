@@ -5,10 +5,42 @@ import monix.execution.Scheduler.Implicits.global
 
 import scala.collection.breakOut
 import scala.concurrent.Future
+import scala.scalajs.js
+import scala.scalajs.js.annotation.JSGlobal
 import scala.util.Try
 import scala.xml.{Group, Node}
 
 object Utils {
+
+
+  @js.native
+  sealed trait JQuery extends js.Any {
+
+    /**
+      * From Bootstrap
+      */
+    def collapse(arg: String): js.Any
+  }
+
+  @JSGlobal("jQuery")
+  @js.native
+  object JQuery extends js.Object {
+    def apply(x: String): JQuery = js.native
+
+    //TODO: not the complete API yet, should be string || "Options"
+    def collapse(arg: String): js.Any = js.native
+
+  }
+
+  implicit class JQueryExtra(val jq: JQuery) extends AnyVal {
+
+    /**
+      * From Bootstrap
+      */
+    def collapseToggle = jq.collapse("toggle")
+
+  }
+
 
   implicit class IterableMhtml[T, C[X] <: Iterable[X]](val list: C[T]) extends AnyVal {
     def mapToNode(fn: T => Node): Node =
