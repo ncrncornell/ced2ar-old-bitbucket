@@ -27,7 +27,8 @@ object Utils {
   object JQuery extends js.Object {
     def apply(x: String): JQuery = js.native
 
-    //TODO: not the complete API yet, should be string || "Options"
+    //TODO not the complete API yet, should be string || "Options":
+    //TODO https://bootstrapdocs.com/v3.3.6/docs/javascript/#collapse-methods
     def collapse(arg: String): js.Any = js.native
 
   }
@@ -60,14 +61,6 @@ object Utils {
         case None => errNode
       }
     }
-  }
-
-
-  //TODO: use version now in in mhtml:
-  def fromFuture[T](future: Future[T]): Rx[Option[Try[T]]] = {
-    val result = Var(Option.empty[Try[T]])
-    future.onComplete(x => result := Some(x))
-    result
   }
 
   def stripUriHash(uriString: String): String = {

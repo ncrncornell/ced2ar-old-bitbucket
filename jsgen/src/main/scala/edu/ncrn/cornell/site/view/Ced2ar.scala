@@ -138,20 +138,20 @@ object Ced2ar {
   //
 
   // Load JS deps
-  private val bodyScriptContainer = dom.document.getElementById("body-scripts")
-
-  //TODO: for locally optimized js, can switch based on build settings
-  val bodyScriptUrls = Seq(
-    "./target/js/jquery.slim.min.js",
-    "./target/js/bootstrap.min.js"
-  )
-  val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
-    <script type="application/javascript" src={scriptUrl}></script>
-  ))
-  mount(bodyScriptContainer, bodyScripts)
+//  private val bodyScriptContainer = dom.document.getElementById("body-scripts")
+//
+//  //TODO: for locally optimized js, can switch based on build settings
+//  private val bodyScriptUrls = Seq(
+//    "./target/js/jquery.slim.min.js",
+//    "./target/js/bootstrap.min.js"
+//  )
+//  private val bodyScripts = Group( bodyScriptUrls.map(scriptUrl =>
+//    <script type="application/javascript" src={scriptUrl} defer="defer"></script>
+//  ))
+//  mount(bodyScriptContainer, bodyScripts)
 
   // Load CSS deps
-  val cssUrls = Seq(
+  private val cssUrls = Seq(
     "./target/css/bootstrap.min.css",
     "./target/css/bootstrap-theme.min.css"
   )

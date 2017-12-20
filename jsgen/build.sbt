@@ -49,7 +49,6 @@ lazy val view = (project in file("."))
     // TODO: maybe later? requires system has yarn installed:
     ,useYarn := true
     // Execute the tests in browser-like environment:
-    ,scalaJSUseMainModuleInitializer := true
     ,jsEnv in Test := new org.scalajs.jsenv.phantomjs.PhantomJSEnv()
     ,scalaJSUseMainModuleInitializer := true
     ,copyCss <<= (baseDirectory, target, streams) map {

@@ -7,6 +7,7 @@ import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import io.circe.parser._
 import mhtml._
+import mhtml.future.syntax._
 import monix.execution.Scheduler.Implicits.global
 import org.scalajs.dom
 
@@ -23,7 +24,7 @@ object Variable {
     )
 
     val details: Rx[VarDetails] = request.flatMap(req =>
-      Utils.fromFuture(req.send()).map {
+      req.send().toRx.map {
         case Some(resTry) => resTry match {
           case res: Success[SimpleHttpResponse] =>
             decode[VarDetails](res.get.body) match {

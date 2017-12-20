@@ -5,6 +5,7 @@ import edu.ncrn.cornell.site.view.utils.Utils
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import mhtml.Rx
+import mhtml.future.syntax._
 import io.circe._
 import io.circe.generic.auto._
 import io.circe.parser._
@@ -23,7 +24,7 @@ object Request {
   : Rx[I[B]] = {
     def emptyIter: I[B] = cbf().result()
     reqRx.flatMap(req =>
-      Utils.fromFuture(req.send()).map {
+      req.send().toRx.map {
         case Some(resTry) => resTry match {
           case res: Success[SimpleHttpResponse] =>
             decodeIterable[B, I](res.get.body)
