@@ -28,25 +28,28 @@ object Codebook {
 
       val glyphClicked: Var[Boolean] = Var(false)
       val glyphClass: Rx[String] = glyphClicked.map {
-        case false => "glyphicon-menu-right"
-        case true => "glyphicon-menu-down"
+        case false => "glyphicon glyphicon-menu-right"
+        case true => "glyphicon glyphicon-menu-down"
+      }
+      val showStyle: Rx[String] = glyphClicked.map {
+        case false => "display: none;"
+        case true  => "display: block;"
       }
 
       if (collapsibleFields.contains(fieldName))
         <div>
           <h3>
-            { glyphClass.map{ gclass =>
-              <a class={s"glyphicon $gclass"}
-                 onclick={ (ev: dom.Event) => {
-                   JQuery(s"#$fieldName-detail").collapseToggle
-                   glyphClicked.update(click => !click) }
-                 } >
-                {fieldName}
-              </a>
-            }}
-            <div id={s"$fieldName-detail"} class="collapse">
+            <a class={ glyphClass }
+               onclick={ (ev: dom.Event) => {
+                 glyphClicked.update(click => !click) }
+               } >
+              {fieldName}
+            </a>
+
+            <div id={s"$fieldName-detail"} style={ showStyle }>
               <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
             </div>
+
           </h3>
         </div>
       else

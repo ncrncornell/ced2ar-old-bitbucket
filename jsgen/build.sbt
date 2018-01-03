@@ -14,8 +14,7 @@ val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
 val cssInPaths = Map(
   "bootstrap/dist/css" -> "/css/",
   "bootstrap/dist/js" -> "/js/",
-  "bootstrap/dist/fonts" -> "/fonts/",
-  "jquery/dist" -> "/js/"
+  "bootstrap/dist/fonts" -> "/fonts/"
 )
 val apiSourceDir = "../services-core/src/main/java/edu/ncrn/cornell/service"
 val sourceDirMap = Map("api" -> "/edu/ncrn/cornell/service/api/")
@@ -43,8 +42,10 @@ lazy val view = (project in file("."))
   .enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin)
   .settings(
     scalacOptions ++= Seq(
-      "-feature"
+      "-deprecation"
+      ,"-feature"
       ,"-language:higherKinds"
+      ,"-language:implicitConversions"
     )
     // TODO: maybe later? requires system has yarn installed:
     ,useYarn := true
@@ -60,6 +61,7 @@ lazy val view = (project in file("."))
         copyFiles(base, trg, strms, apiSourceDir, sourceDirMap)
     }
     ,webpackConfigFile in fullOptJS := Some(baseDirectory.value / "prod.webpack.config.js")
+    ,webpackBundlingMode in fastOptJS := BundlingMode.Application
     ,webpackConfigFile in fastOptJS := Some(baseDirectory.value / "dev.webpack.config.js")
     ,libraryDependencies ++= Seq(
       "in.nvilla" %%% "monadic-rx-cats" % mhtmlV,
@@ -75,7 +77,6 @@ lazy val view = (project in file("."))
       "io.circe" %%% "circe-parser"
     ).map(_ % circeVersion)
     ,npmDependencies in Compile ++= Seq(
-      "bootstrap" -> "3.3.7",
-      "jquery" -> "3.2.1"
+      "bootstrap" -> "3.3.7"
     )
   )
