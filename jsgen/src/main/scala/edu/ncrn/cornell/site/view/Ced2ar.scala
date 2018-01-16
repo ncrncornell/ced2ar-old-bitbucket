@@ -3,18 +3,21 @@
 package edu.ncrn.cornell.site.view
 
 
+import java.net.URI
+
 import scala.xml._
 import mhtml._
 import cats.implicits._
 import edu.ncrn.cornell.site.view.component._
 import edu.ncrn.cornell.site.view.component.editor.{Editor, NeptuneStyles}
-import edu.ncrn.cornell.site.view.routing.{HostConfig, Router}
+import edu.ncrn.cornell.site.view.routing.{HostConfig, Router, Routes}
 import edu.ncrn.cornell.site.view.utils.Utils._
 import mhtml.implicits.cats._
 import org.scalajs.dom
 import org.scalajs.dom.{DOMList, Event, KeyboardEvent, html}
 import org.scalajs.dom.ext.KeyCode
 import org.scalajs.dom.ext.LocalStorage
+import scala.scalajs.js.timers._
 import org.scalajs.dom.ext.PimpedNodeList
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -70,11 +73,12 @@ object Ced2ar {
           </li>
           {
             val navItems = Map[String, String](
-              "Browse by Codebook" ->  "#/codebook",
-              "Browse by Variable" -> "#/var",
+              "Browse by Codebook" ->  s"#/${Routes.codebook}",
+              "Browse by Variable" -> s"#/${Routes.variable}",
               "Upload a Codebook" -> "/upload",
               "Documentation" -> "#",
-              "About" -> "#/about"
+              "About" -> s"#/${Routes.about}",
+              "Settings" -> s"#/${Routes.config}"
             )
             Group(navItems.toSeq.map(nItem =>  Group(
                 <li class="divider-vertical hidden-xs"/>
@@ -88,17 +92,9 @@ object Ced2ar {
 
     val testEditor = Editor.editor()
 
-    val configView = <div>
-      <p>
-        {HostConfig.currentApiUri.map { curUri =>
-          s"Current API URI: ${curUri.toString}"
-        }}
-      </p>
-      {HostConfig.apiUriApp.app._1}
-    </div>
+    val configComp = Config()
 
     val demoView = <div>
-      {configView}
       <h2>Demo editor</h2>
       {testEditor.view()}
       <h3>Begin editor output</h3>
@@ -112,11 +108,27 @@ object Ced2ar {
       val (curPathRx, childPathRx) = Router.splitRoute(path)
       lazy val codebookList = CodebookList(childPathRx)
       lazy val varList = VariableList(None, childPathRx)
-      curPathRx.map{curPath =>
-        if (curPath == "about") aboutComp.view()
-        else if (curPath == "codebook") codebookList.view()
-        else if (curPath == "var") varList.view()
-        else demoView
+      curPathRx.flatMap{curPath =>
+        if (curPath == Routes.about) Rx(aboutComp.view())
+        else if (curPath == Routes.codebook) Rx(codebookList.view())
+        else if (curPath == Routes.variable) Rx(varList.view())
+        else if (curPath == Routes.config) Rx(configComp.view())
+        else {
+          HostConfig.currentApiUri.flatMap{curUri =>
+            println(s"main page's currentApiSource is ${curUri}") // DEBUG
+            setTimeout(5 * 1000) {
+
+            }
+            val goodApiUriMaybe = HostConfig.checkApiUri(curUri.toString)
+            goodApiUriMaybe.map {
+              case _: Some[URI] =>
+                dom.window.location.hash = "#/" + Routes.codebook
+              case None =>
+                //TODO: not working, need to change currentApiUri to use Diode's Pot
+                dom.window.location.hash = "#/" + Routes.config
+            }.map(_ => <div>Unreached</div>)
+          }
+        }
       }.toNode()
     }
     val router = Router(Router.routePath, thisRoute)

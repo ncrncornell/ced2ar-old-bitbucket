@@ -67,6 +67,7 @@ object HostConfig {
     * @return
     */
   def checkApiUri(uriString: String): Rx[Option[URI]] = {
+    //TODO: not working for some uses, need to change currentApiUri to use Diode's Pot
     val uriMaybe: Rx[Option[URI]] = try {
       val uri = URI.create(stripUriHash(uriString))
       println(s"checkApiUri created uri has hash = ${System.identityHashCode(uri)}")
@@ -82,9 +83,9 @@ object HostConfig {
       })
       testResult.map {
         case None => None
-        case Some(success) if success => Some(uri)
-        case Some(failure) => None
-      }
+        case Some(true) => Some(uri)
+        case Some(false) => None
+      }.impure.sharing
     } catch {
       case ex: IllegalArgumentException => Rx(None)
     }
@@ -121,29 +122,12 @@ object HostConfig {
     holder.hvar.dropRepeats.impure.sharing.map{x => println(s"DropRepeat out: $x"); x} // DEBUG
   }
 
-  //TODO: we don't want a foldp here - we want to change to (local internal) Var and do a conditional update !!!!!!!!!!!!!!!!!!!!!
-
-//  val currentApiUri: Rx[URI] = (checkApiUri(localApiUri)
-//    |@| apiUriApp.app._2.flatMap(uri => checkApiUri(uri.toString))
-//    ).map{
-//    case (Some(lUri), Some(sUri)) => sUri
-//    case (Some(lUri), None) => lUri
-//    case (None, Some(sUri)) => sUri
-//    case (None, None) => defaultUri
-//  }.foldp(defaultUri){(curUriObj, newUriObj) =>
-//    if (curUriObj.toString == newUriObj.toString) curUriObj
-//    else newUriObj
-//  }.dropRepeats.map{ capiUri =>
-//    // DEBUG
-//    println(s"current API URI is $capiUri; hash = ${System.identityHashCode(capiUri)}")
-//    capiUri
-//  }
 
   def keepUri(uris: Comp[URI]): Boolean = uris.oldA == uris.newA
 
-  val currentApiSource: Rx[URI] = (checkApiUri(localApiUri)
+  private val currentApiSource: Rx[URI] = (checkApiUri(localApiUri)
     |@| apiUriApp.app._2.flatMap(uri => checkApiUri(uri.toString))
-    ).map{
+  ).map{
     case (Some(lUri), Some(sUri)) => sUri
     case (Some(lUri), None) => lUri
     case (None, Some(sUri)) => sUri

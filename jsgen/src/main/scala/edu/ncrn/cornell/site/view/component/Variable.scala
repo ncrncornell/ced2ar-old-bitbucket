@@ -1,18 +1,18 @@
 package edu.ncrn.cornell.site.view.component
 
 import edu.ncrn.cornell.service.api._
-import edu.ncrn.cornell.site.view.routing.{EndPoints, HostConfig}
-import edu.ncrn.cornell.site.view.utils.Utils
+import edu.ncrn.cornell.site.view.routing.EndPoints
+import edu.ncrn.cornell.site.view.utils.Field.renderField
+
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.response.SimpleHttpResponse
 import io.circe.parser._
 import mhtml._
 import mhtml.future.syntax._
 import monix.execution.Scheduler.Implicits.global
-import org.scalajs.dom
 
 import scala.util.{Failure, Success}
-import scala.xml.{Group, Node, Text}
+import scala.xml.Node
 
 
 object Variable {
@@ -46,44 +46,10 @@ object Variable {
   def view(details: Rx[VarDetails], cbHandle: CodebookId): Node = {
     val collapsibleFields = Set("Values")
 
-    def renderField(fieldName: VarNameId, fieldValues: List[VarValue]): Node = {
-
-      val glyphClicked: Var[Boolean] = Var(false)
-      val glyphClass: Rx[String] = glyphClicked.map {
-        case false => "glyphicon-menu-right"
-        case true => "glyphicon-menu-down"
-      }
-
-      if (collapsibleFields.contains(fieldName))
-        <div>
-          <h3>
-            { glyphClass.map{ gclass =>
-              <a class={s"glyphicon $gclass"}
-                 href={s"#$fieldName-detail"} data-toggle="collapse"
-                 onclick={ (ev: dom.Event) => { glyphClicked.update(click => !click) } }>
-                {fieldName}
-              </a>
-            }}
-            <div id={s"$fieldName-detail"} class="collapse">
-              <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
-            </div>
-          </h3>
-        </div>
-      else
-        <div>
-          <h3>
-            {fieldName}
-          </h3>
-          <p>
-            {fieldValues.mkString("\n")}
-          </p>
-        </div>
-    }
-
     <div>
       <div>
         { details.map(vd => vd.map {
-          case (fieldName, fieldValues) => renderField(fieldName, fieldValues)
+          case (fieldName, fieldValues) => renderField(fieldName, fieldValues, collapsibleFields)
         })}
       </div>
     </div>

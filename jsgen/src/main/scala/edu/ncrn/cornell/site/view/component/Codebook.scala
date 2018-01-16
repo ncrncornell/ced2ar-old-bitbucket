@@ -4,10 +4,10 @@ import edu.ncrn.cornell.service.api._
 import edu.ncrn.cornell.site.view.comm.Request.requestDecodeIterable
 import edu.ncrn.cornell.site.view.routing.{EndPoints, Router}
 import edu.ncrn.cornell.site.view.utils.Utils._
+import edu.ncrn.cornell.site.view.utils.Field.renderField
 
-import scala.xml.{Group, Node, Text}
+import scala.xml.Node
 import mhtml._
-import org.scalajs.dom
 import fr.hmil.roshttp.HttpRequest
 
 
@@ -24,52 +24,14 @@ object Codebook {
   def view(details: Rx[CodebookDetails], cbHandle: CodebookId): Node = {
     val collapsibleFields = Set("Files")
 
-    def renderField(fieldName: String, fieldValues: List[String]): Node = {
-
-      val glyphClicked: Var[Boolean] = Var(false)
-      val glyphClass: Rx[String] = glyphClicked.map {
-        case false => "glyphicon glyphicon-menu-right"
-        case true => "glyphicon glyphicon-menu-down"
-      }
-      val showStyle: Rx[String] = glyphClicked.map {
-        case false => "display: none;"
-        case true  => "display: block;"
-      }
-
-      if (collapsibleFields.contains(fieldName))
-        <div>
-          <h3>
-            <a class={ glyphClass }
-               onclick={ (ev: dom.Event) => {
-                 glyphClicked.update(click => !click) }
-               } >
-              {fieldName}
-            </a>
-
-            <div id={s"$fieldName-detail"} style={ showStyle }>
-              <p>{ fieldValues.map(fv => Group(Seq(Text(fv), <br />))) }</p>
-            </div>
-
-          </h3>
-        </div>
-      else
-        <div>
-          <h3>
-            {fieldName}
-          </h3>
-          <p>
-            {fieldValues.mkString("\n")}
-          </p>
-        </div>
-    }
-
     <div>
       <div>
         <a href={s"#/codebook/$cbHandle/var"}>View Variables</a>
       </div>
       <div>
         {details.map(cd => cd.map {
-        case (fieldName, fieldValues) => renderField(fieldName, fieldValues)
+        case (fieldName, fieldValues) =>
+          renderField(fieldName, fieldValues, collapsibleFields)
       })}
       </div>
     </div>
