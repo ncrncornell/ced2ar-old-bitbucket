@@ -94,7 +94,7 @@ object Editor {
     document.execCommand(command, false, value)
   }
 
-  def editor(settings: Settings = Settings()): Component[String] = {
+  def editor(settings: Settings = Settings(), initText: String = ""): Component[String] = {
 
     stylesLoaded.isCompleted match {
       case true => ()
@@ -113,9 +113,10 @@ object Editor {
       }
     }</div>
 
-    val content: Var[String] = Var("")
+    val content: Var[String] = Var(initText)
 
     def updateContent(domNode: Div): Unit = {
+      domNode.innerHTML = initText
       def observerCallback(muts: js.Array[MutationRecord], obs: MutationObserver) = {
         content := domNode.innerHTML
       }

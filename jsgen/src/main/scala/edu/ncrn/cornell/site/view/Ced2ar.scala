@@ -89,19 +89,7 @@ object Ced2ar {
       </div>
     </nav>
 
-
-    val testEditor = Editor.editor()
-
     val configComp = Config()
-
-    val demoView = <div>
-      <h2>Demo editor</h2>
-      {testEditor.view()}
-      <h3>Begin editor output</h3>
-      {testEditor.model()}
-      <h3>End editor output</h3>
-    </div>
-
     val aboutComp = About()
 
     private def thisRoute(path: Rx[String]): Node = {
