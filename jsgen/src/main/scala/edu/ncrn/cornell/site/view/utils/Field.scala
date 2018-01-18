@@ -27,17 +27,17 @@ object Field {
       case true => "glyphicon glyphicon-minus"
     }
 
-    val glyphClicked: Var[Boolean] = Var(false)
-    val glyphClass: Rx[String] = glyphClicked.map {
+    val showClicked: Var[Boolean] = Var(false)
+    val showClass: Rx[String] = showClicked.map {
       case false => "glyphicon glyphicon-menu-right"
       case true => "glyphicon glyphicon-menu-down"
     }
-    val showStyle: Rx[String] = glyphClicked.map {
+    val showStyle: Rx[String] = showClicked.map {
       case false => "display: none;"
       case true => "display: block;"
     }
 
-    val viewfield = {
+    val viewField = {
       if (collapsibleFields.contains(fieldName))
         <div id={s"$fieldName-detail"} style={showStyle}>
           <p>
@@ -52,15 +52,22 @@ object Field {
         </div>
     }
 
+    //FIXME: prevent field edits from being lost when "minimized" (switched to viewField)
+    val editField = makeFieldEditor(fieldName, fieldValues)
+
     <div>
-      <h3> {
-        if (collapsibleFields.contains(fieldName))
-          <a class={glyphClass}
-             onclick={(ev: dom.Event) => {
-               glyphClicked.update(click => !click)
-             }}>
-          </a>
-          fieldName
+      <h3>
+        {
+          val showGlyph =
+            if (collapsibleFields.contains(fieldName)) {
+              Some(<a class={showClass}
+                onclick={(ev: dom.Event) => {
+                  showClicked.update(click => !click)
+                }}>
+              </a>)
+            }
+            else None
+          <span>{ showGlyph} { fieldName }</span>
         }
         <a class={editIconClass}
            onclick={(ev: dom.Event) => {
@@ -70,15 +77,15 @@ object Field {
       </h3>
       {
         editing.map{
-          case false => viewfield
-          case true => editField(fieldName, fieldValues)
+          case false => viewField
+          case true => editField
         }
       }
     </div>
 
   }
 
-  def editField(
+  def makeFieldEditor(
     fieldName: String,
     fieldValues: List[String]
   ): Node = {
@@ -86,9 +93,9 @@ object Field {
     // TODO: only supports one field value currently
     val varEditor = Editor.editor(Settings(), fieldValues.head)
     <div>
-      <h2>
-        {fieldName}
-      </h2>{varEditor.view()}<h3>XML Output</h3>{varEditor.model()}
+      { varEditor.view() }
+      <h3>XML Output</h3>
+      { varEditor.model() }
     </div>
   }
 }
