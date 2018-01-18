@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <properties>
-        <scalajs.version>0.6.18</scalajs.version>
+        <scalajs.version>0.6.21</scalajs.version>
         <mhtml.version>0.4.0-RC1</mhtml.version>
         <circe.version>0.8.0</circe.version>
     </properties>

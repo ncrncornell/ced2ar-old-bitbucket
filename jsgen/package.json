@@ -1,9 +1,30 @@
 {
-  "private": true,
-  "dependencies": {
-    "todomvc-app-css": "^2.0.4",
-    "todomvc-common": "^1.0.1"
+  "name": "CED2AR",
+  "version": "0.0.1",
+  "description": "CED2AR v3 Single Page Application",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
   },
-  "license": " Apache-2.0"
+  "dependencies": {
+    "jsdom": "^11.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://bebarker@bitbucket.org/ncrncornell/ced2ar.git"
+  },
+  "keywords": [
+    "scala.js",
+    "rx"
+  ],
+  "author": "Brandon Elam Barker",
+  "license": " CC-BY-NC-SA-4.0",
+  "bugs": {
+    "url": "https://jira.cornell.edu/browse/CDR-85"
+  },
+  "homepage": "https://www.ncrn.cornell.edu/"
 }
-

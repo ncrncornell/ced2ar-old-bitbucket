@@ -5,8 +5,10 @@ import org.scalajs.dom
 import dom.{document, window}
 import dom.raw.{MouseEvent, MutationObserver, MutationObserverInit, MutationRecord}
 import edu.ncrn.cornell.site.view.component.Component
+import edu.ncrn.cornell.site.view.utils.Utils._
 import mhtml.{Rx, Var}
 import org.scalajs.dom.html.Div
+import org.scalajs.dom.raw.{DOMParser, XMLSerializer}
 
 import scala.concurrent.{Future, Promise}
 import scala.xml.Node
@@ -94,7 +96,11 @@ object Editor {
     document.execCommand(command, false, value)
   }
 
+
   def editor(settings: Settings = Settings(), initText: String = ""): Component[String] = {
+
+    implicit val parser: DOMParser = new DOMParser()
+    implicit val serializer: XMLSerializer = new XMLSerializer()
 
     stylesLoaded.isCompleted match {
       case true => ()
@@ -113,12 +119,12 @@ object Editor {
       }
     }</div>
 
-    val content: Var[String] = Var(initText)
+    val content: Var[String] = Var(htmlToXHML(initText))
 
     def updateContent(domNode: Div): Unit = {
       domNode.innerHTML = initText
       def observerCallback(muts: js.Array[MutationRecord], obs: MutationObserver) = {
-        content := domNode.innerHTML
+        content := htmlToXHML(domNode.innerHTML)
       }
       val contentObserver: MutationObserver = new MutationObserver(observerCallback _)
       val contentObserverParams = new js.Object{

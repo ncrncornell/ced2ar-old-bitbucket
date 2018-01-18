@@ -9,6 +9,11 @@ lazy val mhtmlV = "0.4.0-RC1" //TODO: also set from mvn if possible
 
 val circeVersion = "0.8.0"
 
+lazy val testSettings = Seq(
+  testOptions  in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF"),
+  scalaJSStage in Test := FastOptStage,
+  jsEnv        in Test := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv())
+
 lazy val copyCss = TaskKey[Unit]("copyCss")
 val nodeModulesDir = "target/scala-2.12/scalajs-bundler/main/node_modules"
 val cssInPaths = Map(
@@ -69,7 +74,8 @@ lazy val view = (project in file("."))
       "com.lihaoyi" %%% "upickle" % "0.4.4",
       "fr.hmil" %%% "roshttp" % "2.0.1",
       "io.monix" %%% "monix" % "2.2.3",
-      "com.github.japgolly.scalacss" %%% "core" % "0.5.3"
+      "com.github.japgolly.scalacss" %%% "core" % "0.5.3",
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
     )
     ,libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
@@ -80,3 +86,4 @@ lazy val view = (project in file("."))
       "bootstrap" -> "3.3.7"
     )
   )
+  .settings(testSettings: _*)
