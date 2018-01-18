@@ -75,7 +75,7 @@ lazy val view = (project in file("."))
       "fr.hmil" %%% "roshttp" % "2.0.1",
       "io.monix" %%% "monix" % "2.2.3",
       "com.github.japgolly.scalacss" %%% "core" % "0.5.3",
-      "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test"
     )
     ,libraryDependencies ++= Seq(
       "io.circe" %%% "circe-core",
