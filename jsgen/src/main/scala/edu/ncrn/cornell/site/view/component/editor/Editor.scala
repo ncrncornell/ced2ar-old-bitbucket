@@ -119,12 +119,12 @@ object Editor {
       }
     }</div>
 
-    val content: Var[String] = Var(htmlToXHML(initText))
+    val content: Var[String] = Var(htmlToXHTML(initText))
 
     def updateContent(domNode: Div): Unit = {
       domNode.innerHTML = initText
       def observerCallback(muts: js.Array[MutationRecord], obs: MutationObserver) = {
-        content := htmlToXHML(domNode.innerHTML)
+        content := htmlToXHTML(domNode.innerHTML)
       }
       val contentObserver: MutationObserver = new MutationObserver(observerCallback _)
       val contentObserverParams = new js.Object{

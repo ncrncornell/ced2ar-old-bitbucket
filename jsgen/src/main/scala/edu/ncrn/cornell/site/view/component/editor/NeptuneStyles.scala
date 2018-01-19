@@ -18,7 +18,6 @@ object NeptuneStyles extends StyleSheet.Inline {
   val neptuneBoxShadow = s"0 2px 3px ${neptuneBorderColor.value}, 0 0 0 1px ${neptuneBorderColor.value}"
   val neptuneButtonHeight = 30 px
   val neptuneButtonWidth = 30 px
-  val neptuneContentHeight = 300 px
   val neptuneContentPadding = 10 px
 
   val neptune = style(
@@ -30,7 +29,6 @@ object NeptuneStyles extends StyleSheet.Inline {
 
   val neptuneContent = style(
     boxSizing.borderBox,
-    height(neptuneContentHeight),
     outline.none,
     overflowY.auto,
     padding(neptuneContentPadding),

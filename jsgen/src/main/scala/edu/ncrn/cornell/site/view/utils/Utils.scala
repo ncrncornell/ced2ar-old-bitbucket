@@ -42,7 +42,7 @@ object Utils {
       XPathResult.FIRST_ORDERED_NODE_TYPE, null
     )
 
-  def htmlToXHML(input: String)
+  def htmlToXHTML(input: String)
   (implicit parser: DOMParser, serializer: XMLSerializer): String = {
     val doc = parser.parseFromString(input, "text/html")
     val body = getElementByXpath("/html/body", doc).singleNodeValue
