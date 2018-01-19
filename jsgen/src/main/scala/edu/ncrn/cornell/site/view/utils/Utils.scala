@@ -1,17 +1,13 @@
 package edu.ncrn.cornell.site.view.utils
 
 import mhtml._
-import monix.execution.Scheduler.Implicits.global
-import org.scalajs.dom.raw.{XPathNSResolver, XPathResult}
+import org.scalajs.dom.raw.{NodeList, XPathNSResolver, XPathResult}
 
 import scala.collection.breakOut
-import scala.concurrent.Future
-import scala.scalajs.js
-import scala.scalajs.js.annotation.{JSGlobal, JSImport}
-import org.scalajs.dom.{DOMParser, Document, XMLSerializer, document, Node => DomNode}
+import org.scalajs.dom.{DOMList, DOMParser, Document, Element, XMLSerializer, document, Node => DomNode}
 
-import scala.util.Try
 import scala.xml.{Group, Node}
+import org.scalajs.dom.ext._
 
 object Utils {
 
@@ -48,6 +44,15 @@ object Utils {
     val body = getElementByXpath("/html/body", doc).singleNodeValue
     val bodyXmlString = serializer.serializeToString(body)
     val xmldoc = parser.parseFromString(bodyXmlString, "application/xml")
+    // TODO: can't seem to strip xmlns attributes
+    //    val xmlDocElems: NodeList = xmldoc.getElementsByTagName("*")
+    //    xmlDocElems.foreach{
+    //      case elem: Element =>
+    //        elem.removeAttribute("xmlns")
+    //        // Tried elem.setAttribute("xmlns", ""), but the result is weird
+    //        println(s"Found element $elem with html: ${elem.outerHTML}")
+    //      case node => println(s"Warning: found unexpected non-element node: $node.")
+    //    }
     xmldoc.firstElementChild.innerHTML
   }
 
