@@ -91,6 +91,10 @@ object Field {
   ): Node = {
 
     // TODO: only supports one field value currently
+    // TODO: Ideally, we will solves the "component of components" problem before tackling this,
+    // TODO: so that we can have multiple subfield components within one editor, with the edit bar
+    // TODO: being shared among all subfield components
+
     val varEditor = Editor.editor(Settings(), fieldValues.head)
     <div>
       { varEditor.view() }

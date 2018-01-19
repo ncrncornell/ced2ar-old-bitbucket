@@ -42,6 +42,9 @@ object Editor {
   case class Settings(actions: Seq[Action] = actions, styleWithCss: Boolean = false)
 
   val actions = Seq(
+    Act(<b>💾</b>, "Save") {
+      () => Unit // TODO: Unimplemented
+    },
     Act(<b>B</b>, "Bold") {
       exec("bold")
     },
